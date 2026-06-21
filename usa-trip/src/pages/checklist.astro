@@ -112,11 +112,17 @@ const categoriesJson = JSON.stringify(checklistCategories);
     // Checkbox change handler
     document.querySelectorAll('.check-input').forEach(input => {
       input.addEventListener('change', () => {
-        const state = loadState();
-        state[input.dataset.id] = input.checked;
-        saveState(state);
-        input.closest('li').classList.toggle('checked', input.checked);
-        updateProgress(state);
+        const newChecked = input.checked;
+        input.checked = !newChecked;
+        const requireAuth = window.piiRequireAuth || (cb => cb());
+        requireAuth(() => {
+          const state = loadState();
+          state[input.dataset.id] = newChecked;
+          saveState(state);
+          input.checked = newChecked;
+          input.closest('li').classList.toggle('checked', newChecked);
+          updateProgress(state);
+        });
       });
     });
 
@@ -134,12 +140,15 @@ const categoriesJson = JSON.stringify(checklistCategories);
 
     // Reset
     document.getElementById('reset-btn').addEventListener('click', () => {
-      if (!confirm('Reset all checklist items?')) return;
-      const empty = {};
-      saveState(empty);
-      document.querySelectorAll('.check-input').forEach(i => { i.checked = false; });
-      document.querySelectorAll('.check-item').forEach(i => i.classList.remove('checked'));
-      updateProgress(empty);
+      const requireAuth = window.piiRequireAuth || (cb => cb());
+      requireAuth(() => {
+        if (!confirm('Reset all checklist items?')) return;
+        const empty = {};
+        saveState(empty);
+        document.querySelectorAll('.check-input').forEach(i => { i.checked = false; });
+        document.querySelectorAll('.check-item').forEach(i => i.classList.remove('checked'));
+        updateProgress(empty);
+      });
     });
   }
 

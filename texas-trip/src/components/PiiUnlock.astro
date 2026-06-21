@@ -196,6 +196,13 @@ const passEl = document.getElementById('pii-pass') as HTMLInputElement;
 const errEl  = document.getElementById('pii-error')!;
 const cancel = document.getElementById('pii-cancel')!;
 
+let pendingCallback: (() => void) | null = null;
+(window as any).piiRequireAuth = (callback: () => void) => {
+  if (sessionStorage.getItem(SS_KEY)) { callback(); return; }
+  pendingCallback = callback;
+  passEl.value = ''; errEl.hidden = true; dialog.showModal(); passEl.focus();
+};
+
 loadKey().then(key => { if (key) applyPii(key); });
 
 fab.addEventListener('click', () => {
@@ -226,6 +233,7 @@ form.addEventListener('submit', async (e) => {
       storeKey(key);
       await applyPii(key);
       dialog.close();
+      if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
       return;
     }
     const first = testEls[0].dataset.pii!;
@@ -233,6 +241,7 @@ form.addEventListener('submit', async (e) => {
     storeKey(key);
     await applyPii(key);
     dialog.close();
+    if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
   } catch {
     errEl.hidden = false;
     passEl.select();

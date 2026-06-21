@@ -143,12 +143,15 @@ const catMeta = budgetCategories.map(cat => ({
 
       listEl.querySelectorAll('.exp-delete').forEach(btn => {
         btn.addEventListener('click', () => {
-          const id = btn.dataset.id;
-          const arr = loadExpenses().filter(e => e.id !== id);
-          localStorage.setItem(EXP_KEY, JSON.stringify(arr));
-          renderExpenses();
-          updateSummary();
-          renderCharts(loadExpenses());
+          const requireAuth = (window as any).piiRequireAuth || ((cb: () => void) => cb());
+          requireAuth(() => {
+            const id = btn.dataset.id;
+            const arr = loadExpenses().filter(e => e.id !== id);
+            localStorage.setItem(EXP_KEY, JSON.stringify(arr));
+            renderExpenses();
+            updateSummary();
+            renderCharts(loadExpenses());
+          });
         });
       });
     }

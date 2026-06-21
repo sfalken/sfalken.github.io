@@ -362,10 +362,13 @@ const seedJson = JSON.stringify(seedExpenses);
   };
 
   window.deleteExpense = function(id) {
-    if (!confirm('Delete this expense?')) return;
-    const expenses = getExpenses().filter(e => e.id !== id);
-    saveExpenses(expenses);
-    renderAll();
+    const requireAuth = window.piiRequireAuth || (cb => cb());
+    requireAuth(() => {
+      if (!confirm('Delete this expense?')) return;
+      const expenses = getExpenses().filter(e => e.id !== id);
+      saveExpenses(expenses);
+      renderAll();
+    });
   };
 
   function seedKnownExpenses() {

@@ -93,6 +93,7 @@
   }
 
   let currentKey: CryptoKey | null = null;
+  let pendingCallback: (() => void) | null = null;
 
   async function unlock(password: string) {
     const key = await deriveKey(password);
@@ -135,6 +136,15 @@
 
     observer.observe(document.body, { childList: true, subtree: true });
 
+    (window as any).piiRequireAuth = (callback: () => void) => {
+      if (sessionStorage.getItem(SESSION_KEY)) { callback(); return; }
+      pendingCallback = callback;
+      if (pwInput) pwInput.value = '';
+      if (errorEl) errorEl.hidden = true;
+      dialog?.showModal();
+      setTimeout(() => pwInput?.focus(), 50);
+    };
+
     const stored = await loadKey();
     if (stored) {
       currentKey = stored;
@@ -162,6 +172,7 @@
         await unlock(pw);
         dialog?.close();
         if (errorEl) errorEl.hidden = true;
+        if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
       } catch {
         if (errorEl) errorEl.hidden = false;
       } finally {

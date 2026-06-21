@@ -178,14 +178,16 @@ const today = new Date().toISOString().split('T')[0];
 
       errorEl.style.display = 'none';
 
-      const expenses = loadExpenses();
-      expenses.push({ amount, category, label, date, id: Date.now() });
-      saveExpenses(expenses);
-
-      successDetail.textContent = `${formatUSD(amount)} · ${label}`;
-      form.style.display = 'none';
-      successMsg.style.display = 'flex';
-      renderRecent();
+      const requireAuth = window.piiRequireAuth || (cb => cb());
+      requireAuth(() => {
+        const expenses = loadExpenses();
+        expenses.push({ amount, category, label, date, id: Date.now() });
+        saveExpenses(expenses);
+        successDetail.textContent = `${formatUSD(amount)} · ${label}`;
+        form.style.display = 'none';
+        successMsg.style.display = 'flex';
+        renderRecent();
+      });
     });
 
     addAnother.addEventListener('click', () => {

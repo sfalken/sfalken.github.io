@@ -217,10 +217,13 @@ const totalEstimated = budgetCategories.reduce(
 
       logEl.querySelectorAll('.exp-del-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const all = loadExpenses();
-          all.splice(Number(btn.dataset.index), 1);
-          localStorage.setItem(EXPENSE_KEY, JSON.stringify(all));
-          init();
+          const requireAuth = window.piiRequireAuth || (cb => cb());
+          requireAuth(() => {
+            const all = loadExpenses();
+            all.splice(Number(btn.dataset.index), 1);
+            localStorage.setItem(EXPENSE_KEY, JSON.stringify(all));
+            init();
+          });
         });
       });
     }

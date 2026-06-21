@@ -100,9 +100,12 @@ const categories = budgetCategories.map(c => ({ id: c.id, label: c.label }));
 
     el.querySelectorAll<HTMLButtonElement>('.del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const id = btn.dataset.id!;
-        saveExpenses(loadExpenses().filter(e => e.id !== id));
-        renderRecent();
+        const requireAuth = (window as any).piiRequireAuth || ((cb: () => void) => cb());
+        requireAuth(() => {
+          const id = btn.dataset.id!;
+          saveExpenses(loadExpenses().filter(e => e.id !== id));
+          renderRecent();
+        });
       });
     });
   }
@@ -118,18 +121,18 @@ const categories = budgetCategories.map(c => ({ id: c.id, label: c.label }));
       amount:      parseFloat((form.elements.namedItem('amount') as HTMLInputElement).value),
       currency:    'USD',
     };
-    const arr = loadExpenses();
-    arr.push(expense);
-    saveExpenses(arr);
-
-    form.reset();
-    dateInput.value = new Date().toISOString().slice(0, 10);
-
-    const success = document.getElementById('log-success')!;
-    success.hidden = false;
-    setTimeout(() => { success.hidden = true; }, 2500);
-
-    renderRecent();
+    const requireAuth = (window as any).piiRequireAuth || ((cb: () => void) => cb());
+    requireAuth(() => {
+      const arr = loadExpenses();
+      arr.push(expense);
+      saveExpenses(arr);
+      form.reset();
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      const success = document.getElementById('log-success')!;
+      success.hidden = false;
+      setTimeout(() => { success.hidden = true; }, 2500);
+      renderRecent();
+    });
   });
 
   renderRecent();

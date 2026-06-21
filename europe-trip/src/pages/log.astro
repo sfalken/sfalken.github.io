@@ -195,15 +195,16 @@ const base = import.meta.env.BASE_URL;
         date: document.getElementById('log-date').value,
         savedAt: new Date().toISOString(),
       };
-      const expenses = getExpenses();
-      expenses.push(expense);
-      saveExpenses(expenses);
-
-      // Reset form
-      document.getElementById('log-amount').value = '';
-      document.getElementById('log-desc').value = '';
-      showToast();
-      renderRecent();
+      const requireAuth = window.piiRequireAuth || (cb => cb());
+      requireAuth(() => {
+        const expenses = getExpenses();
+        expenses.push(expense);
+        saveExpenses(expenses);
+        document.getElementById('log-amount').value = '';
+        document.getElementById('log-desc').value = '';
+        showToast();
+        renderRecent();
+      });
     });
 
     renderRecent();

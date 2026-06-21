@@ -87,8 +87,11 @@ const categories = budgetCategories.map(c => ({ id: c.id, label: c.label }));
     `).join('');
     el.querySelectorAll('.del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        saveExpenses(loadExpenses().filter(e => e.id !== btn.dataset.id));
-        renderRecent();
+        const requireAuth = window.piiRequireAuth || (cb => cb());
+        requireAuth(() => {
+          saveExpenses(loadExpenses().filter(e => e.id !== btn.dataset.id));
+          renderRecent();
+        });
       });
     });
   }
@@ -104,12 +107,15 @@ const categories = budgetCategories.map(c => ({ id: c.id, label: c.label }));
       amount:      parseFloat(form.elements.namedItem('amount').value),
       currency:    form.elements.namedItem('currency').value,
     };
-    const arr = loadExpenses(); arr.push(expense); saveExpenses(arr);
-    form.reset();
-    dateInput.value = new Date().toISOString().slice(0, 10);
-    const s = document.getElementById('log-success');
-    s.hidden = false; setTimeout(() => { s.hidden = true; }, 2500);
-    renderRecent();
+    const requireAuth = window.piiRequireAuth || (cb => cb());
+    requireAuth(() => {
+      const arr = loadExpenses(); arr.push(expense); saveExpenses(arr);
+      form.reset();
+      dateInput.value = new Date().toISOString().slice(0, 10);
+      const s = document.getElementById('log-success');
+      s.hidden = false; setTimeout(() => { s.hidden = true; }, 2500);
+      renderRecent();
+    });
   });
 
   renderRecent();
