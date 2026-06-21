@@ -1,0 +1,76 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Build hub (outputs to dist/ at repo root)
+      - name: Install hub dependencies
+        run: npm install
+
+      - name: Build hub
+        run: npm run build
+
+      # Build europe-trip (base: /europe-trip → outputs flat to europe-trip/dist/)
+      - name: Install europe-trip dependencies
+        working-directory: europe-trip
+        run: npm install
+
+      - name: Build europe-trip
+        working-directory: europe-trip
+        run: npm run build
+
+      - name: Copy europe-trip output into dist/europe-trip/
+        run: |
+          mkdir -p dist/europe-trip
+          cp -r europe-trip/dist/. dist/europe-trip/
+
+      # Build usa-trip (base: /usa-trip → outputs flat to usa-trip/dist/)
+      - name: Install usa-trip dependencies
+        working-directory: usa-trip
+        run: npm install
+
+      - name: Build usa-trip
+        working-directory: usa-trip
+        run: npm run build
+
+      - name: Copy usa-trip output into dist/usa-trip/
+        run: |
+          mkdir -p dist/usa-trip
+          cp -r usa-trip/dist/. dist/usa-trip/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,211 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Sync" description="Import and export expense data for cross-device sync">
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">Cross-Device Sync</span>
+      <h1>Import / Export</h1>
+      <p>Export your expense data as JSON to back it up or transfer to another device.</p>
+    </div>
+  </div>
+
+  <main>
+    <div class="container sync-container">
+
+      <div class="sync-cards">
+
+        <div class="card">
+          <h3>📤 Export Expenses</h3>
+          <p>Download all your logged expenses as a JSON file.</p>
+          <div class="export-info">
+            <span id="expense-count">Loading...</span>
+          </div>
+          <button id="export-btn" class="btn btn-primary">Download JSON</button>
+          <button id="copy-btn" class="btn btn-outline">Copy to Clipboard</button>
+        </div>
+
+        <div class="card">
+          <h3>📥 Import Expenses</h3>
+          <p>Import expenses from a previously exported JSON file. Choose whether to merge with or replace existing data.</p>
+          <div class="import-options">
+            <label class="radio-label">
+              <input type="radio" name="import-mode" value="merge" checked /> Merge (keep existing + add new)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="import-mode" value="replace" /> Replace (overwrite all existing)
+            </label>
+          </div>
+          <div class="file-drop" id="file-drop">
+            <span>📁 Drop JSON file here or click to browse</span>
+            <input type="file" id="file-input" accept=".json" style="display:none;" />
+          </div>
+          <div id="import-status" class="import-status"></div>
+        </div>
+
+      </div>
+
+      <div class="card raw-card">
+        <h3>Raw Data</h3>
+        <p style="font-size:0.85rem;color:var(--eu-muted);">View or manually edit the stored expense JSON. Paste updated JSON here and click Save.</p>
+        <textarea id="raw-json" class="raw-textarea" spellcheck="false"></textarea>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button id="save-raw" class="btn btn-primary">Save Raw JSON</button>
+          <button id="clear-raw" class="btn btn-outline" style="color:var(--eu-red);border-color:var(--eu-red);">Clear All Expenses</button>
+        </div>
+      </div>
+
+      <div id="toast" class="toast" style="display:none;"></div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const EXPENSE_KEY = 'europe-expenses';
+
+  function getExpenses() {
+    try { return JSON.parse(localStorage.getItem(EXPENSE_KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveExpenses(e) { localStorage.setItem(EXPENSE_KEY, JSON.stringify(e)); }
+
+  function showToast(msg, ok = true) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = ok ? '#166534' : '#991b1b';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+
+  function renderCount() {
+    const e = getExpenses();
+    document.getElementById('expense-count').textContent = `${e.length} expense${e.length !== 1 ? 's' : ''} stored`;
+    document.getElementById('raw-json').value = JSON.stringify(e, null, 2);
+  }
+
+  function init() {
+    renderCount();
+
+    document.getElementById('export-btn').addEventListener('click', () => {
+      const data = getExpenses();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `europe-trip-expenses-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(getExpenses(), null, 2));
+        showToast('✅ Copied to clipboard!');
+      } catch {
+        showToast('❌ Copy failed — try the download button', false);
+      }
+    });
+
+    const fileDrop = document.getElementById('file-drop');
+    const fileInput = document.getElementById('file-input');
+
+    fileDrop.addEventListener('click', () => fileInput.click());
+    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+    fileDrop.addEventListener('drop', e => {
+      e.preventDefault();
+      fileDrop.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!Array.isArray(parsed)) throw new Error('Not an array');
+          const mode = document.querySelector('input[name="import-mode"]:checked').value;
+          let final = parsed;
+          if (mode === 'merge') {
+            const existing = getExpenses();
+            const existingIds = new Set(existing.map(e => e.id));
+            const newOnes = parsed.filter(e => !existingIds.has(e.id));
+            final = [...existing, ...newOnes];
+          }
+          saveExpenses(final);
+          renderCount();
+          const status = document.getElementById('import-status');
+          status.textContent = `✅ Imported ${parsed.length} expense${parsed.length !== 1 ? 's' : ''} (mode: ${mode})`;
+          status.style.color = '#166534';
+          showToast(`✅ Imported successfully!`);
+        } catch (err) {
+          const status = document.getElementById('import-status');
+          status.textContent = `❌ Invalid JSON: ${err.message}`;
+          status.style.color = '#991b1b';
+          showToast('❌ Import failed', false);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById('save-raw').addEventListener('click', () => {
+      try {
+        const parsed = JSON.parse(document.getElementById('raw-json').value);
+        if (!Array.isArray(parsed)) throw new Error('Must be an array');
+        saveExpenses(parsed);
+        renderCount();
+        showToast('✅ Saved!');
+      } catch (err) {
+        showToast(`❌ Invalid JSON: ${err.message}`, false);
+      }
+    });
+
+    document.getElementById('clear-raw').addEventListener('click', () => {
+      if (!confirm('Delete ALL expenses? This cannot be undone.')) return;
+      saveExpenses([]);
+      renderCount();
+      showToast('✅ All expenses cleared');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>
+
+<style>
+  .sync-container { max-width: 900px; padding: 3rem 1.5rem; }
+  .sync-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card { display: flex; flex-direction: column; gap: 0.75rem; }
+  .card h3 { font-size: 1.15rem; }
+  .card p { font-size: 0.88rem; color: var(--eu-muted); }
+  .export-info { font-size: 0.82rem; font-weight: 600; color: var(--eu-blue); }
+  .import-options { display: flex; flex-direction: column; gap: 0.4rem; }
+  .radio-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; }
+  .file-drop {
+    border: 2px dashed var(--eu-border);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--eu-muted);
+    transition: all 0.15s;
+  }
+  .file-drop:hover, .file-drop.drag-over { border-color: var(--eu-red); background: #fff5f5; color: var(--eu-red); }
+  .import-status { font-size: 0.82rem; font-weight: 600; }
+  .raw-card { }
+  .raw-textarea { width: 100%; height: 200px; font-family: monospace; font-size: 0.78rem; padding: 0.75rem; border: 1px solid var(--eu-border); border-radius: 8px; resize: vertical; }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); color: white; padding: 0.75rem 1.5rem; border-radius: 30px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
+</style>

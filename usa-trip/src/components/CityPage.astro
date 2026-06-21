@@ -1,0 +1,202 @@
+---
+import type { CityData } from '../data/types';
+import HotelCard from './HotelCard.astro';
+import RestaurantCard from './RestaurantCard.astro';
+import DayCard from './DayCard.astro';
+import MapSection from './MapSection.astro';
+
+export interface Props {
+  city: CityData;
+}
+
+const { city } = Astro.props;
+---
+
+<div class="city-page">
+  <!-- Hero -->
+  <div class="city-hero">
+    <div class="container">
+      <p class="section-label">{city.country}</p>
+      <h1>{city.name}</h1>
+      <p class="city-sub">
+        {city.days.length} days · {city.hotels.length} hotels · {city.restaurants.length} restaurants
+      </p>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Interactive Map</p>
+      <h2>Boston at a Glance</h2>
+      <p class="section-sub">Click any marker for details.</p>
+      <div style="margin-top:1rem;">
+        <MapSection points={city.mapPoints} center={city.coordinates} zoom={13} mapId="boston-map" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Hotels -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="section-label">Where to Stay</p>
+      <h2>Hotel Recommendations</h2>
+      <p class="section-sub">Options across all budget tiers for a solo traveler.</p>
+      <div class="grid-2" style="margin-top:1.25rem;">
+        {city.hotels.map(hotel => <HotelCard hotel={hotel} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Restaurants -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Where to Eat</p>
+      <h2>Restaurant Recommendations</h2>
+      <p class="section-sub">From North End pizza to lobster rolls and Asian fusion.</p>
+      <div class="grid-2" style="margin-top:1.25rem;">
+        {city.restaurants.map(r => <RestaurantCard restaurant={r} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ice Cream Selfies -->
+  {city.iceCreamSpots && city.iceCreamSpots.length > 0 && (
+    <section class="section section-icecream">
+      <div class="container">
+        <p class="section-label" style="color:var(--usa-red)">Ice Cream Selfie Tradition</p>
+        <h2>🍦 Ice Cream Selfie Spots</h2>
+        <p class="section-sub">
+          A conference tradition — grab a scoop, strike a pose, share the joy.
+          Boston and Cambridge have some truly photogenic options.
+        </p>
+        <div class="icecream-grid" style="margin-top:1.25rem;">
+          {city.iceCreamSpots.map(spot => (
+            <div class="icecream-card card">
+              <div class="ic-header">
+                <span class="ic-emoji">🍦</span>
+                <div>
+                  <h3 class="ic-name">{spot.name}</h3>
+                  <p class="ic-address">📍 {spot.address}</p>
+                </div>
+              </div>
+              <div class="ic-flavors">
+                <span class="section-label">Signature flavors</span>
+                <div class="flavor-list">
+                  {spot.signatureFlavors.map(f => <span class="flavor-tag">{f}</span>)}
+                </div>
+              </div>
+              <p class="ic-note">{spot.photoNote}</p>
+              <a href={spot.mapsLink} target="_blank" rel="noopener" class="btn btn-primary ic-btn">
+                Get Directions 📍
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Itinerary -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="section-label">Day by Day</p>
+      <h2>Itinerary</h2>
+      <p class="section-sub">Sep 22–26, 2026 · 5 days in Boston</p>
+      <div class="days-list" style="margin-top:1.25rem;">
+        {city.days.map((day, i) => <DayCard day={day} index={i} />)}
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .city-hero {
+    background: linear-gradient(135deg, var(--usa-blue) 0%, #2a2950 100%);
+    color: white;
+    padding: 3rem 0 2.5rem;
+  }
+
+  .city-hero .section-label { color: rgba(255,255,255,0.7); }
+  .city-hero h1 { color: white; margin-bottom: 0.5rem; }
+
+  .city-sub {
+    color: rgba(255,255,255,0.75);
+    font-size: 1rem;
+  }
+
+  .section-sub {
+    color: var(--gray-500);
+    margin-top: 0.35rem;
+    font-size: 0.95rem;
+  }
+
+  .section-alt {
+    background: white;
+  }
+
+  .days-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .section-icecream {
+    background: linear-gradient(135deg, #fff0f6 0%, #fef2f2 100%);
+    border-top: 3px solid var(--usa-red);
+  }
+
+  .icecream-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .icecream-card {
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border: 2px solid #fce7f3;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .icecream-card:hover { border-color: #ec4899; box-shadow: 0 4px 12px rgba(236,72,153,0.12); }
+
+  .ic-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .ic-emoji { font-size: 2rem; flex-shrink: 0; line-height: 1; }
+
+  .ic-name { font-size: 1.05rem; margin-bottom: 0.2rem; }
+
+  .ic-address { font-size: 0.78rem; color: var(--gray-500); }
+
+  .ic-flavors .section-label { display: block; margin-bottom: 0.3rem; }
+
+  .flavor-list { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  .flavor-tag {
+    background: #fce7f3;
+    color: #be185d;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .ic-note {
+    font-size: 0.83rem;
+    color: var(--gray-700);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .ic-btn {
+    align-self: flex-start;
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+  }
+</style>

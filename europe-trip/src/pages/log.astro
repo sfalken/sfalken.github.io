@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { budgetCategories } from '../data/budget';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Log Expense" description="Quick mobile expense entry for Prague and Nuremberg trip">
+  <Nav slot="nav" />
+
+  <main class="log-main">
+    <div class="log-container">
+      <div class="log-header">
+        <h1>Log Expense</h1>
+        <a href={`${base}budget/`} class="back-link">← Budget</a>
+      </div>
+
+      <form id="log-form" class="log-form">
+        <!-- Amount + Currency -->
+        <div class="amount-row">
+          <div class="form-group amount-group">
+            <label>Amount</label>
+            <input
+              type="number"
+              id="log-amount"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              required
+              autocomplete="off"
+            />
+          </div>
+          <div class="form-group currency-group">
+            <label>Currency</label>
+            <select id="log-currency">
+              <option value="CZK">CZK Kč</option>
+              <option value="EUR">EUR €</option>
+              <option value="USD">USD $</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick amounts -->
+        <div class="quick-amounts" id="quick-amounts">
+          <button type="button" data-amount="100">100</button>
+          <button type="button" data-amount="200">200</button>
+          <button type="button" data-amount="500">500</button>
+          <button type="button" data-amount="1000">1000</button>
+          <button type="button" data-amount="5">5</button>
+          <button type="button" data-amount="10">10</button>
+          <button type="button" data-amount="20">20</button>
+          <button type="button" data-amount="50">50</button>
+        </div>
+
+        <!-- City -->
+        <div class="form-group">
+          <label>City</label>
+          <div class="city-toggle">
+            <button type="button" class="city-btn active" data-city="Prague">🇨🇿 Prague</button>
+            <button type="button" class="city-btn" data-city="Nuremberg">🇩🇪 Nuremberg</button>
+            <button type="button" class="city-btn" data-city="Transit">🚆 Transit</button>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label>Category</label>
+          <select id="log-category">
+            {budgetCategories.map(c => <option value={c.id}>{c.icon} {c.label}</option>)}
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label>Description <span class="optional">(optional)</span></label>
+          <input type="text" id="log-desc" placeholder="e.g. Lunch at Lokál" autocomplete="off" />
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="log-date" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary log-submit">Save Expense</button>
+      </form>
+
+      <!-- Recent entries -->
+      <div class="recent">
+        <h3>Recent Expenses</h3>
+        <div id="recent-list" class="recent-list">
+          <p class="empty-msg">No expenses yet.</p>
+        </div>
+      </div>
+
+      <div id="toast" class="toast" style="display:none;">✅ Expense saved!</div>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ budgetJson: JSON.stringify(budgetCategories), base }}>
+  const EXPENSE_KEY = 'europe-expenses';
+  const budgetCategories = JSON.parse(budgetJson);
+  let selectedCity = 'Prague';
+
+  function getExpenses() {
+    try { return JSON.parse(localStorage.getItem(EXPENSE_KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveExpenses(e) { localStorage.setItem(EXPENSE_KEY, JSON.stringify(e)); }
+
+  function fmt(amount, currency) {
+    const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '';
+    const suf = currency === 'CZK' ? ' Kč' : '';
+    return sym + parseFloat(amount).toLocaleString('en-US', { maximumFractionDigits: 0 }) + suf;
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 2500);
+  }
+
+  function renderRecent() {
+    const expenses = getExpenses();
+    const container = document.getElementById('recent-list');
+    if (!expenses.length) { container.innerHTML = '<p class="empty-msg">No expenses yet.</p>'; return; }
+    const recent = [...expenses].sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt)).slice(0, 8);
+    container.innerHTML = recent.map(e => `
+      <div class="recent-item">
+        <div class="ri-left">
+          <span class="ri-city">${e.city || ''}</span>
+          <span class="ri-desc">${e.description || '—'}</span>
+        </div>
+        <span class="ri-amount">${fmt(e.amount, e.currency)}</span>
+      </div>
+    `).join('');
+  }
+
+  function updateQuickAmounts() {
+    const currency = document.getElementById('log-currency').value;
+    const czkAmounts = [100, 200, 500, 1000];
+    const eurUsdAmounts = [5, 10, 20, 50];
+    const amounts = currency === 'CZK' ? czkAmounts : eurUsdAmounts;
+    document.querySelectorAll('#quick-amounts button').forEach((btn, i) => {
+      if (i < 4) {
+        btn.dataset.amount = amounts[0 + i];
+        btn.textContent = amounts[0 + i];
+      }
+    });
+  }
+
+  function init() {
+    // Set today's date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('log-date').value = today;
+
+    // City toggle
+    document.querySelectorAll('.city-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCity = btn.dataset.city;
+        // Auto-switch currency
+        const cur = document.getElementById('log-currency');
+        if (selectedCity === 'Prague') cur.value = 'CZK';
+        else if (selectedCity === 'Nuremberg') cur.value = 'EUR';
+        updateQuickAmounts();
+      });
+    });
+
+    // Quick amounts
+    document.querySelectorAll('#quick-amounts button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('log-amount').value = btn.dataset.amount;
+      });
+    });
+
+    // Currency change
+    document.getElementById('log-currency').addEventListener('change', updateQuickAmounts);
+
+    // Form submit
+    document.getElementById('log-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('log-amount').value);
+      if (!amount || amount <= 0) return;
+      const expense = {
+        id: Date.now().toString(),
+        amount,
+        currency: document.getElementById('log-currency').value,
+        category: document.getElementById('log-category').value,
+        description: document.getElementById('log-desc').value,
+        city: selectedCity,
+        date: document.getElementById('log-date').value,
+        savedAt: new Date().toISOString(),
+      };
+      const expenses = getExpenses();
+      expenses.push(expense);
+      saveExpenses(expenses);
+
+      // Reset form
+      document.getElementById('log-amount').value = '';
+      document.getElementById('log-desc').value = '';
+      showToast();
+      renderRecent();
+    });
+
+    renderRecent();
+    updateQuickAmounts();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>
+
+<style>
+  .log-main { padding: 0; background: var(--eu-bg); min-height: calc(100vh - 60px); }
+  .log-container { max-width: 480px; margin: 0 auto; padding: 1.5rem; }
+  .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .log-header h1 { font-size: 1.8rem; }
+  .back-link { font-size: 0.85rem; color: var(--eu-muted); }
+
+  .log-form { display: flex; flex-direction: column; gap: 1.25rem; background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid var(--eu-border); margin-bottom: 2rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--eu-muted); }
+  .optional { font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .form-group input, .form-group select { padding: 0.75rem; border: 1px solid var(--eu-border); border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 1rem; background: white; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--eu-red); }
+
+  .amount-row { display: flex; gap: 0.75rem; }
+  .amount-group { flex: 2; }
+  .currency-group { flex: 1; }
+  #log-amount { font-size: 1.5rem; font-weight: 700; }
+
+  .quick-amounts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .quick-amounts button { padding: 0.4rem 0.9rem; border: 1px solid var(--eu-border); border-radius: 20px; background: none; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.88rem; font-weight: 500; color: var(--eu-text); transition: all 0.15s; }
+  .quick-amounts button:hover { border-color: var(--eu-red); color: var(--eu-red); }
+
+  .city-toggle { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .city-btn { padding: 0.5rem 1rem; border: 2px solid var(--eu-border); border-radius: 8px; background: none; cursor: pointer; font-family: 'Jost', sans-serif; font-size: 0.88rem; font-weight: 500; transition: all 0.15s; }
+  .city-btn.active { border-color: var(--eu-red); background: #fee2e2; color: var(--eu-red); }
+
+  .log-submit { width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem; }
+
+  .recent h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+  .recent-list { display: flex; flex-direction: column; gap: 0.4rem; }
+  .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.75rem; background: white; border-radius: 8px; border: 1px solid var(--eu-border); }
+  .ri-left { display: flex; align-items: center; gap: 0.5rem; }
+  .ri-city { font-size: 0.7rem; background: #dbeafe; color: var(--eu-blue); padding: 0.1rem 0.4rem; border-radius: 20px; font-weight: 600; }
+  .ri-desc { font-size: 0.88rem; }
+  .ri-amount { font-weight: 700; font-size: 0.9rem; }
+  .empty-msg { color: var(--eu-muted); font-size: 0.85rem; text-align: center; padding: 1rem; }
+
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: #166534; color: white; padding: 0.75rem 1.5rem; border-radius: 30px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; }
+</style>

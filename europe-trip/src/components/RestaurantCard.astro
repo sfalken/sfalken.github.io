@@ -1,0 +1,67 @@
+---
+import type { Restaurant } from '../data/types';
+
+interface Props {
+  restaurant: Restaurant;
+}
+const { restaurant } = Astro.props;
+---
+
+<div class="card restaurant-card">
+  <div class="rest-header">
+    <div>
+      <span class="tag">{restaurant.cuisine}</span>
+      <h3 class="rest-name">
+        {restaurant.url
+          ? <a href={restaurant.url} target="_blank" rel="noopener">{restaurant.name}</a>
+          : restaurant.name}
+      </h3>
+    </div>
+    <span class="price-range">{restaurant.priceRange}</span>
+  </div>
+
+  <div class="rest-rating">
+    <span class="stars">{'★'.repeat(Math.floor(restaurant.rating))}{'☆'.repeat(5 - Math.floor(restaurant.rating))}</span>
+    <span class="rating-num">{restaurant.rating}</span>
+  </div>
+
+  <p class="rest-address">📍 {restaurant.address}</p>
+  <p class="rest-hours">🕐 {restaurant.hours}</p>
+
+  <div class="must-try">
+    <p class="must-try-label">Must try:</p>
+    <ul>
+      {restaurant.mustTry.map(dish => <li>{dish}</li>)}
+    </ul>
+  </div>
+
+  <div class="booking-tip">
+    <span>📅</span>
+    <span>{restaurant.bookingAdvice}</span>
+  </div>
+</div>
+
+<style>
+  .restaurant-card { display: flex; flex-direction: column; gap: 0.6rem; }
+  .rest-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+  .rest-name { font-size: 1.15rem; margin-top: 0.3rem; }
+  .rest-name a { color: var(--eu-dark); }
+  .rest-name a:hover { color: var(--eu-red); }
+  .price-range { font-size: 1.1rem; font-weight: 700; color: var(--eu-muted); white-space: nowrap; }
+  .rest-rating { display: flex; align-items: center; gap: 0.5rem; }
+  .rating-num { font-size: 0.85rem; color: var(--eu-muted); font-weight: 600; }
+  .rest-address, .rest-hours { font-size: 0.82rem; color: var(--eu-muted); }
+  .must-try { background: #f8fafc; border-radius: 8px; padding: 0.6rem 0.8rem; }
+  .must-try-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: var(--eu-muted); margin-bottom: 0.25rem; }
+  .must-try ul { padding-left: 1.1rem; font-size: 0.88rem; }
+  .must-try li { margin-bottom: 0.15rem; }
+  .booking-tip {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: #374151;
+    background: #f0fdf4;
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+  }
+</style>

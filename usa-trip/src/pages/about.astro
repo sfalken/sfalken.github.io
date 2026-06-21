@@ -1,0 +1,250 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const base = '/usa-trip';
+---
+
+<Layout title="About — USA Trip 2026" description="About this trip planner for DevConf.US Boston 2026.">
+  <Nav />
+  <main>
+    <div class="about-hero">
+      <div class="container">
+        <p class="section-label">About This Trip</p>
+        <h1>DevConf.US Boston 2026</h1>
+        <p class="hero-sub">Solo conference trip, September 22–26, 2026</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container about-container">
+
+        <div class="card about-card">
+          <h2>The Trip</h2>
+          <p>
+            This is a solo trip to <strong>Boston, Massachusetts</strong> to attend <strong>DevConf.US 2026</strong>
+            at Boston University, September 24–25. The trip runs September 22–26, with a couple of days
+            for sightseeing before and after the conference.
+          </p>
+          <p>
+            DevConf.US is a free, community-organized conference run by Red Hat covering open source software,
+            Linux, containers, Kubernetes, developer tooling, and more. It's a great place to meet contributors
+            from across the open source ecosystem.
+          </p>
+          <div class="trip-stats">
+            <div class="trip-stat">
+              <span class="ts-value">5</span>
+              <span class="ts-label">Days</span>
+            </div>
+            <div class="trip-stat">
+              <span class="ts-value">1</span>
+              <span class="ts-label">City</span>
+            </div>
+            <div class="trip-stat">
+              <span class="ts-value">2</span>
+              <span class="ts-label">Conference days</span>
+            </div>
+            <div class="trip-stat">
+              <span class="ts-value">5</span>
+              <span class="ts-label">Ice cream spots</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card about-card">
+          <h2>🍦 The Ice Cream Selfie Tradition</h2>
+          <p>
+            A beloved conference tradition — after each day of talks, workshops, and hallway conversations,
+            there's nothing better than finding a great local ice cream spot, getting a scoop of something
+            delicious, and taking a selfie with it.
+          </p>
+          <p>
+            Boston and Cambridge are home to some outstanding ice cream shops, from the legendary
+            <strong>J.P. Licks</strong> on Newbury Street (with its colorful cups and iconic cow logo)
+            to the adventurous <strong>Toscanini's</strong> in Cambridge (burnt caramel! green tea!),
+            and the exotic-spice-forward <strong>Christina's Homemade Ice Cream</strong> in Inman Square.
+          </p>
+          <p>
+            The goal: a different shop for each conference day, with photos worthy of sharing.
+            Because after a full day of open source talks, you've earned it.
+          </p>
+          <a href={`${base}/boston/`} class="btn btn-primary" style="margin-top:0.5rem;">
+            See all ice cream spots →
+          </a>
+        </div>
+
+        <div class="card about-card">
+          <h2>About This App</h2>
+          <p>
+            This trip planner was built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+            and deployed as a static site on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+            It works offline as a PWA (Progressive Web App) — install it to your home screen for quick access.
+          </p>
+          <ul class="feature-list">
+            <li>📍 Interactive Leaflet map with all hotels, restaurants, attractions, and ice cream spots</li>
+            <li>🏨 Hotel and restaurant recommendations with real ratings and booking tips</li>
+            <li>📅 Day-by-day itinerary for all 5 days</li>
+            <li>✅ Planning checklist with localStorage persistence</li>
+            <li>💰 Budget tracker with Chart.js visualizations</li>
+            <li>📊 Expense log with import/export for cross-device sync</li>
+            <li>📱 PWA — installable, offline-capable</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="badge">Astro 5</span>
+            <span class="badge">TypeScript</span>
+            <span class="badge">Leaflet</span>
+            <span class="badge">Chart.js</span>
+            <span class="badge">GitHub Pages</span>
+          </div>
+        </div>
+
+        <div class="card about-card conf-links-card">
+          <h2>Useful Links</h2>
+          <div class="links-grid">
+            <a href="https://www.devconf.us" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">💻</span>
+              <div>
+                <strong>DevConf.US</strong>
+                <span>Conference website &amp; schedule</span>
+              </div>
+            </a>
+            <a href="https://www.mbta.com" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">🚇</span>
+              <div>
+                <strong>MBTA</strong>
+                <span>Boston subway &amp; bus</span>
+              </div>
+            </a>
+            <a href="https://www.thefreedomtrail.org" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">🏛️</span>
+              <div>
+                <strong>Freedom Trail</strong>
+                <span>Historic trail map &amp; guide</span>
+              </div>
+            </a>
+            <a href="https://www.neaq.org" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">🐧</span>
+              <div>
+                <strong>New England Aquarium</strong>
+                <span>Tickets &amp; visiting info</span>
+              </div>
+            </a>
+            <a href="https://www.mfa.org" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">🎨</span>
+              <div>
+                <strong>Museum of Fine Arts</strong>
+                <span>Boston MFA</span>
+              </div>
+            </a>
+            <a href="https://www.massport.com/logan-airport/" target="_blank" rel="noopener" class="link-item">
+              <span class="link-icon">✈️</span>
+              <div>
+                <strong>Logan Airport (BOS)</strong>
+                <span>Arrivals, departures &amp; transport</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, var(--usa-red) 0%, #8b1a26 60%, var(--usa-blue) 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .about-hero .section-label { color: rgba(255,255,255,0.65); }
+  .about-hero h1 { color: white; margin-bottom: 0.4rem; }
+  .hero-sub { color: rgba(255,255,255,0.75); }
+
+  .about-container {
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .about-card {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .about-card h2 { font-size: 1.4rem; }
+  .about-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.65; }
+
+  .trip-stats {
+    display: flex;
+    gap: 2rem;
+    padding-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .trip-stat { text-align: center; }
+  .ts-value {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--usa-red);
+    line-height: 1;
+  }
+  .ts-label { font-size: 0.78rem; color: var(--gray-500); }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 0.88rem;
+    color: var(--gray-700);
+    padding-left: 0.25rem;
+  }
+
+  .feature-list li { line-height: 1.4; }
+
+  .tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding-top: 0.25rem;
+  }
+
+  .conf-links-card .links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .link-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.85rem;
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .link-item:hover {
+    border-color: var(--usa-red);
+    background: var(--usa-red-pale);
+    text-decoration: none;
+  }
+
+  .link-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+  .link-item strong { display: block; font-size: 0.88rem; font-weight: 600; color: var(--gray-900); }
+  .link-item span { font-size: 0.78rem; color: var(--gray-500); }
+
+  @media (max-width: 480px) {
+    .conf-links-card .links-grid { grid-template-columns: 1fr; }
+    .trip-stats { gap: 1.25rem; }
+  }
+</style>

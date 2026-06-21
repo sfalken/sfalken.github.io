@@ -1,0 +1,210 @@
+---
+import type { CityData } from '../data/types';
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import HotelCard from './HotelCard.astro';
+import RestaurantCard from './RestaurantCard.astro';
+import DayCard from './DayCard.astro';
+import MapSection from './MapSection.astro';
+
+interface Props {
+  city: CityData;
+  prevCity?: { name: string; href: string };
+  nextCity?: { name: string; href: string };
+  flag: string;
+  conferenceTag?: string;
+  conferenceUrl?: string;
+}
+
+const { city, prevCity, nextCity, flag, conferenceTag, conferenceUrl } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={city.name} description={`${city.name}, ${city.country} — hotels, restaurants, itinerary, and map`}>
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">{flag} {city.country}</span>
+      <h1>{city.name}</h1>
+      <p>{city.description}</p>
+      {conferenceTag && (
+        <div class="conference-badge">
+          <span class="conf-tag">🎪 {conferenceTag}</span>
+          {conferenceUrl && <a href={conferenceUrl} target="_blank" rel="noopener" class="conf-link">Conference site →</a>}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <!-- City Navigation -->
+      <div class="city-nav">
+        {prevCity
+          ? <a href={`${base}${prevCity.href}/`} class="city-nav-btn">← {prevCity.name}</a>
+          : <span></span>}
+        <a href={base} class="city-nav-btn outline">Overview</a>
+        {nextCity
+          ? <a href={`${base}${nextCity.href}/`} class="city-nav-btn">→ {nextCity.name}</a>
+          : <span></span>}
+      </div>
+
+      <!-- Map -->
+      <section class="section">
+        <div class="section-header">
+          <span class="eyebrow">Interactive Map</span>
+          <h2>{city.name} Map</h2>
+        </div>
+        <MapSection
+          center={city.coordinates}
+          zoom={city.mapZoom}
+          points={city.mapPoints}
+          cityName={city.name}
+          mapId={`map-${city.name.toLowerCase()}`}
+        />
+      </section>
+
+      <!-- Hotels -->
+      <section class="section">
+        <div class="section-header">
+          <span class="eyebrow">Where to Stay</span>
+          <h2>Hotels in {city.name}</h2>
+        </div>
+        <div class="grid-2">
+          {city.hotels.map(hotel => <HotelCard hotel={hotel} />)}
+        </div>
+      </section>
+
+      <!-- Restaurants -->
+      <section class="section">
+        <div class="section-header">
+          <span class="eyebrow">Where to Eat</span>
+          <h2>Restaurants in {city.name}</h2>
+        </div>
+        <div class="grid-2">
+          {city.restaurants.map(restaurant => <RestaurantCard restaurant={restaurant} />)}
+        </div>
+      </section>
+
+      <!-- Ice Cream Selfie Spots -->
+      {city.iceCreamSpots && city.iceCreamSpots.length > 0 && (
+        <section class="section icecream-section">
+          <div class="section-header">
+            <span class="eyebrow">🍦 Mariatta's Tradition</span>
+            <h2>Ice Cream Selfie Spots</h2>
+            <p class="section-desc">Every conference needs ice cream selfies. Here are the best spots in {city.name} — one for each conference day!</p>
+          </div>
+          <div class="grid-2">
+            {city.iceCreamSpots.map((spot, i) => (
+              <div class="card icecream-card">
+                <div class="ic-header">
+                  <span class="ic-number">Day {i + 1}</span>
+                  <h3><a href={spot.mapsLink} target="_blank" rel="noopener">{spot.name}</a></h3>
+                </div>
+                <p class="ic-address">📍 {spot.address}</p>
+                <div class="ic-flavors">
+                  <p class="flavors-label">Signature flavors:</p>
+                  <ul>
+                    {spot.signatureFlavors.map(f => <li>{f}</li>)}
+                  </ul>
+                </div>
+                <div class="ic-photo-note">
+                  📸 {spot.photoNote}
+                </div>
+                <a href={spot.mapsLink} target="_blank" rel="noopener" class="btn btn-outline ic-maps-btn">Open in Maps 🗺️</a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Itinerary -->
+      <section class="section">
+        <div class="section-header">
+          <span class="eyebrow">Day by Day</span>
+          <h2>{city.name} Itinerary</h2>
+        </div>
+        <div class="itinerary-list">
+          {city.days.map(day => <DayCard day={day} currency={city.currencyCode} />)}
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .section { margin: 3rem 0; }
+  .section-header { margin-bottom: 1.5rem; }
+  .section-header h2 { margin-top: 0.25rem; }
+  .section-desc { color: var(--eu-muted); font-size: 0.95rem; margin-top: 0.5rem; }
+
+  .conference-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  .conf-tag {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .conf-link {
+    color: var(--eu-gold);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .city-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .city-nav-btn {
+    background: var(--eu-red);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .city-nav-btn:hover { background: #b8111a; text-decoration: none; }
+  .city-nav-btn.outline { background: transparent; border: 2px solid var(--eu-border); color: var(--eu-text); }
+  .city-nav-btn.outline:hover { background: #f3f4f6; }
+
+  .itinerary-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .icecream-section { background: #fdf4ff; border-radius: 16px; padding: 2rem; margin: 3rem -1rem; }
+  .icecream-card { border-color: #f0abfc; }
+  .ic-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .ic-number {
+    background: #ec4899;
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .ic-header h3 { font-size: 1.05rem; }
+  .ic-header h3 a { color: var(--eu-dark); }
+  .ic-header h3 a:hover { color: #ec4899; }
+  .ic-address { font-size: 0.82rem; color: var(--eu-muted); }
+  .ic-flavors { background: #fce7f3; border-radius: 8px; padding: 0.5rem 0.75rem; margin: 0.25rem 0; }
+  .flavors-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9d174d; margin-bottom: 0.2rem; }
+  .ic-flavors ul { padding-left: 1.1rem; font-size: 0.85rem; }
+  .ic-photo-note { font-size: 0.82rem; color: #7c3aed; background: #f5f3ff; border-radius: 8px; padding: 0.5rem 0.75rem; }
+  .ic-maps-btn { font-size: 0.8rem; padding: 0.4rem 0.8rem; align-self: flex-start; margin-top: 0.25rem; }
+</style>

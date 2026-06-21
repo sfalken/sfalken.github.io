@@ -1,0 +1,129 @@
+---
+import type { Restaurant } from '../data/types';
+
+export interface Props {
+  restaurant: Restaurant;
+}
+
+const { restaurant } = Astro.props;
+const stars = '★'.repeat(Math.round(restaurant.rating)) + '☆'.repeat(5 - Math.round(restaurant.rating));
+---
+
+<div class="card restaurant-card">
+  <div class="rest-header">
+    <div class="rest-meta">
+      <span class="badge">{restaurant.cuisine}</span>
+      <span class="price-range">{restaurant.priceRange}</span>
+    </div>
+    <h3 class="rest-name">{restaurant.name}</h3>
+    <span class="stars" title={`${restaurant.rating} stars`}>{stars} <small>{restaurant.rating}</small></span>
+  </div>
+
+  <div class="rest-body">
+    <div class="must-try">
+      <span class="section-label">Must try</span>
+      <ul class="must-try-list">
+        {restaurant.mustTry.map(item => <li>{item}</li>)}
+      </ul>
+    </div>
+
+    <div class="rest-detail">
+      <span>🕐</span>
+      <span>{restaurant.hours}</span>
+    </div>
+
+    <div class="rest-detail">
+      <span>💡</span>
+      <span>{restaurant.bookingAdvice}</span>
+    </div>
+
+    <div class="rest-detail">
+      <span>📍</span>
+      <span>{restaurant.address}</span>
+    </div>
+  </div>
+
+  <div class="rest-footer">
+    <a href={restaurant.website} target="_blank" rel="noopener" class="btn btn-outline">
+      Website →
+    </a>
+    <a
+      href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`}
+      target="_blank"
+      rel="noopener"
+      class="btn btn-secondary"
+    >
+      Map
+    </a>
+  </div>
+</div>
+
+<style>
+  .restaurant-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rest-header {
+    padding: 1.1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .rest-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .price-range {
+    font-weight: 700;
+    color: var(--usa-red);
+    font-size: 0.9rem;
+  }
+
+  .rest-name {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .rest-body {
+    padding: 1rem 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .must-try .section-label { display: block; margin-bottom: 0.25rem; }
+
+  .must-try-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .must-try-list li {
+    background: var(--usa-red-pale);
+    color: var(--usa-red);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .rest-detail {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.83rem;
+    color: var(--gray-700);
+    line-height: 1.4;
+  }
+
+  .rest-footer {
+    padding: 0.75rem 1.25rem 1.1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>

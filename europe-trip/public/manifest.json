@@ -1,0 +1,43 @@
+{
+  "name": "Prague & Nuremberg Trip 2026",
+  "short_name": "EU Trip 2026",
+  "description": "openSUSECon + Flock to Fedora trip planner — Prague and Nuremberg, June 2026",
+  "start_url": "/europe-trip/",
+  "scope": "/europe-trip/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fafaf8",
+  "theme_color": "#D7141A",
+  "icons": [
+    {
+      "src": "/europe-trip/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/europe-trip/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Expense",
+      "short_name": "Log",
+      "description": "Quickly log a new expense",
+      "url": "/europe-trip/log/",
+      "icons": [{ "src": "/europe-trip/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Checklist",
+      "short_name": "Checklist",
+      "description": "View planning checklist",
+      "url": "/europe-trip/checklist/",
+      "icons": [{ "src": "/europe-trip/icon-192.svg", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["travel", "productivity"],
+  "lang": "en"
+}

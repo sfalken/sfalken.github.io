@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="32" fill="#3C3B6E"/>
+  <rect width="192" height="96" rx="0" fill="#B22234"/>
+  <rect y="0" width="192" height="32" fill="#B22234"/>
+  <rect y="0" x="0" width="192" height="192" rx="32" fill="none" stroke="none"/>
+  <!-- Red top half -->
+  <path d="M0 0 H192 V96 H0 Z" fill="#B22234" clip-path="url(#rc)"/>
+  <defs><clipPath id="rc"><rect width="192" height="192" rx="32"/></clipPath></defs>
+  <path d="M0 0 H192 V96 H0 Z" fill="#B22234" clip-path="url(#rc)"/>
+  <path d="M0 96 H192 V192 H0 Z" fill="#3C3B6E" clip-path="url(#rc)"/>
+  <!-- White M -->
+  <text x="96" y="130" font-family="Georgia, serif" font-size="90" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">M</text>
+</svg>

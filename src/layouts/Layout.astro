@@ -1,0 +1,130 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "sfalken's travel plans — open source conferences and adventures." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style is:global>
+      :root {
+        --hub-bg: #f7f8fc;
+        --hub-surface: #ffffff;
+        --hub-border: #e2e8f0;
+        --hub-text: #0f172a;
+        --hub-muted: #64748b;
+        --hub-accent: #4338ca;
+        --hub-hero-from: #0f1b35;
+        --hub-hero-to: #1e3a5f;
+
+        --s-progress: #16a34a;
+        --s-progress-bg: #f0fdf4;
+        --s-progress-border: #bbf7d0;
+        --s-upcoming: #2563eb;
+        --s-upcoming-bg: #eff6ff;
+        --s-upcoming-border: #bfdbfe;
+        --s-completed: #6b7280;
+        --s-completed-bg: #f9fafb;
+        --s-completed-border: #e5e7eb;
+        --s-shelved: #d97706;
+        --s-shelved-bg: #fffbeb;
+        --s-shelved-border: #fde68a;
+
+        font-family: 'Jost', system-ui, sans-serif;
+        color: var(--hub-text);
+        background: var(--hub-bg);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.6;
+        background-color: var(--hub-bg);
+        background-image: radial-gradient(circle at 1px 1px, rgba(67,56,202,0.055) 1px, transparent 0);
+        background-size: 24px 24px;
+      }
+
+      main { flex: 1; }
+
+      h1, h2, h3 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        line-height: 1.2;
+        font-weight: 700;
+      }
+
+      h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
+      h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 600; }
+      h3 { font-size: clamp(1.3rem, 2.5vw, 1.7rem); }
+
+      a { color: var(--hub-accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Site header */
+      .site-header {
+        background: var(--hub-hero-from);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 56px;
+      }
+
+      .brand {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 0.01em;
+      }
+      .brand:hover { text-decoration: none; opacity: 0.85; }
+
+      /* Footer */
+      .site-footer {
+        background: var(--hub-hero-from);
+        color: rgba(255,255,255,0.55);
+        text-align: center;
+        padding: 1.5rem;
+        font-size: 0.82rem;
+        margin-top: 4rem;
+      }
+      .site-footer a { color: rgba(255,255,255,0.75); }
+      .site-footer a:hover { color: white; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.idea/
+.DS_Store
+europe-trip/node_modules/
+europe-trip/dist/
+europe-trip/.astro/
+usa-trip/node_modules/
+usa-trip/dist/
+usa-trip/.astro/

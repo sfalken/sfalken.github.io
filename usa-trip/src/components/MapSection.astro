@@ -1,0 +1,130 @@
+---
+import type { MapPoint } from '../data/types';
+
+export interface Props {
+  points: MapPoint[];
+  center: [number, number];
+  zoom?: number;
+  mapId?: string;
+}
+
+const { points, center, zoom = 13, mapId = 'map' } = Astro.props;
+const pointsJson = JSON.stringify(points);
+const centerJson = JSON.stringify(center);
+---
+
+<div class="map-wrapper card">
+  <div class="map-legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Hotels</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span>Restaurants</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Attractions</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#a855f7"></span>Conference</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ec4899"></span>Ice Cream</span>
+  </div>
+  <div id={mapId} class="map-container"></div>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS + init -->
+<script is:inline define:vars={{ pointsJson, centerJson, zoom, mapId }}>
+  (function initMap() {
+    const points = JSON.parse(pointsJson);
+    const center = JSON.parse(centerJson);
+
+    function loadLeaflet(cb) {
+      if (window.L) { cb(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      s.onload = cb;
+      document.head.appendChild(s);
+    }
+
+    function getMarkerOpts(category) {
+      const configs = {
+        hotel:      { color: '#3b82f6', emoji: '🏨' },
+        restaurant: { color: '#f97316', emoji: '🍽️' },
+        attraction: { color: '#22c55e', emoji: '🏛️' },
+        conference: { color: '#a855f7', emoji: '💻' },
+        icecream:   { color: '#ec4899', emoji: '🍦' },
+      };
+      return configs[category] || { color: '#6b7280', emoji: '📍' };
+    }
+
+    function createIcon(category) {
+      const { color, emoji } = getMarkerOpts(category);
+      const html = `<div style="
+        background:${color};
+        width:30px;height:30px;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        border:2px solid white;
+        box-shadow:0 2px 6px rgba(0,0,0,0.3);
+        display:flex;align-items:center;justify-content:center;
+      "><span style="transform:rotate(45deg);font-size:13px;line-height:1">${emoji}</span></div>`;
+      return window.L.divIcon({ html, className: '', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -32] });
+    }
+
+    loadLeaflet(function() {
+      const mapEl = document.getElementById(mapId);
+      if (!mapEl || mapEl._leaflet_id) return;
+
+      const map = window.L.map(mapId).setView(center, zoom);
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      }).addTo(map);
+
+      points.forEach(function(point) {
+        const icon = createIcon(point.category);
+        const popup = `
+          <strong>${point.name}</strong><br>
+          ${point.description ? `<span style="font-size:0.85em;color:#555">${point.description}</span><br>` : ''}
+          ${point.website ? `<a href="${point.website}" target="_blank" rel="noopener" style="font-size:0.82em;color:#B22234">Visit website →</a>` : ''}
+        `;
+        window.L.marker(point.coordinates, { icon }).addTo(map).bindPopup(popup);
+      });
+    });
+  })();
+</script>
+
+<style>
+  .map-wrapper {
+    overflow: hidden;
+  }
+
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.8rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--gray-700);
+    font-weight: 500;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .map-container {
+    height: 450px;
+    width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .map-container { height: 300px; }
+  }
+</style>

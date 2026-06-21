@@ -1,0 +1,254 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="Sync — USA Trip 2026" description="Import and export your trip data for cross-device sync.">
+  <Nav />
+  <main>
+    <div class="sync-hero">
+      <div class="container">
+        <p class="section-label">Data</p>
+        <h1>Import / Export</h1>
+        <p class="hero-sub">Back up and restore your expenses and checklist across devices.</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container sync-container">
+
+        <!-- Export -->
+        <div class="card sync-card">
+          <div class="sync-icon">📤</div>
+          <h2>Export Data</h2>
+          <p>Download all your expenses and checklist progress as a JSON file. Save it to your device or share between devices.</p>
+          <button id="export-btn" class="btn btn-primary">Download JSON</button>
+          <div id="export-info" class="sync-info"></div>
+        </div>
+
+        <!-- Import -->
+        <div class="card sync-card">
+          <div class="sync-icon">📥</div>
+          <h2>Import Data</h2>
+          <p>Restore from a previously exported JSON file. This will <strong>merge</strong> with your current data (expenses are added, checklist items are updated).</p>
+          <div class="file-drop" id="file-drop">
+            <span class="file-drop-icon">📂</span>
+            <span>Drop JSON file here or</span>
+            <label class="btn btn-outline" style="cursor:pointer;">
+              Browse
+              <input type="file" id="file-input" accept=".json,application/json" style="display:none;" />
+            </label>
+          </div>
+          <div id="import-info" class="sync-info"></div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card sync-card danger-card">
+          <div class="sync-icon">⚠️</div>
+          <h2>Danger Zone</h2>
+          <p>Clear all locally stored data. This cannot be undone — export first if you want a backup.</p>
+          <div class="danger-buttons">
+            <button id="clear-expenses" class="btn btn-danger">Clear Expenses</button>
+            <button id="clear-checklist" class="btn btn-danger">Clear Checklist</button>
+            <button id="clear-all" class="btn btn-danger">Clear Everything</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script is:inline>
+  const EXPENSE_KEY = 'usa-expenses';
+  const CHECKLIST_KEY = 'usa-checklist';
+
+  function loadExpenses() { try { return JSON.parse(localStorage.getItem(EXPENSE_KEY) || '[]'); } catch { return []; } }
+  function loadChecklist() { try { return JSON.parse(localStorage.getItem(CHECKLIST_KEY) || '{}'); } catch { return {}; } }
+
+  function showInfo(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'sync-info sync-info-' + type;
+  }
+
+  // Export
+  document.getElementById('export-btn').addEventListener('click', () => {
+    const data = {
+      exported: new Date().toISOString(),
+      trip: 'usa-trip-devconf-boston-2026',
+      expenses: loadExpenses(),
+      checklist: loadChecklist(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `usa-trip-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showInfo('export-info', `Exported ${data.expenses.length} expenses and ${Object.keys(data.checklist).length} checklist items.`, 'success');
+  });
+
+  // Import
+  document.getElementById('file-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.expenses && Array.isArray(data.expenses)) {
+          const existing = loadExpenses();
+          const merged = [...existing, ...data.expenses];
+          localStorage.setItem(EXPENSE_KEY, JSON.stringify(merged));
+        }
+        if (data.checklist && typeof data.checklist === 'object') {
+          const existing = loadChecklist();
+          const merged = { ...existing, ...data.checklist };
+          localStorage.setItem(CHECKLIST_KEY, JSON.stringify(merged));
+        }
+        const expCount = data.expenses?.length || 0;
+        const chkCount = Object.keys(data.checklist || {}).length;
+        showInfo('import-info', `Imported ${expCount} expenses and ${chkCount} checklist states successfully.`, 'success');
+      } catch {
+        showInfo('import-info', 'Error: Could not parse file. Make sure it is a valid JSON export.', 'error');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // File drop
+  const fileDrop = document.getElementById('file-drop');
+  fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    fileDrop.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const input = document.getElementById('file-input');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+
+  // Clear buttons
+  document.getElementById('clear-expenses').addEventListener('click', () => {
+    if (!confirm('Clear all expenses? This cannot be undone.')) return;
+    localStorage.removeItem(EXPENSE_KEY);
+    showInfo('import-info', 'Expenses cleared.', 'success');
+  });
+
+  document.getElementById('clear-checklist').addEventListener('click', () => {
+    if (!confirm('Clear all checklist progress? This cannot be undone.')) return;
+    localStorage.removeItem(CHECKLIST_KEY);
+    showInfo('import-info', 'Checklist cleared.', 'success');
+  });
+
+  document.getElementById('clear-all').addEventListener('click', () => {
+    if (!confirm('Clear ALL data (expenses + checklist)? This cannot be undone.')) return;
+    localStorage.removeItem(EXPENSE_KEY);
+    localStorage.removeItem(CHECKLIST_KEY);
+    showInfo('import-info', 'All data cleared.', 'success');
+  });
+</script>
+
+<style>
+  .sync-hero {
+    background: linear-gradient(135deg, var(--usa-blue) 0%, #2a2950 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .sync-hero .section-label { color: rgba(255,255,255,0.65); }
+  .sync-hero h1 { color: white; margin-bottom: 0.4rem; }
+  .hero-sub { color: rgba(255,255,255,0.75); }
+
+  .sync-container {
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .sync-card {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .sync-icon { font-size: 2rem; }
+
+  .sync-card h2 { font-size: 1.3rem; }
+  .sync-card p { font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
+
+  .file-drop {
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    transition: border-color 0.15s, background 0.15s;
+    cursor: default;
+  }
+
+  .file-drop.drag-over {
+    border-color: var(--usa-red);
+    background: var(--usa-red-pale);
+  }
+
+  .file-drop-icon { font-size: 1.75rem; }
+
+  .sync-info {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius);
+    display: none;
+  }
+
+  .sync-info-success {
+    display: block;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+  }
+
+  .sync-info-error {
+    display: block;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+  }
+
+  .danger-card { border: 2px solid #fecaca; }
+
+  .danger-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid #fca5a5;
+    background: #fef2f2;
+    color: #dc2626;
+    transition: all 0.15s;
+  }
+  .btn-danger:hover { background: #dc2626; color: white; border-color: #dc2626; }
+</style>

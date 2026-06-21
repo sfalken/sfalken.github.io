@@ -1,0 +1,136 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="About" description="About this trip planner — openSUSECon + Flock to Fedora, Prague and Nuremberg 2026">
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">About This Trip</span>
+      <h1>Open Source in Central Europe</h1>
+      <p>Two of the most important Linux and open-source community conferences, back-to-back, in two beautiful medieval cities.</p>
+    </div>
+  </div>
+
+  <main>
+    <div class="container about-container">
+
+      <div class="about-grid">
+
+        <div class="about-section">
+          <h2>The Trip</h2>
+          <p>This is a 20-day solo trip through the Czech Republic and Germany, anchored by two open-source conferences: <strong>Flock to Fedora</strong> in Prague (June 13–15) and <strong>openSUSE Conference</strong> in Nuremberg (June 23–25).</p>
+          <p>The trip runs June 10–29, 2026, with 12 nights in Prague and 7 nights in Nuremberg, connected by a FlixBus/RegioJet ride from Prague Florenc to Nuremberg ZOB (~4 hours) on June 22.</p>
+        </div>
+
+        <div class="about-section">
+          <h2>The Conferences</h2>
+          <div class="conf-about">
+            <div class="conf-item">
+              <span class="conf-emoji">🐧</span>
+              <div>
+                <h3><a href="https://flocktofedora.org" target="_blank" rel="noopener">Flock to Fedora</a></h3>
+                <p>The annual Fedora community conference, bringing together contributors, developers, designers, and users to collaborate, share, and plan the future of Fedora Linux.</p>
+              </div>
+            </div>
+            <div class="conf-item">
+              <span class="conf-emoji">🦎</span>
+              <div>
+                <h3><a href="https://events.opensuse.org" target="_blank" rel="noopener">openSUSE Conference</a></h3>
+                <p>The global openSUSE community conference held annually in Nuremberg — the home city of SUSE and the openSUSE project. Three days of talks, BoFs, workshops, and the famous Geeko community spirit.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-section">
+          <h2>🍦 The Ice Cream Selfie Tradition</h2>
+          <p>This trip includes a special tradition: taking an ice cream selfie at every conference! Each city has been curated with the best gelaterias and ice cream shops near the conference venues — one spot per conference day, so there's a new photo opportunity each day.</p>
+          <p>Check the <a href={`${base}prague/`}>Prague</a> and <a href={`${base}nuremberg/`}>Nuremberg</a> city pages for the full Ice Cream Selfie Spots guide.</p>
+        </div>
+
+        <div class="about-section">
+          <h2>This Site</h2>
+          <p>Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> and deployed on GitHub Pages. Features include:</p>
+          <ul class="feature-list">
+            <li>Interactive maps (Leaflet + OpenStreetMap)</li>
+            <li>Day-by-day itinerary for both cities</li>
+            <li>Hotel & restaurant recommendations</li>
+            <li>Planning checklist with localStorage persistence</li>
+            <li>Budget tracker with CZK/EUR/USD currency switching</li>
+            <li>Mobile-optimized expense logging</li>
+            <li>Import/export for cross-device sync</li>
+            <li>PWA — works offline</li>
+          </ul>
+        </div>
+
+        <div class="about-section">
+          <h2>Cities at a Glance</h2>
+          <div class="city-quick">
+            <div class="cq-card">
+              <h3>🇨🇿 Prague</h3>
+              <dl>
+                <dt>Country</dt><dd>Czech Republic</dd>
+                <dt>Currency</dt><dd>CZK (Czech Koruna)</dd>
+                <dt>Language</dt><dd>Czech (English widely spoken)</dd>
+                <dt>Airport</dt><dd>PRG (Václav Havel)</dd>
+                <dt>Transit</dt><dd>Metro, tram, bus — excellent system</dd>
+                <dt>Conference</dt><dd>🐧 Flock to Fedora, June 13–15</dd>
+              </dl>
+            </div>
+            <div class="cq-card">
+              <h3>🇩🇪 Nuremberg</h3>
+              <dl>
+                <dt>Country</dt><dd>Germany</dd>
+                <dt>Currency</dt><dd>EUR (Euro)</dd>
+                <dt>Language</dt><dd>German (English well-spoken)</dd>
+                <dt>Airport</dt><dd>NUE (Albrecht Dürer)</dd>
+                <dt>Transit</dt><dd>U-Bahn, tram, S-Bahn (MVV/VGN)</dd>
+                <dt>Conference</dt><dd>🦎 openSUSECon, June 23–25</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="back-links">
+        <a href={`${base}prague/`} class="btn btn-primary">🇨🇿 Prague Guide</a>
+        <a href={`${base}nuremberg/`} class="btn btn-outline">🇩🇪 Nuremberg Guide</a>
+        <a href={`${base}checklist/`} class="btn btn-outline">✅ Checklist</a>
+        <a href={`${base}budget/`} class="btn btn-outline">💰 Budget</a>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-container { max-width: 900px; padding: 3rem 1.5rem; }
+  .about-grid { display: flex; flex-direction: column; gap: 2.5rem; }
+  .about-section h2 { margin-bottom: 0.75rem; }
+  .about-section p { font-size: 0.95rem; color: var(--eu-text); margin-bottom: 0.5rem; }
+
+  .conf-about { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+  .conf-item { display: flex; gap: 1rem; align-items: flex-start; }
+  .conf-emoji { font-size: 2rem; flex-shrink: 0; }
+  .conf-item h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+  .conf-item h3 a { color: var(--eu-dark); }
+  .conf-item h3 a:hover { color: var(--eu-red); }
+  .conf-item p { font-size: 0.88rem; color: var(--eu-muted); }
+
+  .feature-list { padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
+  .feature-list li { font-size: 0.9rem; }
+
+  .city-quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 0.5rem; }
+  .cq-card { background: var(--eu-surface); border: 1px solid var(--eu-border); border-radius: 12px; padding: 1.25rem; }
+  .cq-card h3 { font-size: 1.05rem; margin-bottom: 0.75rem; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; font-size: 0.82rem; }
+  dt { color: var(--eu-muted); font-weight: 600; }
+  dd { color: var(--eu-text); }
+
+  .back-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 3rem; }
+</style>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <clipPath id="circle192"><circle cx="96" cy="96" r="96"/></clipPath>
+  </defs>
+  <g clip-path="url(#circle192)">
+    <rect x="0" y="0" width="96" height="192" fill="#D7141A"/>
+    <rect x="96" y="0" width="96" height="192" fill="#FFCC00"/>
+  </g>
+  <text x="96" y="130" font-family="Arial, sans-serif" font-size="96" font-weight="bold" fill="white" text-anchor="middle">M</text>
+</svg>

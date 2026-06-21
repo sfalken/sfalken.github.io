@@ -1,0 +1,353 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+  title="Overview"
+  description="openSUSECon + Flock to Fedora trip — Prague, Czech Republic and Nuremberg, Germany. June 10–29, 2026."
+>
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">June 10 – 29, 2026 · Solo</span>
+      <h1>Prague & Nuremberg</h1>
+      <p>Two open-source conferences, two medieval cities, one epic Central European adventure. 12 nights in Prague for Flock to Fedora, then a bus ride to Nuremberg for openSUSECon.</p>
+      <div class="hero-events">
+        <div class="event-chip flock">🐧 Flock to Fedora · Prague · June 13–15</div>
+        <div class="event-chip opensuse">🦎 openSUSECon · Nuremberg · June 23–25</div>
+      </div>
+      <div class="hero-actions">
+        <a href={`${base}prague/`} class="btn btn-primary">🇨🇿 Prague</a>
+        <a href={`${base}nuremberg/`} class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">🇩🇪 Nuremberg</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <!-- Trip at a Glance -->
+      <section class="section">
+        <span class="eyebrow">Trip at a Glance</span>
+        <h2>19 Nights · 2 Countries · 2 Conferences</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <span class="stat-num">20</span>
+            <span class="stat-label">Days</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">12+7</span>
+            <span class="stat-label">Nights (PRG + NUE)</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">2</span>
+            <span class="stat-label">Conferences</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">8+</span>
+            <span class="stat-label">Ice Cream Selfies 🍦</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Route -->
+      <section class="section">
+        <span class="eyebrow">Route</span>
+        <h2>The Journey</h2>
+        <div class="route">
+          <div class="route-step">
+            <div class="route-dot home"></div>
+            <div class="route-content">
+              <strong>Home Airport</strong>
+              <span>Departure</span>
+            </div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot prague"></div>
+            <div class="route-content">
+              <strong>🇨🇿 Prague</strong>
+              <span>June 10–22 · 12 nights</span>
+              <span class="conf-badge flock-badge">🐧 Flock to Fedora</span>
+            </div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot train"></div>
+            <div class="route-content">
+              <strong>🚌 Bus</strong>
+              <span>Prague Florenc → Nuremberg ZOB (~4 hrs)</span>
+            </div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot nuremberg"></div>
+            <div class="route-content">
+              <strong>🇩🇪 Nuremberg</strong>
+              <span>June 22–29 · 7 nights</span>
+              <span class="conf-badge opensuse-badge">🦎 openSUSECon</span>
+            </div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot home"></div>
+            <div class="route-content">
+              <strong>Home</strong>
+              <span>June 29 · Depart NUE</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cities -->
+      <section class="section">
+        <span class="eyebrow">Destinations</span>
+        <h2>City Guides</h2>
+        <div class="city-cards">
+          <a href={`${base}prague/`} class="city-card prague-card">
+            <div class="city-flag">🇨🇿</div>
+            <h3>Prague</h3>
+            <p>Czech Republic · June 10–22</p>
+            <p class="city-highlights">Old Town · Charles Bridge · Prague Castle · Flock Conference · Amazing Czech Beer</p>
+            <span class="city-link">Explore Prague →</span>
+          </a>
+          <a href={`${base}nuremberg/`} class="city-card nuremberg-card">
+            <div class="city-flag">🇩🇪</div>
+            <h3>Nuremberg</h3>
+            <p>Germany · June 22–29</p>
+            <p class="city-highlights">Imperial Castle · Old Town · Bratwurst · openSUSECon · Rothenburg Day Trip</p>
+            <span class="city-link">Explore Nuremberg →</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Conferences -->
+      <section class="section">
+        <span class="eyebrow">Conferences</span>
+        <h2>The Main Events</h2>
+        <div class="conf-cards">
+          <div class="card conf-card flock-conf">
+            <div class="conf-logo">🐧</div>
+            <div>
+              <h3><a href="https://flocktofedora.org" target="_blank" rel="noopener">Flock to Fedora</a></h3>
+              <p class="conf-where">📍 Prague, Czech Republic</p>
+              <p class="conf-when">📅 June 13–15, 2026</p>
+              <p class="conf-desc">The annual Fedora contributor conference. Three days of talks, workshops, hackfests, and community building.</p>
+              <a href="https://flocktofedora.org" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:0.75rem;font-size:0.82rem;">flocktofedora.org →</a>
+            </div>
+          </div>
+          <div class="card conf-card opensuse-conf">
+            <div class="conf-logo">🦎</div>
+            <div>
+              <h3><a href="https://events.opensuse.org" target="_blank" rel="noopener">openSUSE Conference</a></h3>
+              <p class="conf-where">📍 Nuremberg, Germany</p>
+              <p class="conf-when">📅 June 23–25, 2026</p>
+              <p class="conf-desc">The global openSUSE community conference at Z-Bau in the openSUSE home city. Talks, BoFs, and the legendary Geeko community.</p>
+              <a href="https://events.opensuse.org" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:0.75rem;font-size:0.82rem;">events.opensuse.org →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Travel Tips -->
+      <section class="section">
+        <span class="eyebrow">Planning Tips</span>
+        <h2>Essential Travel Tips</h2>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <span class="tip-icon">💶</span>
+            <h4>Two Currencies</h4>
+            <p>Czech Republic uses CZK (not Euro!). Germany uses EUR. Don't get caught with wrong cash. Exchange at proper banks/ATMs, avoid airport kiosks.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🚌</span>
+            <h4>Prague → Nuremberg Bus</h4>
+            <p>Book on <a href="https://www.flixbus.com" target="_blank">flixbus.com</a> or <a href="https://www.regiojet.com" target="_blank">regiojet.com</a>. ~4 hours, departs Prague Florenc terminal, arrives Nuremberg ZOB near Hauptbahnhof. Much cheaper than the train.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">📱</span>
+            <h4>EU Roaming</h4>
+            <p>Check your phone carrier — many US/Canada plans include EU roaming. Otherwise get an EU SIM or eSIM (Airalo, Holafly). Download offline maps before you go.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🌡️</span>
+            <h4>June Weather</h4>
+            <p>Warm (20–25°C / 68–77°F) but can rain. Pack a light rain jacket. Both cities have outdoor markets and cobblestone streets — comfortable walking shoes are essential.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🛂</span>
+            <h4>Schengen Zone</h4>
+            <p>Both Czech Republic and Germany are in the Schengen Area — no border passport checks. US/CA citizens get 90 days visa-free. Just one entry into the zone.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🍺</span>
+            <h4>Beer Culture</h4>
+            <p>Prague: Try tank-fresh Pilsner Urquell at Lokál — the taste difference is remarkable. Nuremberg: dark Franconian lagers and Kellerbier. Both cities have incredible beer traditions.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Links -->
+      <section class="section">
+        <div class="quick-links">
+          <a href={`${base}checklist/`} class="quick-link">
+            <span class="ql-icon">✅</span>
+            <div>
+              <strong>Planning Checklist</strong>
+              <span>Track what's done before departure</span>
+            </div>
+          </a>
+          <a href={`${base}budget/`} class="quick-link">
+            <span class="ql-icon">💰</span>
+            <div>
+              <strong>Budget Tracker</strong>
+              <span>Estimates & expense logging in CZK/EUR/USD</span>
+            </div>
+          </a>
+          <a href={`${base}log/`} class="quick-link">
+            <span class="ql-icon">➕</span>
+            <div>
+              <strong>Quick Log</strong>
+              <span>Mobile-optimized expense entry</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .section { margin: 3rem 0; }
+  .section h2 { margin-top: 0.25rem; margin-bottom: 1.5rem; }
+
+  .hero-events { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .event-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .event-chip.flock { background: rgba(59, 130, 246, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); color: #bfdbfe; }
+  .event-chip.opensuse { background: rgba(115, 186, 37, 0.2); border: 1px solid rgba(115, 186, 37, 0.3); color: #bbf7d0; }
+  .hero-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .stat-card {
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 700; color: var(--eu-red); line-height: 1; }
+  .stat-label { font-size: 0.78rem; color: var(--eu-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .route { display: flex; flex-direction: column; gap: 0; max-width: 500px; margin-top: 1.5rem; }
+  .route-step { display: flex; align-items: flex-start; gap: 1rem; }
+  .route-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--eu-border);
+  }
+  .route-dot.home { background: var(--eu-muted); }
+  .route-dot.prague { background: var(--eu-red); }
+  .route-dot.train { background: var(--eu-gold); }
+  .route-dot.nuremberg { background: var(--eu-blue); }
+  .route-line {
+    width: 2px;
+    height: 40px;
+    background: var(--eu-border);
+    margin-left: 7px;
+  }
+  .route-content { display: flex; flex-direction: column; gap: 0.1rem; padding-bottom: 0.5rem; }
+  .route-content strong { font-size: 1rem; }
+  .route-content span { font-size: 0.82rem; color: var(--eu-muted); }
+  .conf-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    margin-top: 0.2rem;
+    width: fit-content;
+  }
+  .flock-badge { background: #dbeafe; color: var(--flock-color); }
+  .opensuse-badge { background: #dcfce7; color: #166534; }
+
+  .city-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .city-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .city-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); transform: translateY(-2px); text-decoration: none; }
+  .prague-card { border-top: 4px solid var(--eu-red); }
+  .nuremberg-card { border-top: 4px solid var(--eu-gold); }
+  .city-flag { font-size: 3rem; }
+  .city-card h3 { font-size: 1.6rem; color: var(--eu-dark); }
+  .city-card p { font-size: 0.85rem; color: var(--eu-muted); }
+  .city-highlights { color: var(--eu-text) !important; font-size: 0.82rem !important; }
+  .city-link { color: var(--eu-red); font-weight: 600; font-size: 0.9rem; margin-top: auto; }
+
+  .conf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+  .conf-card { display: flex; gap: 1.25rem; }
+  .flock-conf { border-left: 4px solid var(--flock-color); }
+  .opensuse-conf { border-left: 4px solid var(--opensuse-color); }
+  .conf-logo { font-size: 2.5rem; flex-shrink: 0; }
+  .conf-card h3 { font-size: 1.2rem; }
+  .conf-card h3 a { color: var(--eu-dark); }
+  .conf-card h3 a:hover { color: var(--eu-red); }
+  .conf-where, .conf-when { font-size: 0.82rem; color: var(--eu-muted); }
+  .conf-desc { font-size: 0.88rem; margin-top: 0.5rem; }
+
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+  .tip-card {
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tip-icon { font-size: 1.75rem; }
+  .tip-card h4 { font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 600; }
+  .tip-card p { font-size: 0.85rem; color: var(--eu-muted); }
+
+  .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--eu-surface);
+    border: 1px solid var(--eu-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.15s;
+  }
+  .quick-link:hover { border-color: var(--eu-red); box-shadow: 0 4px 12px rgba(215,20,26,0.1); text-decoration: none; }
+  .ql-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .quick-link strong { display: block; font-size: 0.95rem; color: var(--eu-dark); }
+  .quick-link span { font-size: 0.8rem; color: var(--eu-muted); }
+</style>

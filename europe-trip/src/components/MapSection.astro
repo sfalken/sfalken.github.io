@@ -1,0 +1,125 @@
+---
+import type { MapPoint } from '../data/types';
+
+interface Props {
+  center: [number, number];
+  zoom: number;
+  points: MapPoint[];
+  cityName: string;
+  mapId: string;
+}
+const { center, zoom, points, cityName, mapId } = Astro.props;
+const pointsJson = JSON.stringify(points);
+---
+
+<div class="map-section">
+  <div class="map-legend">
+    <div class="legend-item"><span class="legend-dot hotel"></span> Hotels</div>
+    <div class="legend-item"><span class="legend-dot restaurant"></span> Restaurants</div>
+    <div class="legend-item"><span class="legend-dot attraction"></span> Attractions</div>
+    <div class="legend-item"><span class="legend-dot conference"></span> Conference</div>
+    <div class="legend-item"><span class="legend-dot transport"></span> Transport</div>
+    <div class="legend-item"><span class="legend-dot icecream"></span> 🍦 Ice Cream</div>
+  </div>
+  <div id={mapId} class="leaflet-map" data-center={JSON.stringify(center)} data-zoom={zoom} data-points={pointsJson}></div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script define:vars={{ mapId }}>
+  function initMap() {
+    const el = document.getElementById(mapId);
+    if (!el || el._leafletMap) return;
+
+    const center = JSON.parse(el.dataset.center);
+    const zoom = parseInt(el.dataset.zoom);
+    const points = JSON.parse(el.dataset.points);
+
+    const map = L.map(mapId).setView(center, zoom);
+    el._leafletMap = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const colors = {
+      hotel: '#3b82f6',
+      restaurant: '#f59e0b',
+      attraction: '#8b5cf6',
+      conference: '#D7141A',
+      transport: '#6b7280',
+      icecream: '#ec4899',
+    };
+
+    const icons = {
+      hotel: '🏨',
+      restaurant: '🍽️',
+      attraction: '⭐',
+      conference: '💻',
+      transport: '🚆',
+      icecream: '🍦',
+    };
+
+    function makeIcon(cat) {
+      const color = colors[cat] || '#333';
+      const emoji = icons[cat] || '📍';
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:32px;height:32px;background:${color};border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${emoji}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -20],
+      });
+    }
+
+    points.forEach(pt => {
+      const icon = makeIcon(pt.category);
+      const popup = `<b>${pt.name}</b>${pt.description ? `<br><small>${pt.description}</small>` : ''}${pt.url ? `<br><a href="${pt.url}" target="_blank" rel="noopener">More info →</a>` : ''}`;
+      L.marker(pt.coordinates, { icon }).addTo(map).bindPopup(popup);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMap);
+  } else {
+    initMap();
+  }
+</script>
+
+<style>
+  .map-section { margin: 2rem 0; }
+  .leaflet-map {
+    height: 480px;
+    border-radius: 12px;
+    border: 1px solid var(--eu-border);
+    z-index: 1;
+  }
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.82rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .legend-dot.hotel { background: #3b82f6; }
+  .legend-dot.restaurant { background: #f59e0b; }
+  .legend-dot.attraction { background: #8b5cf6; }
+  .legend-dot.conference { background: var(--eu-red); }
+  .legend-dot.transport { background: #6b7280; }
+  .legend-dot.icecream { background: #ec4899; }
+
+  @media (max-width: 640px) {
+    .leaflet-map { height: 300px; }
+  }
+</style>

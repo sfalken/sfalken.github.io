@@ -1,0 +1,422 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const trips = [
+  {
+    id: 'europe-trip',
+    flags: '🇨🇿🇩🇪',
+    title: 'Prague & Nuremberg',
+    subtitle: 'Czech Republic · Germany',
+    category: 'Conference Trip',
+    dates: 'June 10–29, 2026',
+    travelers: 'Solo',
+    nights: 19,
+    description:
+      'Two open-source conferences, two medieval cities. 12 nights in Prague for Flock to Fedora, then a bus ride to Nuremberg for openSUSECon.',
+    tags: ['🐧 Flock to Fedora', '🦎 openSUSECon'],
+    status: 'in-progress',
+    url: '/europe-trip/',
+    accentColor: '#D7141A',
+  },
+  {
+    id: 'usa-trip',
+    flags: '🇺🇸',
+    title: 'Boston',
+    subtitle: 'Massachusetts, USA',
+    category: 'Conference Trip',
+    dates: 'September 22–26, 2026',
+    travelers: 'Solo',
+    nights: 4,
+    description:
+      'Five days in Boston for DevConf.US at Boston University, plus the Freedom Trail, the North End, and a few ice cream selfies.',
+    tags: ['💻 DevConf.US'],
+    status: 'upcoming',
+    url: '/usa-trip/',
+    accentColor: '#3C3B6E',
+  },
+] as const;
+
+type TripStatus = 'in-progress' | 'upcoming' | 'completed' | 'not-taken';
+
+const statusMeta: Record<TripStatus, { label: string; dot: string }> = {
+  'in-progress': { label: 'In Progress', dot: '●' },
+  'upcoming':    { label: 'Upcoming',    dot: '○' },
+  'completed':   { label: 'Completed',   dot: '✓' },
+  'not-taken':   { label: 'Not Taken',   dot: '✕' },
+};
+
+const sections: { status: TripStatus; heading: string; subheading: string }[] = [
+  { status: 'in-progress', heading: 'Currently Traveling',    subheading: 'In Progress' },
+  { status: 'upcoming',    heading: 'On the Horizon',         subheading: 'Upcoming' },
+  { status: 'completed',   heading: 'Trips Taken',            subheading: 'Completed' },
+  { status: 'not-taken',   heading: 'Plans That Didn\'t Happen', subheading: 'Not Taken' },
+];
+
+const inProgressTrips = trips.filter(t => t.status === 'in-progress');
+---
+
+<Layout title="sfalken's Travels">
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">✈️ sfalken's Travels</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <p class="hero-eyebrow">Trip Planner</p>
+        <h1>Open source conferences<br/>and adventures.</h1>
+        <p class="hero-desc">
+          Itineraries, hotels, budgets, and planning checklists — all in one place.
+        </p>
+        {inProgressTrips.length > 0 && (
+          <div class="traveling-now">
+            <span class="pulse-ring"></span>
+            <span class="pulse-dot"></span>
+            Currently on trip:
+            {inProgressTrips.map(t => <strong>{t.flags} {t.title}</strong>)}
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Trip Sections -->
+    <div class="trips-wrap">
+      <div class="container">
+        {sections.map(({ status, heading, subheading }) => {
+          const group = trips.filter(t => t.status === status);
+          if (group.length === 0) return null;
+          const meta = statusMeta[status];
+          return (
+            <section class={`trip-section section-${status}`}>
+              <div class="section-hd">
+                <span class={`section-badge badge-${status}`}>
+                  {meta.dot} {meta.label}
+                </span>
+                <h2 class="section-title">{heading}</h2>
+              </div>
+
+              <div class="trip-grid">
+                {group.map(trip => (
+                  <article class={`trip-card card-${trip.status}`} style={`--accent: ${trip.accentColor}`}>
+                    <div class="card-top">
+                      <span class="card-flags">{trip.flags}</span>
+                      <span class={`inline-badge badge-${trip.status}`}>
+                        {statusMeta[trip.status].dot} {statusMeta[trip.status].label}
+                      </span>
+                    </div>
+
+                    <p class="card-category">{trip.category}</p>
+                    <h3 class="card-title">{trip.title}</h3>
+                    <p class="card-subtitle">{trip.subtitle}</p>
+
+                    <div class="card-meta">
+                      <span>📅 {trip.dates}</span>
+                      <span>👤 {trip.travelers}</span>
+                      <span>🌙 {trip.nights} nights</span>
+                    </div>
+
+                    <p class="card-desc">{trip.description}</p>
+
+                    <div class="card-tags">
+                      {trip.tags.map(tag => <span class="tag">{tag}</span>)}
+                    </div>
+
+                    <div class="card-footer">
+                      <a href={trip.url} class={`btn-open btn-${trip.status}`}>
+                        Open Trip →
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>✈️ sfalken's Travels · Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> · <a href="https://github.com/sfalken/my-trips" target="_blank" rel="noopener">GitHub Pages</a></p>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, var(--hub-hero-from) 0%, var(--hub-hero-to) 100%);
+    color: white;
+    padding: 5rem 0 4rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 {
+    color: white;
+    margin-bottom: 1rem;
+  }
+
+  .hero-desc {
+    color: rgba(255,255,255,0.7);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin-bottom: 1.75rem;
+  }
+
+  .traveling-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(22,163,74,0.18);
+    border: 1px solid rgba(22,163,74,0.4);
+    color: #bbf7d0;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    position: relative;
+  }
+
+  .pulse-ring, .pulse-dot {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
+    position: relative;
+    transform: none;
+    flex-shrink: 0;
+  }
+
+  .pulse-ring {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+    border: 2px solid #4ade80;
+    animation: pulse 1.5s ease-out infinite;
+    position: relative;
+    transform: none;
+    flex-shrink: 0;
+    margin-right: -8px;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .traveling-now strong { color: white; }
+
+  /* ── Sections ── */
+  .trips-wrap {
+    padding: 3rem 0 2rem;
+  }
+
+  .trip-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-hd {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--hub-border);
+  }
+
+  .section-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+  }
+
+  .badge-in-progress { background: var(--s-progress-bg); color: var(--s-progress); border: 1px solid var(--s-progress-border); }
+  .badge-upcoming    { background: var(--s-upcoming-bg);  color: var(--s-upcoming);  border: 1px solid var(--s-upcoming-border); }
+  .badge-completed   { background: var(--s-completed-bg); color: var(--s-completed); border: 1px solid var(--s-completed-border); }
+  .badge-not-taken   { background: var(--s-shelved-bg);   color: var(--s-shelved);   border: 1px solid var(--s-shelved-border); }
+
+  .section-title {
+    font-size: 1.05rem;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+    color: var(--hub-muted);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Cards ── */
+  .trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .trip-card {
+    background: var(--hub-surface);
+    border: 1px solid var(--hub-border);
+    border-left: 4px solid var(--accent, #4338ca);
+    border-radius: 14px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .trip-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.2rem;
+  }
+
+  .card-flags { font-size: 2.2rem; line-height: 1; }
+
+  .inline-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+  }
+
+  .card-category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--hub-muted);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--hub-text);
+    line-height: 1.15;
+  }
+
+  .card-subtitle {
+    font-size: 0.82rem;
+    color: var(--hub-muted);
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    font-size: 0.8rem;
+    color: var(--hub-muted);
+    margin: 0.25rem 0;
+  }
+
+  .card-desc {
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+  }
+
+  .card-footer {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--hub-border);
+  }
+
+  .btn-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.87rem;
+    font-weight: 600;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-in-progress { background: var(--s-progress); color: white; }
+  .btn-in-progress:hover { background: #15803d; text-decoration: none; color: white; }
+
+  .btn-upcoming { background: var(--s-upcoming); color: white; }
+  .btn-upcoming:hover { background: #1d4ed8; text-decoration: none; color: white; }
+
+  .btn-completed { background: var(--s-completed); color: white; }
+  .btn-completed:hover { background: #4b5563; text-decoration: none; color: white; }
+
+  .btn-not-taken { background: var(--s-shelved); color: white; }
+  .btn-not-taken:hover { background: #b45309; text-decoration: none; color: white; }
+
+  @media (max-width: 640px) {
+    .trip-grid { grid-template-columns: 1fr; }
+    .hero { padding: 3rem 0 2.5rem; }
+    .hero h1 { font-size: 2rem; }
+    .trips-wrap { padding: 2rem 0 1rem; }
+  }
+</style>

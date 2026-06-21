@@ -1,0 +1,149 @@
+---
+import type { Hotel } from '../data/types';
+
+export interface Props {
+  hotel: Hotel;
+}
+
+const { hotel } = Astro.props;
+
+const tierLabel = { budget: 'Budget', mid: 'Mid-range', luxury: 'Luxury' }[hotel.tier];
+const tierClass = { budget: 'badge-blue', mid: '', luxury: 'badge-red' }[hotel.tier];
+const stars = '★'.repeat(Math.round(hotel.rating)) + '☆'.repeat(5 - Math.round(hotel.rating));
+---
+
+<div class="card hotel-card">
+  <div class="hotel-header">
+    <div class="hotel-meta">
+      <span class={`badge ${tierClass}`}>{tierLabel}</span>
+      <span class="stars" title={`${hotel.rating} stars`}>{stars} <small>{hotel.rating}</small></span>
+    </div>
+    <h3 class="hotel-name">{hotel.name}</h3>
+    <div class="hotel-price">
+      <span class="price-amount">${hotel.pricePerNight}</span>
+      <span class="price-unit">/ night</span>
+    </div>
+  </div>
+
+  <div class="hotel-body">
+    <p class="hotel-desc">{hotel.description}</p>
+
+    <div class="hotel-tags">
+      {hotel.tags.map(tag => <span class="tag">{tag}</span>)}
+    </div>
+
+    <div class="hotel-tip">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text">{hotel.tip}</span>
+    </div>
+
+    <div class="hotel-address">
+      <span>📍</span>
+      <span>{hotel.address}</span>
+    </div>
+  </div>
+
+  <div class="hotel-footer">
+    <a href={hotel.website} target="_blank" rel="noopener" class="btn btn-outline">
+      View Hotel →
+    </a>
+    <a
+      href={`https://maps.google.com/?q=${encodeURIComponent(hotel.address)}`}
+      target="_blank"
+      rel="noopener"
+      class="btn btn-secondary"
+    >
+      Map
+    </a>
+  </div>
+</div>
+
+<style>
+  .hotel-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hotel-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .hotel-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .hotel-name {
+    font-size: 1.15rem;
+    margin-bottom: 0.35rem;
+    color: var(--gray-900);
+  }
+
+  .hotel-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .price-amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--usa-red);
+    font-family: var(--font-serif);
+  }
+
+  .price-unit {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+  }
+
+  .hotel-body {
+    padding: 1rem 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hotel-desc {
+    color: var(--gray-700);
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .hotel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .hotel-tip {
+    display: flex;
+    gap: 0.5rem;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    color: #78350f;
+    line-height: 1.45;
+  }
+
+  .tip-icon { flex-shrink: 0; }
+
+  .hotel-address {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--gray-500);
+  }
+
+  .hotel-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>

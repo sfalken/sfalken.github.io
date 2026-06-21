@@ -1,0 +1,131 @@
+---
+const base = import.meta.env.BASE_URL;
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: '/', label: '← All Trips' },
+  { href: `${base}`, label: 'Overview' },
+  { href: `${base}prague/`, label: '🇨🇿 Prague' },
+  { href: `${base}nuremberg/`, label: '🇩🇪 Nuremberg' },
+  { href: `${base}checklist/`, label: '✅ Checklist' },
+  { href: `${base}budget/`, label: '💰 Budget' },
+  { href: `${base}about/`, label: 'About' },
+];
+
+function isActive(href: string) {
+  if (href === base || href === `${base}/`) {
+    return currentPath === base || currentPath === `${base}/`;
+  }
+  return currentPath.startsWith(href);
+}
+---
+
+<nav>
+  <div class="nav-inner container">
+    <a href={base} class="nav-brand">🇨🇿🇩🇪 Europe 2026</a>
+    <button class="nav-toggle" aria-label="Toggle menu" id="nav-toggle">☰</button>
+    <ul class="nav-links" id="nav-links">
+      {links.map(link => (
+        <li>
+          <a
+            href={link.href}
+            class={isActive(link.href) ? 'active' : ''}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href={`${base}log/`} class="nav-log-btn">+ Log</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<style>
+  nav {
+    background: white;
+    border-bottom: 2px solid var(--eu-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: 1rem;
+  }
+  .nav-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--eu-dark);
+    white-space: nowrap;
+  }
+  .nav-brand:hover { text-decoration: none; color: var(--eu-red); }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 0.25rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .nav-links a {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--eu-text);
+    transition: all 0.15s;
+  }
+  .nav-links a:hover { background: #f3f4f6; text-decoration: none; }
+  .nav-links a.active { background: #fee2e2; color: var(--eu-red); font-weight: 600; }
+  .nav-log-btn {
+    background: var(--eu-red) !important;
+    color: white !important;
+    font-weight: 600 !important;
+  }
+  .nav-log-btn:hover { background: #b8111a !important; }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    color: var(--eu-text);
+  }
+
+  @media (max-width: 768px) {
+    .nav-toggle { display: block; }
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: white;
+      border-bottom: 2px solid var(--eu-border);
+      padding: 0.75rem 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .nav-links.open { display: flex; }
+    .nav-links li { width: 100%; }
+    .nav-links a { width: 100%; }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const links = document.getElementById('nav-links');
+  toggle?.addEventListener('click', () => links?.classList.toggle('open'));
+</script>

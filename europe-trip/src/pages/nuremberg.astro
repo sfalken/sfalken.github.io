@@ -1,0 +1,12 @@
+---
+import CityPage from '../components/CityPage.astro';
+import nuremberg from '../data/nuremberg';
+---
+
+<CityPage
+  city={nuremberg}
+  flag="🇩🇪"
+  prevCity={{ name: "Prague", href: "prague" }}
+  conferenceTag="openSUSE Conference 2026"
+  conferenceUrl="https://events.opensuse.org"
+/>
