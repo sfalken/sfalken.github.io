@@ -7,18 +7,21 @@ export interface Props {
 
 const { hotel } = Astro.props;
 
-const tierLabel = { budget: 'Budget', mid: 'Mid-range', luxury: 'Luxury' }[hotel.tier];
-const tierClass = { budget: 'badge-blue', mid: '', luxury: 'badge-red' }[hotel.tier];
+const tierLabel = { budget: 'Budget', mid: 'Mid-range', upscale: 'Upscale', luxury: 'Luxury' }[hotel.tier] ?? hotel.tier;
+const tierClass = { budget: 'badge-blue', mid: '', upscale: 'badge-blue', luxury: 'badge-red' }[hotel.tier] ?? '';
 const stars = '★'.repeat(Math.round(hotel.rating)) + '☆'.repeat(5 - Math.round(hotel.rating));
+const hasPii = !!hotel._pii;
 ---
 
-<div class="card hotel-card">
+<div class="card hotel-card" data-pii={hotel._pii || undefined}>
   <div class="hotel-header">
     <div class="hotel-meta">
       <span class={`badge ${tierClass}`}>{tierLabel}</span>
       <span class="stars" title={`${hotel.rating} stars`}>{stars} <small>{hotel.rating}</small></span>
     </div>
-    <h3 class="hotel-name">{hotel.name}</h3>
+    <h3 class="hotel-name">
+      <span class={hasPii ? 'pii-name' : ''}>{hotel.name}</span>
+    </h3>
     <div class="hotel-price">
       <span class="price-amount">${hotel.pricePerNight}</span>
       <span class="price-unit">/ night</span>
@@ -34,19 +37,23 @@ const stars = '★'.repeat(Math.round(hotel.rating)) + '☆'.repeat(5 - Math.rou
 
     <div class="hotel-tip">
       <span class="tip-icon">💡</span>
-      <span class="tip-text">{hotel.tip}</span>
+      <span class={`tip-text${hasPii ? ' pii-tip' : ''}`}>
+        {hasPii ? 'Unlock to reveal booking details' : (hotel.tip ?? '')}
+      </span>
     </div>
 
     <div class="hotel-address">
       <span>📍</span>
-      <span>{hotel.address}</span>
+      <span class={hasPii ? 'pii-address' : ''}>{hotel.address}</span>
     </div>
   </div>
 
   <div class="hotel-footer">
-    <a href={hotel.website} target="_blank" rel="noopener" class="btn btn-outline">
-      View Hotel →
-    </a>
+    {hasPii
+      ? <a class="pii-link btn btn-outline" href="#" target="_blank" rel="noopener" style="display:none;">View Booking →</a>
+      : hotel.website
+        ? <a href={hotel.website} target="_blank" rel="noopener" class="btn btn-outline">View Hotel →</a>
+        : null}
     <a
       href={`https://maps.google.com/?q=${encodeURIComponent(hotel.address)}`}
       target="_blank"

@@ -1,4 +1,5 @@
 export interface Hotel {
+  id: string;
   name: string;
   rating: number;
   pricePerNight: number;
@@ -7,9 +8,10 @@ export interface Hotel {
   address: string;
   tags: string[];
   description: string;
-  tip: string;
+  tip?: string;
   url?: string;
   coordinates: [number, number];
+  _pii?: string;
 }
 
 export interface Restaurant {
@@ -82,6 +84,7 @@ export interface BudgetItem {
   estimated: number;
   currency: string;
   note?: string;
+  _pii?: string;
 }
 
 export interface BudgetCategory {

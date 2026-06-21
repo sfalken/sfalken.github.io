@@ -1,0 +1,286 @@
+---
+// Client-side AES-256-GCM decryption for PII blobs.
+// Key derivation: PBKDF2-SHA256 · 250k iterations · fixed salt.
+// Session key persisted in sessionStorage so re-entry isn't needed per tab.
+---
+
+<button id="pii-fab" class="pii-fab" title="Unlock private details" aria-label="Unlock private details">🔒</button>
+
+<dialog id="pii-dialog" class="pii-dialog">
+  <div class="pii-form">
+    <h3 class="pii-heading">Unlock private details</h3>
+    <p class="pii-hint">Enter the passphrase to reveal confirmed booking names, addresses, and links.</p>
+    <input type="password" id="pii-password" class="pii-input" placeholder="Passphrase" autocomplete="off" />
+    <div id="pii-error" class="pii-error" hidden>Incorrect passphrase — try again.</div>
+    <div class="pii-actions">
+      <button type="button" id="pii-submit" class="pii-btn pii-btn-primary">Unlock</button>
+      <button type="button" id="pii-cancel" class="pii-btn pii-btn-secondary">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const SALT       = new TextEncoder().encode('sfalken-trips-pii-v1');
+  const ITERATIONS = 250_000;
+  const SESSION_KEY = 'trips-pii-key';
+
+  async function deriveKey(password: string): Promise<CryptoKey> {
+    const mat = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: SALT, iterations: ITERATIONS, hash: 'SHA-256' },
+      mat,
+      { name: 'AES-GCM', length: 256 },
+      true,
+      ['decrypt']
+    );
+  }
+
+  async function decryptBlob(b64: string, key: CryptoKey): Promise<Record<string, string>> {
+    const raw  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const iv   = raw.slice(0, 12);
+    const data = raw.slice(12); // ciphertext + GCM tag
+    const dec  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+    return JSON.parse(new TextDecoder().decode(dec));
+  }
+
+  async function storeKey(key: CryptoKey) {
+    const raw = await crypto.subtle.exportKey('raw', key);
+    sessionStorage.setItem(SESSION_KEY, btoa(String.fromCharCode(...new Uint8Array(raw))));
+  }
+
+  async function loadKey(): Promise<CryptoKey | null> {
+    const b64 = sessionStorage.getItem(SESSION_KEY);
+    if (!b64) return null;
+    const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  }
+
+  const FIELD_MAP: [string, string][] = [
+    ['pii-name',    'name'],
+    ['pii-address', 'address'],
+    ['pii-tip',     'tip'],
+    ['pii-label',   'label'],
+    ['pii-note',    'note'],
+    ['pii-desc',    'description'],
+  ];
+
+  async function applyPii(key: CryptoKey) {
+    const elements = document.querySelectorAll<HTMLElement>('[data-pii]');
+    for (const el of elements) {
+      const blob = el.dataset.pii;
+      if (!blob || el.dataset.piiApplied) continue;
+      try {
+        const pii = await decryptBlob(blob, key);
+        for (const [cls, field] of FIELD_MAP) {
+          if (pii[field] != null) {
+            el.querySelectorAll(`.${cls}`).forEach(ch => { ch.textContent = pii[field]; });
+          }
+        }
+        if (pii.url) {
+          el.querySelectorAll<HTMLAnchorElement>('.pii-link').forEach(a => {
+            a.href = pii.url;
+            a.style.display = '';
+          });
+        }
+        el.dataset.piiApplied = '1';
+        el.classList.add('pii-unlocked');
+      } catch {
+        // empty or wrong-key blob — skip silently
+      }
+    }
+  }
+
+  let currentKey: CryptoKey | null = null;
+
+  async function unlock(password: string) {
+    const key = await deriveKey(password);
+    // Verify against first non-empty blob (throws on wrong key)
+    const testEl = [...document.querySelectorAll<HTMLElement>('[data-pii]')]
+      .find(el => el.dataset.pii && el.dataset.pii.length > 10);
+    if (testEl) await decryptBlob(testEl.dataset.pii!, key);
+    await storeKey(key);
+    currentKey = key;
+    await applyPii(key);
+    setFabState(true);
+  }
+
+  function lock() {
+    sessionStorage.removeItem(SESSION_KEY);
+    currentKey = null;
+    location.reload();
+  }
+
+  function setFabState(unlocked: boolean) {
+    const fab = document.getElementById('pii-fab') as HTMLButtonElement | null;
+    if (!fab) return;
+    fab.textContent = unlocked ? '🔓' : '🔒';
+    fab.title = unlocked ? 'Lock private details' : 'Unlock private details';
+    fab.dataset.unlocked = unlocked ? '1' : '';
+  }
+
+  // Auto-decrypt newly added [data-pii] elements (e.g. expense rows rendered by JS)
+  const observer = new MutationObserver(async () => {
+    if (currentKey) await applyPii(currentKey);
+  });
+
+  async function init() {
+    const fab      = document.getElementById('pii-fab') as HTMLButtonElement | null;
+    const dialog   = document.getElementById('pii-dialog') as HTMLDialogElement | null;
+    const pwInput  = document.getElementById('pii-password') as HTMLInputElement | null;
+    const submitBtn = document.getElementById('pii-submit') as HTMLButtonElement | null;
+    const cancelBtn = document.getElementById('pii-cancel') as HTMLButtonElement | null;
+    const errorEl  = document.getElementById('pii-error') as HTMLElement | null;
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const stored = await loadKey();
+    if (stored) {
+      currentKey = stored;
+      await applyPii(stored);
+      setFabState(true);
+    }
+
+    fab?.addEventListener('click', () => {
+      if (fab.dataset.unlocked) {
+        lock();
+      } else {
+        if (pwInput) pwInput.value = '';
+        if (errorEl) errorEl.hidden = true;
+        dialog?.showModal();
+        setTimeout(() => pwInput?.focus(), 50);
+      }
+    });
+
+    submitBtn?.addEventListener('click', async () => {
+      const pw = pwInput?.value ?? '';
+      if (!pw) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Unlocking…';
+      try {
+        await unlock(pw);
+        dialog?.close();
+        if (errorEl) errorEl.hidden = true;
+      } catch {
+        if (errorEl) errorEl.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Unlock';
+      }
+    });
+
+    pwInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitBtn?.click();
+    });
+
+    cancelBtn?.addEventListener('click', () => dialog?.close());
+
+    dialog?.addEventListener('click', e => {
+      if (e.target === dialog) dialog?.close();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<style>
+  .pii-fab {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 800;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--eu-dark);
+    color: white;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pii-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+
+  .pii-dialog {
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    max-width: 380px;
+    width: calc(100vw - 2rem);
+  }
+  .pii-dialog::backdrop {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+  }
+
+  .pii-form {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pii-heading {
+    font-size: 1.25rem;
+    color: var(--eu-dark);
+  }
+
+  .pii-hint {
+    font-size: 0.875rem;
+    color: var(--eu-muted);
+    line-height: 1.5;
+  }
+
+  .pii-input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--eu-border);
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+  }
+  .pii-input:focus {
+    border-color: var(--eu-red);
+    box-shadow: 0 0 0 2px rgba(215,20,26,0.15);
+  }
+
+  .pii-error {
+    font-size: 0.82rem;
+    color: var(--eu-red);
+    background: #fee2e2;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+  }
+
+  .pii-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .pii-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .pii-btn:disabled { opacity: 0.6; cursor: default; }
+  .pii-btn-primary  { background: var(--eu-red); color: white; }
+  .pii-btn-primary:hover:not(:disabled) { background: #b8111a; }
+  .pii-btn-secondary { background: var(--eu-border); color: var(--eu-text); }
+  .pii-btn-secondary:hover:not(:disabled) { background: #d1d5db; }
+</style>

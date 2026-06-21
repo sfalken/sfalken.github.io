@@ -1,3 +1,6 @@
+import seedBlobsRaw from './seed-expenses-pii-blobs.json';
+const seedBlobs = seedBlobsRaw as Record<string, string>;
+
 export interface Expense {
   id: string;
   amount: number;
@@ -7,6 +10,7 @@ export interface Expense {
   city: string;
   date: string;
   savedAt: string;
+  _pii?: string;
 }
 
 export const seedExpenses: Expense[] = [
@@ -15,19 +19,21 @@ export const seedExpenses: Expense[] = [
     amount: 5191.33,
     currency: 'USD',
     category: 'flights',
-    description: 'KLM Premium Select — SEA→AMS→PRG / NUE→AMS→SEA (round trip)',
+    description: 'Confirmed flight (unlock for details)',
     city: 'Transit',
     date: '2026-06-10',
     savedAt: '2026-06-10T00:00:00.000Z',
+    _pii: seedBlobs['seed-klm-rt-flight'] || undefined,
   },
   {
     id: 'seed-hotel-andels',
     amount: 1152.46,
     currency: 'USD',
     category: 'accommodation',
-    description: 'Orea Hotel Andel\'s Praha — Jun 11–17 (6 nights)',
+    description: 'Confirmed accommodation (unlock for details)',
     city: 'Prague',
     date: '2026-06-11',
     savedAt: '2026-06-11T00:00:00.000Z',
+    _pii: seedBlobs['seed-hotel-andels'] || undefined,
   },
 ];

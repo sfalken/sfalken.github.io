@@ -1,4 +1,5 @@
 export interface Hotel {
+  id: string;
   name: string;
   rating: number;
   pricePerNight: number;
@@ -6,10 +7,11 @@ export interface Hotel {
   tier: 'budget' | 'mid' | 'luxury';
   tags: string[];
   description: string;
-  tip: string;
+  tip?: string;
   address: string;
-  website: string;
+  website?: string;
   coordinates: [number, number];
+  _pii?: string;
 }
 
 export interface Restaurant {

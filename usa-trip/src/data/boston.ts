@@ -6,6 +6,7 @@ export const boston: CityData = {
   coordinates: [42.3601, -71.0589],
   hotels: [
     {
+      id: 'verb-hotel',
       name: 'The Verb Hotel',
       rating: 4.4,
       pricePerNight: 229,
@@ -19,6 +20,7 @@ export const boston: CityData = {
       coordinates: [42.3467, -71.0972],
     },
     {
+      id: 'bu-hotel',
       name: 'Boston University Hotel & Conference Center',
       rating: 3.9,
       pricePerNight: 175,
@@ -32,6 +34,7 @@ export const boston: CityData = {
       coordinates: [42.3505, -71.1186],
     },
     {
+      id: 'kimpton-nine-zero',
       name: 'Kimpton Nine Zero Hotel',
       rating: 4.5,
       pricePerNight: 289,
@@ -45,6 +48,7 @@ export const boston: CityData = {
       coordinates: [42.3573, -71.0612],
     },
     {
+      id: 'hi-boston',
       name: 'HI Boston Hostel',
       rating: 4.2,
       pricePerNight: 55,

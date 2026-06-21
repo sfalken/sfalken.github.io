@@ -1,4 +1,6 @@
 import type { CityData } from './types';
+import piiBlobsRaw from './nuremberg-pii-blobs.json';
+const piiBlobs = piiBlobsRaw as Record<string, string>;
 
 const nuremberg: CityData = {
   name: 'Nuremberg',
@@ -11,19 +13,20 @@ const nuremberg: CityData = {
 
   hotels: [
     {
-      name: 'Sheraton Carlton Hotel Nuremberg ★ BOOKED (Jun 22–29)',
+      id: 'sheraton-carlton',
+      name: 'Upscale Hotel · Near Hauptbahnhof',
       rating: 4.4,
       pricePerNight: 180,
       currency: 'EUR',
       tier: 'upscale',
-      address: 'Eilgutstraße 15, 90443 Nürnberg',
-      tags: ['Booked', 'Marriott Bonvoy', 'Near Hauptbahnhof', 'Full service'],
-      description: 'Full-service Sheraton directly opposite Nuremberg Hauptbahnhof. Spacious rooms, excellent breakfast, reliable conference Wi-Fi. Z-Bau (openSUSECon venue) is reachable by U-Bahn or a 20-min walk.',
-      tip: 'Hauptbahnhof is 200m away — perfect for the Rothenburg ob der Tauber day trip. Earn/redeem Marriott Bonvoy points.',
-      url: 'https://www.marriott.com/hotels/travel/nuesi-sheraton-carlton-hotel-nuremberg',
+      address: 'Near Hauptbahnhof, Nuremberg',
+      tags: ['Booked', 'Near Hauptbahnhof', 'Full service'],
+      description: 'Full-service upscale hotel directly opposite Nuremberg Hauptbahnhof. Spacious rooms, excellent breakfast, reliable conference Wi-Fi. Z-Bau (openSUSECon venue) is reachable by U-Bahn or a 20-min walk.',
       coordinates: [49.4455, 11.0793],
+      _pii: piiBlobs['sheraton-carlton'] || undefined,
     },
     {
+      id: 'motel-one',
       name: 'Motel One Nürnberg-City',
       rating: 4.5,
       pricePerNight: 89,
@@ -37,19 +40,21 @@ const nuremberg: CityData = {
       coordinates: [49.4548, 11.0838],
     },
     {
+      id: 'nh-collection',
       name: 'NH Collection Nürnberg City',
       rating: 4.6,
       pricePerNight: 155,
       currency: 'EUR',
       tier: 'upscale',
       address: 'Bahnhofstraße 17-19, 90402 Nürnberg',
-      tags: ['Upscale', 'Business', 'Central Station'],
+      tags: ['Upscale', 'Business', 'Central Station', 'Rooftop bar'],
       description: 'Upscale hotel opposite the main station with rooftop bar and panoramic city views. Conference-friendly with reliable Wi-Fi.',
       tip: 'Roof bar is open to non-guests — great for post-conference drinks with a castle view.',
       url: 'https://www.nh-hotels.com/hotel/nh-collection-nuernberg-city',
       coordinates: [49.4468, 11.0823],
     },
     {
+      id: 'lebenslust',
       name: 'Lebenslust im Turm',
       rating: 4.7,
       pricePerNight: 180,

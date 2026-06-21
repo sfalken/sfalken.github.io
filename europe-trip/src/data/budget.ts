@@ -1,4 +1,6 @@
 import type { BudgetCategory } from './types';
+import budgetBlobsRaw from './budget-pii-blobs.json';
+const budgetBlobs = budgetBlobsRaw as Record<string, string>;
 
 export const budgetCategories: BudgetCategory[] = [
   {
@@ -6,8 +8,8 @@ export const budgetCategories: BudgetCategory[] = [
     label: 'Flights',
     icon: '✈️',
     items: [
-      { id: 'flight-outbound', label: 'KLM outbound SEA → AMS → PRG (Premium Select)', estimated: 2596, currency: 'USD', note: 'Actual RT total: $5,191.33 — split evenly' },
-      { id: 'flight-return', label: 'KLM return NUE → AMS → SEA (Premium Select)', estimated: 2596, currency: 'USD', note: 'Included in $5,191.33 RT booking with KLM' },
+      { id: 'flight-outbound', label: 'Outbound flight (confirmed)', estimated: 2596, currency: 'USD', _pii: budgetBlobs['flight-outbound'] || undefined },
+      { id: 'flight-return',   label: 'Return flight (confirmed)',   estimated: 2596, currency: 'USD', _pii: budgetBlobs['flight-return']   || undefined },
     ],
   },
   {
@@ -15,9 +17,9 @@ export const budgetCategories: BudgetCategory[] = [
     label: 'Accommodation',
     icon: '🏨',
     items: [
-      { id: 'hotel-andels', label: 'Orea Hotel Andel\'s Praha (Jun 11–17, 6 nights)', estimated: 1152, currency: 'USD', note: 'Actual cost: $1,152.46' },
-      { id: 'hotel-hilton-prague', label: 'Hilton Atrium Prague (Jun 17–22, 5 nights)', estimated: 850, currency: 'USD', note: 'Near Florenc bus terminal — estimate' },
-      { id: 'hotel-nuremberg', label: 'Sheraton Carlton Nuremberg (Jun 22–29, 7 nights)', estimated: 1260, currency: 'USD', note: '~180 EUR/night — estimate' },
+      { id: 'hotel-andels',        label: 'Prague accommodation, 6 nights (Jun 11–17)', estimated: 1152, currency: 'USD', _pii: budgetBlobs['hotel-andels']        || undefined },
+      { id: 'hotel-hilton-prague', label: 'Prague accommodation, 5 nights (Jun 17–22)', estimated: 850,  currency: 'USD', _pii: budgetBlobs['hotel-hilton-prague'] || undefined },
+      { id: 'hotel-nuremberg',     label: 'Nuremberg accommodation, 7 nights (Jun 22–29)', estimated: 1260, currency: 'USD', _pii: budgetBlobs['hotel-nuremberg']   || undefined },
     ],
   },
   {

@@ -1,4 +1,6 @@
 import type { CityData } from './types';
+import piiBlobsRaw from './prague-pii-blobs.json';
+const piiBlobs = piiBlobsRaw as Record<string, string>;
 
 const prague: CityData = {
   name: 'Prague',
@@ -11,32 +13,33 @@ const prague: CityData = {
 
   hotels: [
     {
-      name: 'Orea Hotel Andel\'s Praha ★ BOOKED (Jun 11–17)',
+      id: 'orea-andels',
+      name: 'Upscale Hotel · Anděl/Smíchov',
       rating: 4.3,
       pricePerNight: 4320,
       currency: 'CZK',
       tier: 'upscale',
-      address: 'Stroupežnického 21, 150 00 Praha 5',
+      address: 'Anděl/Smíchov, Prague 5',
       tags: ['Booked', 'Rooftop pool', 'Anděl district', 'Design hotel'],
       description: 'Contemporary 4-star design hotel in the Anděl/Smíchov district. Rooftop pool with city views, modern rooms, and direct tram access. Café Savoy is a 5-minute walk.',
-      tip: 'Tram 22 from Anděl runs directly to Prague Castle (Pohořelec stop, ~15 min). Actual cost: $1,152.46 for 6 nights.',
-      url: 'https://www.orea.cz/en/hotel-andels-prague',
       coordinates: [50.0706, 14.4023],
+      _pii: piiBlobs['orea-andels'] || undefined,
     },
     {
-      name: 'Hilton Atrium Prague ★ BOOKED (Jun 17–22)',
+      id: 'hilton-atrium',
+      name: 'Upscale Hotel · Karlín',
       rating: 4.2,
       pricePerNight: 3800,
       currency: 'CZK',
       tier: 'upscale',
-      address: 'Pobřežní 1, 186 00 Praha 8',
-      tags: ['Booked', 'Hilton Honors', 'Near Florenc', 'Karlín'],
-      description: 'Classic Hilton with dramatic atrium interior in the trendy Karlín district. Florenc bus terminal (FlixBus/RegioJet to Nuremberg) is a 3-minute walk — perfectly placed for the June 22 departure.',
-      tip: 'Explore the Karlín food scene during your stay — it\'s one of Prague\'s best neighborhoods for restaurants. Bus to Nuremberg departs right around the corner.',
-      url: 'https://www.hilton.com/en/hotels/prgphhh-hilton-prague',
+      address: 'Karlín, Prague 8',
+      tags: ['Booked', 'Near Florenc bus terminal', 'Karlín'],
+      description: 'Full-service upscale hotel with dramatic atrium interior in the trendy Karlín district. Florenc bus terminal (FlixBus/RegioJet to Nuremberg) is a 3-minute walk — perfectly placed for the June 22 departure.',
       coordinates: [50.0934, 14.4462],
+      _pii: piiBlobs['hilton-atrium'] || undefined,
     },
     {
+      id: 'mosaic-house',
       name: 'Mosaic House Design Hotel',
       rating: 4.3,
       pricePerNight: 2200,
@@ -50,6 +53,7 @@ const prague: CityData = {
       coordinates: [50.0713, 14.4034],
     },
     {
+      id: 'unitas',
       name: 'Unitas Hotel',
       rating: 4.1,
       pricePerNight: 1800,

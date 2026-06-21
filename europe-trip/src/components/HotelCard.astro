@@ -17,16 +17,19 @@ const tierLabels: Record<string, string> = {
   upscale: 'Upscale',
   luxury: 'Luxury',
 };
+const hasPii = !!hotel._pii;
 ---
 
-<div class="card hotel-card">
+<div class="card hotel-card" data-pii={hotel._pii || undefined}>
   <div class="hotel-header">
     <div>
       <span class={tierColors[hotel.tier]}>{tierLabels[hotel.tier]}</span>
       <h3 class="hotel-name">
-        {hotel.url
-          ? <a href={hotel.url} target="_blank" rel="noopener">{hotel.name}</a>
-          : hotel.name}
+        {hasPii
+          ? <span class="pii-name">{hotel.name}</span>
+          : hotel.url
+            ? <a href={hotel.url} target="_blank" rel="noopener">{hotel.name}</a>
+            : hotel.name}
       </h3>
     </div>
     <div class="hotel-price">
@@ -40,7 +43,7 @@ const tierLabels: Record<string, string> = {
     <span class="rating-num">{hotel.rating}</span>
   </div>
 
-  <p class="hotel-address">📍 {hotel.address}</p>
+  <p class="hotel-address">📍 <span class={hasPii ? 'pii-address' : ''}>{hotel.address}</span></p>
   <p class="hotel-desc">{hotel.description}</p>
 
   <div class="hotel-tags">
@@ -49,8 +52,16 @@ const tierLabels: Record<string, string> = {
 
   <div class="hotel-tip">
     <span class="tip-icon">💡</span>
-    <span>{hotel.tip}</span>
+    <span class={hasPii ? 'pii-tip' : ''}>
+      {hasPii ? 'Unlock to reveal booking details' : (hotel.tip ?? '')}
+    </span>
   </div>
+
+  {hasPii && (
+    <a class="pii-link btn btn-outline" href="#" target="_blank" rel="noopener" style="display:none;align-self:flex-start;margin-top:0.25rem;">
+      View Booking →
+    </a>
+  )}
 </div>
 
 <style>

@@ -87,10 +87,10 @@ const seedJson = JSON.stringify(seedExpenses);
               </div>
               <div class="budget-items">
                 {cat.items.map(item => (
-                  <div class="budget-item" data-item-id={item.id} data-raw-amount={item.estimated} data-raw-currency={item.currency}>
+                  <div class="budget-item" data-item-id={item.id} data-raw-amount={item.estimated} data-raw-currency={item.currency} data-pii={item._pii || undefined}>
                     <div class="item-label">
-                      <span class="item-name">{item.label}</span>
-                      {item.note && <span class="item-note">{item.note}</span>}
+                      <span class={item._pii ? 'item-name pii-label' : 'item-name'}>{item.label}</span>
+                      {item.note && <span class={item._pii ? 'item-note pii-note' : 'item-note'}>{item.note}</span>}
                     </div>
                     <span class="item-est">
                       <span class="raw-amount">{item.estimated.toLocaleString()} {item.currency}</span>
@@ -325,23 +325,27 @@ const seedJson = JSON.stringify(seedExpenses);
       return;
     }
     const sorted = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
-    container.innerHTML = sorted.map(e => `
-      <div class="expense-row">
-        <div class="exp-main">
-          <span class="exp-city">${e.city || ''}</span>
-          <span class="exp-desc">${e.description || '—'}</span>
-          <span class="exp-cat">${budgetCategories.find(c => c.id === e.category)?.label || e.category}</span>
-        </div>
-        <div class="exp-right">
-          <span class="exp-amount">${fmt(e.amount, e.currency)} <small>${e.currency}</small></span>
-          <span class="exp-date">${e.date}</span>
-          <div class="exp-actions">
-            <button class="exp-btn" onclick="editExpense('${e.id}')">✏️</button>
-            <button class="exp-btn" onclick="deleteExpense('${e.id}')">🗑️</button>
+    container.innerHTML = sorted.map(e => {
+      const piiAttr  = e._pii ? ` data-pii="${e._pii}"` : '';
+      const descClass = e._pii ? 'exp-desc pii-desc' : 'exp-desc';
+      return `
+        <div class="expense-row"${piiAttr}>
+          <div class="exp-main">
+            <span class="exp-city">${e.city || ''}</span>
+            <span class="${descClass}">${e.description || '—'}</span>
+            <span class="exp-cat">${budgetCategories.find(c => c.id === e.category)?.label || e.category}</span>
+          </div>
+          <div class="exp-right">
+            <span class="exp-amount">${fmt(e.amount, e.currency)} <small>${e.currency}</small></span>
+            <span class="exp-date">${e.date}</span>
+            <div class="exp-actions">
+              <button class="exp-btn" onclick="editExpense('${e.id}')">✏️</button>
+              <button class="exp-btn" onclick="deleteExpense('${e.id}')">🗑️</button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   window.editExpense = function(id) {
@@ -367,11 +371,20 @@ const seedJson = JSON.stringify(seedExpenses);
   function seedKnownExpenses() {
     const seeds = JSON.parse(seedJson);
     const existing = getExpenses();
-    const existingIds = new Set(existing.map(e => e.id));
-    const toAdd = seeds.filter(s => !existingIds.has(s.id));
-    if (toAdd.length > 0) {
-      saveExpenses([...existing, ...toAdd]);
-    }
+    const existingMap = new Map(existing.map(e => [e.id, e]));
+    let changed = false;
+    const result = [...existing];
+    seeds.forEach(s => {
+      if (!existingMap.has(s.id)) {
+        result.push(s);
+        changed = true;
+      } else if (s._pii && !existingMap.get(s.id)._pii) {
+        // Patch in _pii blob after encrypt script runs
+        const idx = result.findIndex(e => e.id === s.id);
+        if (idx !== -1) { result[idx] = { ...result[idx], _pii: s._pii }; changed = true; }
+      }
+    });
+    if (changed) saveExpenses(result);
   }
 
   function init() {

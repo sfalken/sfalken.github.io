@@ -1,4 +1,6 @@
 ---
+import PiiUnlock from '../components/PiiUnlock.astro';
+
 export interface Props {
   title: string;
   description?: string;
@@ -211,6 +213,8 @@ const siteUrl = 'https://sfalken.github.io/europe-trip';
         Hosted on <a href="https://github.com/sfalken/europe-trip" target="_blank">GitHub Pages</a>
       </p>
     </footer>
+
+    <PiiUnlock />
 
     <script>
       if ('serviceWorker' in navigator) {

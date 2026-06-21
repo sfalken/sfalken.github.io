@@ -1,4 +1,6 @@
 ---
+import PiiUnlock from '../components/PiiUnlock.astro';
+
 export interface Props {
   title: string;
   description?: string;
@@ -263,6 +265,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <p>🇺🇸 USA Trip · Solo · September 2026</p>
       <p style="margin-top:0.25rem;">Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> · Hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></p>
     </footer>
+
+    <PiiUnlock />
 
     <!-- Service Worker registration -->
     <script is:inline>
