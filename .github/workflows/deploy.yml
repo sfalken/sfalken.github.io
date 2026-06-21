@@ -73,6 +73,20 @@ jobs:
           mkdir -p dist/texas-trip
           cp -r texas-trip/dist/. dist/texas-trip/
 
+      # Build canada-trip (base: /canada-trip)
+      - name: Install canada-trip dependencies
+        working-directory: canada-trip
+        run: npm install
+
+      - name: Build canada-trip
+        working-directory: canada-trip
+        run: npm run build
+
+      - name: Copy canada-trip output into dist/canada-trip/
+        run: |
+          mkdir -p dist/canada-trip
+          cp -r canada-trip/dist/. dist/canada-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

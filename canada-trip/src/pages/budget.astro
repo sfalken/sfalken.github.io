@@ -1,0 +1,345 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { budgetCategories, defaultExchangeRate } from '../data/budget';
+
+const catMeta = budgetCategories.map(cat => ({
+  id:       cat.id,
+  label:    cat.label,
+  items:    cat.items.map(i => ({ id: i.id, label: i.label, estimated: i.estimated, currency: i.currency })),
+}));
+---
+
+<Layout title="Budget — Canada Trip" description="USD/CAD budget tracker for FOSSY 2026 Vancouver trip.">
+  <Nav />
+  <main>
+    <div class="budget-hero">
+      <div class="container">
+        <p class="section-label">Financial Planning</p>
+        <h1>Budget</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Currency controls -->
+      <div class="currency-controls">
+        <div class="currency-toggle">
+          <button id="btn-usd" class="currency-btn active">USD $</button>
+          <button id="btn-cad" class="currency-btn">CAD $</button>
+        </div>
+        <div class="fx-rate-wrap">
+          <label for="fx-rate">1 USD =</label>
+          <input type="number" id="fx-rate" step="0.01" min="0.5" max="3" value={defaultExchangeRate} />
+          <span>CAD</span>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="sum-label">Estimated Total</div>
+          <div class="sum-value" id="est-total">—</div>
+          <div class="sum-sub" id="display-currency-label">USD</div>
+        </div>
+        <div class="summary-card highlight">
+          <div class="sum-label">Actual Spent</div>
+          <div class="sum-value" id="actual-total">—</div>
+          <div class="sum-sub">from logged expenses</div>
+        </div>
+        <div class="summary-card">
+          <div class="sum-label">Remaining</div>
+          <div class="sum-value" id="remaining">—</div>
+          <div class="sum-sub">vs. estimate</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <h3>Estimated vs Actual</h3>
+          <canvas id="chart-bar" height="200"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>By Category</h3>
+          <canvas id="chart-doughnut" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Budget breakdown -->
+      <section class="section">
+        <p class="section-label">Breakdown</p>
+        <h2>All Categories</h2>
+        <div class="budget-categories" style="margin-top:1rem;">
+          {budgetCategories.map(cat => {
+            return (
+              <div class="card budget-cat" data-cat={cat.id}>
+                <div class="cat-header">
+                  <span class="cat-icon">{cat.icon}</span>
+                  <h3 class="cat-name">{cat.label}</h3>
+                  <span class="cat-total" data-cat-total={cat.id}>—</span>
+                </div>
+                <div class="cat-items">
+                  {cat.items.map(item => (
+                    <div class="budget-item" data-pii={item._pii || undefined}>
+                      <div class="item-info">
+                        <span class="item-name pii-label">{item.label}</span>
+                        {item.note && <span class="item-note pii-note">{item.note}</span>}
+                      </div>
+                      <div class="item-right">
+                        <span class={`currency-badge currency-${item.currency.toLowerCase()}`}>{item.currency}</span>
+                        <span class="item-est" data-item-id={item.id} data-orig={item.estimated} data-orig-currency={item.currency}>
+                          {item.estimated.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <!-- Logged expenses -->
+      <section class="section">
+        <div class="exp-section-header">
+          <div>
+            <p class="section-label">Expense Log</p>
+            <h2>Logged Expenses</h2>
+          </div>
+          <a href="/canada-trip/log/" class="btn btn-primary">+ Add Expense</a>
+        </div>
+        <div id="no-expenses" class="no-expenses">
+          <p>No expenses logged yet. <a href="/canada-trip/log/">Add your first expense →</a></p>
+        </div>
+        <div id="expense-list" class="expense-list" hidden></div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ catMeta, defaultExchangeRate }}>
+  const EXP_KEY  = 'canada-expenses';
+  const PREF_KEY = 'canada-budget-settings';
+
+  function loadExpenses() { try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); } catch { return []; } }
+  function loadPrefs()    { try { return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); } catch { return {}; } }
+  function savePrefs(p)   { localStorage.setItem(PREF_KEY, JSON.stringify(p)); }
+
+  let prefs = loadPrefs();
+  let displayCurrency = prefs.displayCurrency || 'USD';
+  let exchangeRate    = prefs.exchangeRate    || defaultExchangeRate;
+
+  const fxInput  = document.getElementById('fx-rate');
+  const btnUsd   = document.getElementById('btn-usd');
+  const btnCad   = document.getElementById('btn-cad');
+  const labelEl  = document.getElementById('display-currency-label');
+
+  fxInput.value = exchangeRate;
+
+  function convert(amount, origCurrency) {
+    if (origCurrency === displayCurrency) return amount;
+    if (origCurrency === 'USD' && displayCurrency === 'CAD') return amount * exchangeRate;
+    if (origCurrency === 'CAD' && displayCurrency === 'USD') return amount / exchangeRate;
+    return amount;
+  }
+
+  function fmt(amount) {
+    const sym = displayCurrency === 'USD' ? '$' : 'CA$';
+    return sym + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function updateDisplay() {
+    btnUsd.classList.toggle('active', displayCurrency === 'USD');
+    btnCad.classList.toggle('active', displayCurrency === 'CAD');
+    if (labelEl) labelEl.textContent = displayCurrency;
+
+    // Update individual item amounts
+    document.querySelectorAll('[data-item-id]').forEach(el => {
+      const orig = parseFloat(el.dataset.orig);
+      const origCur = el.dataset.origCurrency;
+      el.textContent = convert(orig, origCur).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    });
+
+    // Update category totals
+    catMeta.forEach(cat => {
+      const total = cat.items.reduce((s, item) => s + convert(item.estimated, item.currency), 0);
+      const el = document.querySelector(`[data-cat-total="${cat.id}"]`);
+      if (el) el.textContent = fmt(total);
+    });
+
+    updateSummary();
+    renderCharts(loadExpenses());
+  }
+
+  function updateSummary() {
+    const expenses = loadExpenses();
+    const estimated = catMeta.reduce((s, cat) =>
+      s + cat.items.reduce((ss, item) => ss + convert(item.estimated, item.currency), 0), 0);
+    const actual = expenses.reduce((s, e) => s + convert(Number(e.amount), e.currency || 'CAD'), 0);
+
+    const estEl  = document.getElementById('est-total');
+    const actEl  = document.getElementById('actual-total');
+    const remEl  = document.getElementById('remaining');
+    if (estEl) estEl.textContent = fmt(estimated);
+    if (actEl) actEl.textContent = fmt(actual);
+    if (remEl) {
+      const diff = estimated - actual;
+      remEl.textContent = fmt(Math.abs(diff));
+      remEl.style.color = diff >= 0 ? '#059669' : 'var(--ca-red)';
+    }
+  }
+
+  function renderExpenses() {
+    const expenses = loadExpenses();
+    const noEl   = document.getElementById('no-expenses');
+    const listEl = document.getElementById('expense-list');
+    if (!noEl || !listEl) return;
+    if (expenses.length === 0) { noEl.hidden = false; listEl.hidden = true; return; }
+    noEl.hidden = true; listEl.hidden = false;
+    listEl.innerHTML = expenses.map(e => `
+      <div class="exp-row">
+        <div class="exp-info">
+          <span class="exp-date">${e.date}</span>
+          <span class="badge">${e.category}</span>
+          <span class="exp-desc">${e.description}</span>
+          <span class="currency-badge currency-${(e.currency||'CAD').toLowerCase()}">${e.currency||'CAD'}</span>
+        </div>
+        <div class="exp-right">
+          <span class="exp-amount">${fmt(convert(Number(e.amount), e.currency||'CAD'))}</span>
+          <button class="exp-delete" data-id="${e.id}">✕</button>
+        </div>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.exp-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        localStorage.setItem(EXP_KEY, JSON.stringify(loadExpenses().filter(e => e.id !== id)));
+        renderExpenses(); updateSummary(); renderCharts(loadExpenses());
+      });
+    });
+  }
+
+  function renderCharts(expenses) {
+    if (typeof window.Chart === 'undefined') return;
+    const Chart = window.Chart;
+    const COLORS = ['#C8102E','#8b1a1a','#059669','#f59e0b','#7c3aed','#0891b2','#db2777','#65a30d','#ea580c'];
+
+    const catLabels = catMeta.map(c => c.label);
+    const catEst    = catMeta.map(c => c.items.reduce((s, i) => s + convert(i.estimated, i.currency), 0));
+    const actualByCat = {};
+    expenses.forEach(e => { actualByCat[e.category] = (actualByCat[e.category]||0) + convert(Number(e.amount), e.currency||'CAD'); });
+    const catActual = catMeta.map(c => actualByCat[c.id] || 0);
+
+    const barCtx = document.getElementById('chart-bar')?.getContext('2d');
+    if (barCtx) {
+      if (window.__barChart) window.__barChart.destroy();
+      window.__barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: catLabels,
+          datasets: [
+            { label: 'Estimated', data: catEst, backgroundColor: 'rgba(200,16,46,0.2)', borderColor: '#C8102E', borderWidth: 1 },
+            { label: 'Actual',    data: catActual, backgroundColor: 'rgba(139,26,26,0.2)', borderColor: '#8b1a1a', borderWidth: 1 },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true, ticks: { callback: v => (displayCurrency === 'USD' ? '$' : 'CA$') + Math.round(v) } } },
+        },
+      });
+    }
+
+    const doCtx = document.getElementById('chart-doughnut')?.getContext('2d');
+    if (doCtx) {
+      if (window.__donutChart) window.__donutChart.destroy();
+      window.__donutChart = new Chart(doCtx, {
+        type: 'doughnut',
+        data: { labels: catLabels, datasets: [{ data: catEst, backgroundColor: COLORS, borderWidth: 2, borderColor: 'white' }] },
+        options: { responsive: true, plugins: { legend: { position: 'right' } } },
+      });
+    }
+  }
+
+  // Wire up controls
+  btnUsd.addEventListener('click', () => { displayCurrency = 'USD'; prefs.displayCurrency = 'USD'; savePrefs(prefs); updateDisplay(); });
+  btnCad.addEventListener('click', () => { displayCurrency = 'CAD'; prefs.displayCurrency = 'CAD'; savePrefs(prefs); updateDisplay(); });
+  fxInput.addEventListener('input', () => {
+    const v = parseFloat(fxInput.value);
+    if (v > 0) { exchangeRate = v; prefs.exchangeRate = v; savePrefs(prefs); updateDisplay(); }
+  });
+
+  // Load Chart.js
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+  s.onload = () => renderCharts(loadExpenses());
+  document.head.appendChild(s);
+
+  renderExpenses();
+  updateDisplay();
+</script>
+
+<style>
+  .budget-hero { background: linear-gradient(135deg, var(--ca-red) 0%, var(--ca-red-dark) 100%); color: white; padding: 2.5rem 0 2rem; }
+  .budget-hero .section-label { color: rgba(255,255,255,0.7); }
+  .budget-hero h1 { color: white; }
+
+  .currency-controls {
+    display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+    padding: 1rem 0; border-bottom: 1px solid var(--gray-200); margin-bottom: 1rem;
+  }
+  .currency-toggle { display: flex; border: 1.5px solid var(--ca-red); border-radius: var(--radius); overflow: hidden; }
+  .currency-btn {
+    padding: 0.4rem 1rem; background: white; border: none; cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; font-family: var(--font-sans); color: var(--ca-red);
+    transition: background 0.15s, color 0.15s;
+  }
+  .currency-btn.active { background: var(--ca-red); color: white; }
+  .currency-btn + .currency-btn { border-left: 1.5px solid var(--ca-red); }
+  .fx-rate-wrap { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--gray-700); }
+  .fx-rate-wrap input {
+    width: 4.5rem; padding: 0.35rem 0.6rem; border: 1.5px solid var(--gray-300); border-radius: var(--radius);
+    font-size: 0.9rem; text-align: center; font-family: var(--font-sans);
+  }
+  .fx-rate-wrap input:focus { outline: none; border-color: var(--ca-red); }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .summary-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 1.25rem; box-shadow: var(--shadow); text-align: center; }
+  .summary-card.highlight { border-color: var(--ca-red); }
+  .sum-label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 0.35rem; }
+  .sum-value { font-size: 1.75rem; font-family: var(--font-serif); font-weight: 700; color: var(--ca-red); }
+  .sum-sub { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+  .charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .chart-card { padding: 1.25rem; }
+  .chart-card h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+
+  .budget-categories { display: flex; flex-direction: column; gap: 1rem; }
+  .budget-cat { overflow: hidden; }
+  .cat-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.25rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+  .cat-icon { font-size: 1.25rem; }
+  .cat-name { flex: 1; font-size: 0.95rem; font-family: var(--font-sans); font-weight: 600; }
+  .cat-total { font-weight: 700; color: var(--ca-red); font-family: var(--font-serif); font-size: 1.05rem; }
+
+  .cat-items { display: flex; flex-direction: column; }
+  .budget-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 1.25rem; border-bottom: 1px solid var(--gray-100); }
+  .budget-item:last-child { border-bottom: none; }
+  .item-info { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+  .item-name { font-size: 0.9rem; color: var(--gray-900); }
+  .item-note { font-size: 0.78rem; color: var(--gray-500); }
+  .item-right { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+  .item-est { font-size: 0.95rem; font-weight: 600; color: var(--ca-maple); }
+
+  .exp-section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; gap: 1rem; }
+  .no-expenses { background: white; border-radius: var(--radius-lg); border: 1px dashed var(--gray-300); padding: 2rem; text-align: center; color: var(--gray-500); font-size: 0.9rem; }
+  .expense-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .exp-row { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
+  .exp-info { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; flex: 1; }
+  .exp-date { font-size: 0.78rem; color: var(--gray-500); }
+  .exp-desc { font-size: 0.9rem; color: var(--gray-700); }
+  .exp-right { display: flex; align-items: center; gap: 0.75rem; }
+  .exp-amount { font-weight: 600; color: var(--ca-red); font-family: var(--font-serif); font-size: 1rem; white-space: nowrap; }
+  .exp-delete { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.4rem; border-radius: 4px; transition: color 0.1s; }
+  .exp-delete:hover { color: var(--ca-red); background: var(--ca-red-pale); }
+</style>

@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="About — Canada Trip" description="About this FOSSY 2026 Vancouver trip planner.">
+  <Nav />
+  <main>
+    <div class="about-hero">
+      <div class="container">
+        <p class="section-label">About This Site</p>
+        <h1>FOSSY 2026 Vancouver</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="about-grid">
+        <section class="card about-card">
+          <h2>The Trip</h2>
+          <p>A solo drive from Seattle to Vancouver, BC for <a href="https://fossy.us" target="_blank" rel="noopener">FOSSY</a> — the Free and Open Source Software Yearly conference.</p>
+          <ul class="about-list">
+            <li>🚗 Driving SEA → Vancouver (EV, ~140 miles)</li>
+            <li>📅 August 6–9, 2026 (4 days)</li>
+            <li>🐧 FOSSY: all 4 days</li>
+            <li>🤠 Solo traveler</li>
+            <li>🍦 Ice cream selfie tradition (4 spots planned)</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>The Site</h2>
+          <p>A personal trip planner built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>, hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>. Part of a monorepo at <a href="/">sfalken.github.io</a>.</p>
+          <ul class="about-list">
+            <li>💵 Multi-currency: USD + CAD with live exchange rate toggle</li>
+            <li>🗺️ Interactive maps (Leaflet + OpenStreetMap)</li>
+            <li>✅ Planning checklist with browser persistence</li>
+            <li>📱 Progressive Web App — installable, offline-capable</li>
+            <li>🔒 Optional PII encryption for booking details</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>FOSSY</h2>
+          <p>FOSSY (Free and Open Source Software Yearly) is the annual community-organized conference celebrating Linux, open source software, and the communities behind them. It covers topics from kernel development to community building.</p>
+          <a href="https://fossy.us" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:1rem;align-self:flex-start;">Visit fossy.us →</a>
+        </section>
+
+        <section class="card about-card">
+          <h2>Vancouver, BC</h2>
+          <p>Vancouver is one of the most livable cities in the world — a spectacular mix of mountains, ocean, rainforest, and cosmopolitan culture. August is Vancouver's driest and sunniest month.</p>
+          <ul class="about-list">
+            <li>🌆 Population: ~680,000 (metro ~2.8M)</li>
+            <li>🌡️ August: 18–25°C (64–77°F), Vancouver's driest month</li>
+            <li>🕐 Timezone: Pacific (same as Seattle)</li>
+            <li>🛂 Entry: US passport required. No visa needed for US citizens.</li>
+            <li>💵 Currency: Canadian dollar (CAD)</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-hero { background: linear-gradient(135deg, var(--ca-red) 0%, var(--ca-red-dark) 100%); color: white; padding: 2.5rem 0 2rem; }
+  .about-hero .section-label { color: rgba(255,255,255,0.7); }
+  .about-hero h1 { color: white; }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 2rem; margin-bottom: 3rem; }
+  .about-card { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .about-card h2 { font-size: 1.15rem; color: var(--ca-red); }
+  .about-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.6; }
+  .about-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; color: var(--gray-700); }
+</style>

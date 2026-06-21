@@ -1,0 +1,220 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = '/canada-trip';
+---
+
+<Layout title="Canada Trip — FOSSY 2026 Vancouver">
+  <Nav />
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="hero-label">Solo Drive · August 2026</p>
+        <h1>FOSSY 2026<br/><span class="hero-sub">Vancouver, BC</span></h1>
+        <p class="hero-desc">
+          Free and Open Source Software Yearly, Aug 6–9 · Driving from Seattle · Aburi sushi, seawall walks, and four ice cream selfie spots.
+        </p>
+        <div class="hero-actions">
+          <a href={`${base}/vancouver/`} class="btn btn-primary">Explore Vancouver →</a>
+          <a href={`${base}/checklist/`} class="btn btn-secondary">Planning Checklist</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="section">
+        <p class="section-label">Trip Overview</p>
+        <h2>At a Glance</h2>
+        <div class="glance-grid" style="margin-top:1rem;">
+          <div class="glance-card">
+            <div class="glance-icon">📅</div>
+            <div>
+              <div class="glance-label">Dates</div>
+              <div class="glance-value">Aug 6–9, 2026 (4 days)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🚗</div>
+            <div>
+              <div class="glance-label">Getting There</div>
+              <div class="glance-value">Driving SEA → Vancouver (~2.5 hrs + border)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🐧</div>
+            <div>
+              <div class="glance-label">Conference</div>
+              <div class="glance-value">FOSSY 2026, Aug 6–9</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🌡️</div>
+            <div>
+              <div class="glance-label">Weather</div>
+              <div class="glance-value">18–25°C (64–77°F) · Vancouver's driest month</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">💵</div>
+            <div>
+              <div class="glance-label">Currency</div>
+              <div class="glance-value">CAD locally · ~1 USD = 1.35 CAD</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🍦</div>
+            <div>
+              <div class="glance-label">Ice Cream Selfies</div>
+              <div class="glance-value">4 spots (Soft Peaks, Rain or Shine, La Casa Gelato, Earnest)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-label">FOSSY 2026</p>
+        <h2>The Conference</h2>
+        <div class="conf-card card" style="margin-top:1rem;">
+          <div class="conf-body">
+            <div class="conf-text">
+              <p>
+                <strong>FOSSY</strong> (Free and Open Source Software Yearly) is the annual open source community conference covering
+                Linux, open source software, cloud, security, DevOps, and community topics. It's organized by the open source community
+                for the open source community.
+              </p>
+              <p style="margin-top:.75rem;">
+                Venue TBC — check <a href="https://fossy.us" target="_blank" rel="noopener">fossy.us</a> for the confirmed 2026 location.
+              </p>
+              <div class="conf-details">
+                <span>📅 August 6–9, 2026</span>
+                <span>📍 Vancouver, BC</span>
+                <span>🐧 Linux · Open Source · Community</span>
+              </div>
+            </div>
+            <div class="conf-links">
+              <a href="https://fossy.us" target="_blank" rel="noopener" class="btn btn-primary">FOSSY Website →</a>
+              <a href={`${base}/checklist/`} class="btn btn-outline">Pre-trip Checklist</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-label">🚗 Driving Notes</p>
+        <h2>SEA → Vancouver</h2>
+        <div class="driving-cards" style="margin-top:1rem;">
+          <div class="card drive-card">
+            <div class="drive-icon">🛣️</div>
+            <div class="drive-info">
+              <div class="drive-title">The Route</div>
+              <div class="drive-desc">I-5 North → Peace Arch crossing (BC-99) → BC-99 North into Vancouver. About 140 miles / 225 km.</div>
+            </div>
+          </div>
+          <div class="card drive-card">
+            <div class="drive-icon">⏱️</div>
+            <div class="drive-info">
+              <div class="drive-title">Total Time</div>
+              <div class="drive-desc">~2.5 hrs drive + 20–90 min border wait. Depart by 6am to minimize wait times.</div>
+            </div>
+          </div>
+          <div class="card drive-card">
+            <div class="drive-icon">⚡</div>
+            <div class="drive-info">
+              <div class="drive-title">EV Range</div>
+              <div class="drive-desc">Most EVs can complete the 140-mile trip on a single charge. Top up in Vancouver using BC Hydro fast chargers or PlugShare.</div>
+            </div>
+          </div>
+          <div class="card drive-card">
+            <div class="drive-icon">🛂</div>
+            <div class="drive-info">
+              <div class="drive-title">Border Crossing</div>
+              <div class="drive-desc">Have your passport ready. Declare all food items. NEXUS holders use the dedicated lane. Check the CBSA Border Wait Time app before departure.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-label">Navigate</p>
+        <h2>Plan Your Trip</h2>
+        <div class="nav-cards" style="margin-top:1rem;">
+          <a href={`${base}/vancouver/`} class="nav-card card">
+            <div class="nc-icon">🇨🇦</div>
+            <div class="nc-text">
+              <div class="nc-title">Vancouver</div>
+              <div class="nc-desc">Hotels, restaurants, itinerary, map, ice cream spots</div>
+            </div>
+          </a>
+          <a href={`${base}/checklist/`} class="nav-card card">
+            <div class="nc-icon">✅</div>
+            <div class="nc-text">
+              <div class="nc-title">Checklist</div>
+              <div class="nc-desc">Border crossing, hotel, FOSSY, driving prep</div>
+            </div>
+          </a>
+          <a href={`${base}/budget/`} class="nav-card card">
+            <div class="nc-icon">💰</div>
+            <div class="nc-text">
+              <div class="nc-title">Budget</div>
+              <div class="nc-desc">USD + CAD tracker with live exchange rate toggle</div>
+            </div>
+          </a>
+          <a href={`${base}/log/`} class="nav-card card">
+            <div class="nc-icon">📝</div>
+            <div class="nc-text">
+              <div class="nc-title">Expense Log</div>
+              <div class="nc-desc">Quick mobile-optimized expense entry in USD or CAD</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--ca-red) 0%, var(--ca-red-dark) 100%);
+    color: white;
+    padding: 3.5rem 0 3rem;
+    text-align: center;
+  }
+  .hero-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 0.5rem; }
+  .hero h1 { color: white; line-height: 1.15; }
+  .hero-sub { color: rgba(255,255,255,0.85); font-style: italic; }
+  .hero-desc { max-width: 540px; margin: 1rem auto; color: rgba(255,255,255,0.85); font-size: 1.05rem; }
+  .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  .glance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+  .glance-card {
+    background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);
+    padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.85rem; box-shadow: var(--shadow);
+  }
+  .glance-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .glance-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.1rem; }
+  .glance-value { font-size: 0.92rem; color: var(--gray-900); font-weight: 500; }
+
+  .conf-card { padding: 1.5rem; }
+  .conf-body { display: flex; gap: 2rem; align-items: flex-start; }
+  .conf-text { flex: 1; font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; }
+  .conf-details { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; font-size: 0.85rem; color: var(--ca-red); font-weight: 500; }
+  .conf-links { display: flex; flex-direction: column; gap: 0.6rem; flex-shrink: 0; }
+
+  .driving-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .drive-card { display: flex; gap: 0.85rem; padding: 1.25rem; align-items: flex-start; }
+  .drive-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .drive-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .drive-desc { font-size: 0.85rem; color: var(--gray-500); line-height: 1.4; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .nav-card { display: flex; gap: 0.85rem; align-items: flex-start; padding: 1.25rem; text-decoration: none; color: var(--gray-900); transition: box-shadow 0.15s, border-color 0.15s; }
+  .nav-card:hover { box-shadow: var(--shadow-md); border-color: var(--ca-red); text-decoration: none; }
+  .nc-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .nc-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; }
+  .nc-desc { font-size: 0.85rem; color: var(--gray-500); }
+
+  @media (max-width: 640px) {
+    .conf-body { flex-direction: column; }
+    .conf-links { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>

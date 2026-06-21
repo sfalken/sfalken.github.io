@@ -1,0 +1,207 @@
+---
+---
+
+<button id="pii-fab" title="Unlock private details" aria-label="Unlock private details">🔒</button>
+
+<dialog id="pii-dialog">
+  <form id="pii-form" method="dialog">
+    <h2>Unlock Private Details</h2>
+    <p>Enter the passphrase to reveal booking details, hotel names, and confirmation numbers.</p>
+    <label for="pii-pass">Passphrase</label>
+    <input type="password" id="pii-pass" placeholder="Enter passphrase" autocomplete="current-password" required />
+    <p id="pii-error" hidden>Incorrect passphrase — try again.</p>
+    <div class="pii-actions">
+      <button type="submit" class="btn-unlock">Unlock</button>
+      <button type="button" id="pii-cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  #pii-fab {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 900;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--ca-red);
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(200,16,46,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  #pii-fab:hover { transform: scale(1.08); box-shadow: 0 6px 16px rgba(200,16,46,0.5); }
+  #pii-fab.unlocked { background: var(--ca-maple); box-shadow: 0 4px 12px rgba(139,26,26,0.4); }
+
+  dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 2rem;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: min(420px, 92vw);
+    font-family: var(--font-sans);
+    background: white;
+    z-index: 1000;
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.5); }
+
+  dialog h2 { font-family: var(--font-serif); font-size: 1.4rem; color: var(--ca-red-dark); margin-bottom: 0.5rem; }
+  dialog p { color: var(--gray-700); font-size: 0.9rem; margin-bottom: 1rem; }
+
+  label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.35rem; color: var(--gray-700); }
+
+  input[type="password"] {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="password"]:focus { border-color: var(--ca-red); }
+
+  #pii-error { color: var(--ca-red); font-size: 0.85rem; margin-top: 0.4rem; margin-bottom: 0; }
+
+  .pii-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end; }
+
+  .btn-unlock {
+    background: var(--ca-red);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.55rem 1.5rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-unlock:hover { background: var(--ca-red-light); }
+
+  #pii-cancel {
+    background: transparent;
+    color: var(--gray-700);
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius);
+    padding: 0.55rem 1.25rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  #pii-cancel:hover { border-color: var(--gray-500); }
+</style>
+
+<script>
+const SALT_STR = 'sfalken-trips-pii-v1';
+const PBKDF2_ITER = 250_000;
+const SS_KEY = 'trips-pii-key';
+
+async function deriveKey(password: string): Promise<CryptoKey> {
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode(SALT_STR), iterations: PBKDF2_ITER, hash: 'SHA-256' },
+    baseKey,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt'],
+  );
+}
+
+async function decryptBlob(b64: string, key: CryptoKey): Promise<unknown> {
+  const buf  = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const iv   = buf.slice(0, 12);
+  const data = buf.slice(12);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+
+function storeKey(key: CryptoKey) {
+  crypto.subtle.exportKey('raw', key).then(raw => {
+    sessionStorage.setItem(SS_KEY, btoa(String.fromCharCode(...new Uint8Array(raw))));
+  });
+}
+
+async function loadKey(): Promise<CryptoKey | null> {
+  const b64 = sessionStorage.getItem(SS_KEY);
+  if (!b64) return null;
+  try {
+    const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    return await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+  } catch { return null; }
+}
+
+async function applyPii(key: CryptoKey) {
+  const elements = document.querySelectorAll<HTMLElement>('[data-pii]:not([data-pii-applied])');
+  for (const el of elements) {
+    const blob = el.dataset.pii;
+    if (!blob) continue;
+    try {
+      const data = await decryptBlob(blob, key) as Record<string, string>;
+      el.dataset.piiApplied = '1';
+      const n  = el.querySelector<HTMLElement>('.pii-name');    if (n  && data.name)        n.textContent  = data.name;
+      const a  = el.querySelector<HTMLElement>('.pii-address'); if (a  && data.address)     a.textContent  = data.address;
+      const t  = el.querySelector<HTMLElement>('.pii-tip');     if (t  && data.tip)         t.textContent  = data.tip;
+      const l  = el.querySelector<HTMLElement>('.pii-label');   if (l  && data.label)       l.textContent  = data.label;
+      const nt = el.querySelector<HTMLElement>('.pii-note');    if (nt && data.note)        nt.textContent = data.note;
+      const ds = el.querySelector<HTMLElement>('.pii-desc');    if (ds && data.description) ds.textContent = data.description;
+      const lk = el.querySelector<HTMLAnchorElement>('.pii-link');
+      if (lk && data.url) { lk.href = data.url; lk.style.display = ''; }
+    } catch { /* skip bad blob */ }
+  }
+  document.getElementById('pii-fab')?.classList.add('unlocked');
+  (document.getElementById('pii-fab') as HTMLButtonElement).textContent = '🔓';
+}
+
+const fab    = document.getElementById('pii-fab')!;
+const dialog = document.getElementById('pii-dialog') as HTMLDialogElement;
+const form   = document.getElementById('pii-form')!;
+const passEl = document.getElementById('pii-pass') as HTMLInputElement;
+const errEl  = document.getElementById('pii-error')!;
+const cancel = document.getElementById('pii-cancel')!;
+
+loadKey().then(key => { if (key) applyPii(key); });
+
+fab.addEventListener('click', () => {
+  loadKey().then(key => {
+    if (key) { sessionStorage.removeItem(SS_KEY); location.reload(); }
+    else { passEl.value = ''; errEl.hidden = true; dialog.showModal(); passEl.focus(); }
+  });
+});
+
+cancel.addEventListener('click', () => dialog.close());
+dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const pass = passEl.value;
+  if (!pass) return;
+  try {
+    const key = await deriveKey(pass);
+    const testEls = document.querySelectorAll<HTMLElement>('[data-pii]');
+    if (testEls.length === 0) { storeKey(key); await applyPii(key); dialog.close(); return; }
+    await decryptBlob(testEls[0].dataset.pii!, key);
+    storeKey(key); await applyPii(key); dialog.close();
+  } catch { errEl.hidden = false; passEl.select(); }
+});
+
+const observer = new MutationObserver(() => {
+  loadKey().then(key => { if (key) applyPii(key); });
+});
+observer.observe(document.body, { childList: true, subtree: true });
+</script>

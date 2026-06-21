@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import CityPage from '../components/CityPage.astro';
+import { vancouver } from '../data/vancouver';
+---
+
+<Layout
+  title="Vancouver — Canada Trip"
+  description="Hotels, restaurants, itinerary, and map for Vancouver, BC — FOSSY 2026."
+>
+  <Nav />
+  <main>
+    <CityPage city={vancouver} />
+  </main>
+</Layout>

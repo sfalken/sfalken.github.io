@@ -1,0 +1,77 @@
+---
+import type { MapPoint } from '../data/types';
+interface Props {
+  points: MapPoint[];
+  center: [number, number];
+  zoom?: number;
+  title?: string;
+}
+const { points, center, zoom = 13, title } = Astro.props;
+const pointsJson = JSON.stringify(points);
+const centerJson = JSON.stringify(center);
+---
+
+<div class="map-section">
+  {title && <h3 class="section-label">{title}</h3>}
+  <div class="map-legend">
+    <span class="legend-item"><span class="dot dot-hotel"></span> Hotel</span>
+    <span class="legend-item"><span class="dot dot-restaurant"></span> Restaurant</span>
+    <span class="legend-item"><span class="dot dot-attraction"></span> Attraction</span>
+    <span class="legend-item"><span class="dot dot-icecream"></span> Ice Cream</span>
+    <span class="legend-item"><span class="dot dot-conference"></span> Conference</span>
+  </div>
+  <div id="map" class="map-container"></div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" is:inline></script>
+
+<script define:vars={{ pointsJson, centerJson, zoom }}>
+  const points = JSON.parse(pointsJson);
+  const center = JSON.parse(centerJson);
+  const categoryColors = {
+    hotel:      '#8b1a1a',
+    restaurant: '#C8102E',
+    attraction: '#059669',
+    icecream:   '#f59e0b',
+    conference: '#7c3aed',
+    transport:  '#6b7280',
+  };
+  function makeIcon(color) {
+    return L.divIcon({
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);"></div>`,
+      className: '', iconSize: [14, 14], iconAnchor: [7, 7],
+    });
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const map = L.map('map').setView(center, zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+    points.forEach(pt => {
+      const color = categoryColors[pt.category] || '#6b7280';
+      const popup = `
+        <strong>${pt.name}</strong><br/>
+        <span style="color:#6b7280;font-size:0.8em">${pt.category}</span>
+        ${pt.description ? `<br/>${pt.description}` : ''}
+        ${pt.website ? `<br/><a href="${pt.website}" target="_blank" rel="noopener" style="color:#C8102E">Visit →</a>` : ''}
+      `;
+      L.marker([pt.coordinates[0], pt.coordinates[1]], { icon: makeIcon(color) }).addTo(map).bindPopup(popup);
+    });
+  });
+</script>
+
+<style>
+  .map-section { display: flex; flex-direction: column; gap: 0.75rem; }
+  .map-legend { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--gray-700); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  .dot-hotel      { background: #8b1a1a; }
+  .dot-restaurant { background: #C8102E; }
+  .dot-attraction { background: #059669; }
+  .dot-icecream   { background: #f59e0b; }
+  .dot-conference { background: #7c3aed; }
+  .map-container  { height: 420px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--gray-200); }
+  @media (max-width: 640px) { .map-container { height: 300px; } }
+</style>
