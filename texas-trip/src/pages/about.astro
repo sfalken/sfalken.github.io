@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="About — Texas Trip" description="About this Texas LinuxFest trip planner.">
+  <Nav />
+  <main>
+    <div class="about-hero">
+      <div class="container">
+        <p class="section-label">About This Site</p>
+        <h1>Texas LinuxFest 2026</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="about-grid">
+        <section class="card about-card">
+          <h2>The Trip</h2>
+          <p>
+            A solo trip to Austin, Texas for <a href="https://texaslinuxfest.org" target="_blank" rel="noopener">Texas LinuxFest</a>,
+            the annual celebration of Linux and open source software in the Lone Star State.
+          </p>
+          <ul class="about-list">
+            <li>✈️ Flying SEA → AUS from Seattle-Tacoma</li>
+            <li>📅 November 5–8, 2026 (4 days)</li>
+            <li>🐧 Texas LinuxFest: Nov 6–7</li>
+            <li>🤠 Solo traveler</li>
+            <li>🍦 Ice cream selfie tradition (4 spots planned)</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>The Site</h2>
+          <p>
+            This is a personal trip planner built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+            and hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+            It's part of a monorepo of trip planners at <a href="/" >sfalken.github.io</a>.
+          </p>
+          <ul class="about-list">
+            <li>🗺️ Interactive maps (Leaflet + OpenStreetMap)</li>
+            <li>✅ Planning checklist with browser persistence</li>
+            <li>💰 Budget tracker with expense logging</li>
+            <li>📱 Progressive Web App (installable, offline-capable)</li>
+            <li>🔒 Optional PII encryption for booking details</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>Texas LinuxFest</h2>
+          <p>
+            Texas LinuxFest (TxLF) is the annual statewide Linux and open source conference for Texas.
+            It brings together Linux users, administrators, developers, and enthusiasts for talks,
+            workshops, and community building.
+          </p>
+          <p style="margin-top:.75rem;">
+            The conference is typically community-organized and free or very low-cost —
+            reflecting the spirit of the open source community.
+          </p>
+          <a href="https://texaslinuxfest.org" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:1rem;align-self:flex-start;">
+            Visit texaslinuxfest.org →
+          </a>
+        </section>
+
+        <section class="card about-card">
+          <h2>Austin, Texas</h2>
+          <p>
+            Austin is the capital of Texas and a major tech and culture hub. Home to the University of Texas,
+            a thriving live music scene (it calls itself the "Live Music Capital of the World"), legendary barbecue,
+            Barton Springs, South Congress, and a growing open source community.
+          </p>
+          <ul class="about-list">
+            <li>🌆 Population: ~1 million (metro ~2.3M)</li>
+            <li>🌡️ November weather: 55–72°F (13–22°C)</li>
+            <li>🕐 Timezone: Central Time (UTC-6)</li>
+            <li>✈️ Airport: Austin-Bergstrom (AUS), ~20 min from downtown</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, var(--tx-red) 0%, var(--tx-blue) 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .about-hero .section-label { color: rgba(255,255,255,0.7); }
+  .about-hero h1 { color: white; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .about-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .about-card h2 { font-size: 1.15rem; color: var(--tx-red); }
+  .about-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.6; }
+
+  .about-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    color: var(--gray-700);
+  }
+</style>

@@ -31,6 +31,7 @@ const CITY_TRIP = {
   prague:               'europe-trip',
   nuremberg:            'europe-trip',
   boston:               'usa-trip',
+  austin:               'texas-trip',
   'europe-budget':      'europe-trip',
   'europe-seed-expenses': 'europe-trip',
 };

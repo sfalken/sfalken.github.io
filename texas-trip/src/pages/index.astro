@@ -1,0 +1,214 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = '/texas-trip';
+---
+
+<Layout title="Texas Trip — Texas LinuxFest 2026">
+  <Nav />
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero-label">Solo Trip · November 2026</p>
+        <h1>Texas LinuxFest<br/><span class="hero-sub">Austin, Texas</span></h1>
+        <p class="hero-desc">
+          Texas LinuxFest, Nov 6–7 · Brisket, barbecue, ice cream selfies, and the Austin open source community.
+        </p>
+        <div class="hero-actions">
+          <a href={`${base}/austin/`} class="btn btn-primary">Explore Austin →</a>
+          <a href={`${base}/checklist/`} class="btn btn-secondary">Planning Checklist</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Trip at a Glance -->
+      <section class="section">
+        <p class="section-label">Trip Overview</p>
+        <h2>At a Glance</h2>
+        <div class="glance-grid" style="margin-top:1rem;">
+          <div class="glance-card">
+            <div class="glance-icon">📅</div>
+            <div>
+              <div class="glance-label">Dates</div>
+              <div class="glance-value">Nov 5–8, 2026 (4 days)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">✈️</div>
+            <div>
+              <div class="glance-label">Flights</div>
+              <div class="glance-value">SEA → AUS → SEA (direct ~3h30m)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🐧</div>
+            <div>
+              <div class="glance-label">Conference</div>
+              <div class="glance-value">Texas LinuxFest, Nov 6–7</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🌡️</div>
+            <div>
+              <div class="glance-label">Weather</div>
+              <div class="glance-value">55–72°F (13–22°C) · Mostly sunny</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">💵</div>
+            <div>
+              <div class="glance-label">Est. Budget</div>
+              <div class="glance-value">~$1,878 USD (solo)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🍦</div>
+            <div>
+              <div class="glance-label">Ice Cream Selfies</div>
+              <div class="glance-value">4 spots planned (Amy's, Lick, Cow Tipping, Jeni's)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conference section -->
+      <section class="section">
+        <p class="section-label">Texas LinuxFest</p>
+        <h2>The Conference</h2>
+        <div class="conf-card card" style="margin-top:1rem;">
+          <div class="conf-body">
+            <div class="conf-text">
+              <p>
+                <strong>Texas LinuxFest (TxLF)</strong> is the annual gathering of the Texas open source and Linux community.
+                It covers Linux, open source software, cloud infrastructure, security, DevOps, and community topics —
+                with a welcoming, grassroots atmosphere that reflects Texas hospitality.
+              </p>
+              <p style="margin-top:.75rem;">
+                The conference is typically free or low-cost and community-organized.
+                Venue is <strong>Palmer Events Center</strong> (subject to change — check
+                <a href="https://texaslinuxfest.org" target="_blank" rel="noopener">texaslinuxfest.org</a>).
+              </p>
+              <div class="conf-details">
+                <span>📅 November 6–7, 2026</span>
+                <span>📍 Austin, TX</span>
+                <span>🐧 Open source · Linux · Community</span>
+              </div>
+            </div>
+            <div class="conf-links">
+              <a href="https://texaslinuxfest.org" target="_blank" rel="noopener" class="btn btn-primary">TxLF Website →</a>
+              <a href={`${base}/checklist/`} class="btn btn-outline">Pre-trip Checklist</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick nav -->
+      <section class="section">
+        <p class="section-label">Navigate</p>
+        <h2>Plan Your Trip</h2>
+        <div class="nav-cards" style="margin-top:1rem;">
+          <a href={`${base}/austin/`} class="nav-card card">
+            <div class="nc-icon">🤠</div>
+            <div class="nc-text">
+              <div class="nc-title">Austin</div>
+              <div class="nc-desc">Hotels, restaurants, itinerary, map, ice cream spots</div>
+            </div>
+          </a>
+          <a href={`${base}/checklist/`} class="nav-card card">
+            <div class="nc-icon">✅</div>
+            <div class="nc-text">
+              <div class="nc-title">Checklist</div>
+              <div class="nc-desc">Pre-trip planning tasks with progress tracking</div>
+            </div>
+          </a>
+          <a href={`${base}/budget/`} class="nav-card card">
+            <div class="nc-icon">💰</div>
+            <div class="nc-text">
+              <div class="nc-title">Budget</div>
+              <div class="nc-desc">Estimated costs with expense tracking and charts</div>
+            </div>
+          </a>
+          <a href={`${base}/log/`} class="nav-card card">
+            <div class="nc-icon">📝</div>
+            <div class="nc-text">
+              <div class="nc-title">Expense Log</div>
+              <div class="nc-desc">Quick mobile-optimized expense entry</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--tx-red) 0%, var(--tx-blue) 100%);
+    color: white;
+    padding: 3.5rem 0 3rem;
+    text-align: center;
+  }
+  .hero-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 { color: white; line-height: 1.15; }
+  .hero-sub { color: rgba(255,255,255,0.85); font-style: italic; }
+  .hero-desc { max-width: 520px; margin: 1rem auto; color: rgba(255,255,255,0.85); font-size: 1.05rem; }
+  .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  .glance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+  .glance-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: var(--shadow);
+  }
+  .glance-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .glance-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.1rem; }
+  .glance-value { font-size: 0.92rem; color: var(--gray-900); font-weight: 500; }
+
+  .conf-card { padding: 1.5rem; }
+  .conf-body { display: flex; gap: 2rem; align-items: flex-start; }
+  .conf-text { flex: 1; font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; }
+  .conf-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--tx-blue);
+    font-weight: 500;
+  }
+  .conf-links { display: flex; flex-direction: column; gap: 0.6rem; flex-shrink: 0; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .nav-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--gray-900);
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .nav-card:hover { box-shadow: var(--shadow-md); border-color: var(--tx-red); text-decoration: none; }
+  .nc-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .nc-title { font-weight: 600; font-size: 1rem; color: var(--gray-900); margin-bottom: 0.2rem; }
+  .nc-desc { font-size: 0.85rem; color: var(--gray-500); }
+
+  @media (max-width: 640px) {
+    .conf-body { flex-direction: column; }
+    .conf-links { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>

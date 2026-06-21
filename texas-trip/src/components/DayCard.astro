@@ -1,0 +1,93 @@
+---
+import type { Day, Activity } from '../data/types';
+
+interface Props { day: Day; index: number; }
+const { day, index } = Astro.props;
+
+const isConf = day.theme?.toLowerCase().includes('texas linuxfest') ||
+               day.theme?.toLowerCase().includes('txlf') ||
+               day.theme?.toLowerCase().includes('conference');
+---
+
+<div class={`card day-card${isConf ? ' conf-day' : ''}`} id={`day-${index + 1}`}>
+  <div class="day-header">
+    <div class="day-number">Day {index + 1}</div>
+    <div class="day-date">{day.date}</div>
+  </div>
+  {day.theme && (
+    <div class={`day-theme${isConf ? ' conf-banner' : ''}`}>
+      {isConf ? `🐧 ${day.theme}` : day.theme}
+    </div>
+  )}
+  <ul class="day-activities">
+    {day.activities.map((act: Activity) => (
+      <li class="activity">
+        {act.time && <span class="act-time">{act.time}</span>}
+        <div class="act-content">
+          <span class="act-name">
+            {act.url
+              ? <a href={act.url} target="_blank" rel="noopener">{act.name}</a>
+              : act.name
+            }
+          </span>
+          {act.description && <p class="act-desc">{act.description}</p>}
+          {act.mapsLink && (
+            <a href={act.mapsLink} target="_blank" rel="noopener" class="act-map">📍 Map</a>
+          )}
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .day-card { padding: 1.25rem; }
+  .day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .day-number {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--tx-red);
+  }
+  .day-date { font-size: 0.85rem; color: var(--gray-500); }
+  .day-theme {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    background: var(--gray-100);
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .conf-banner {
+    background: var(--tx-blue-pale);
+    color: var(--tx-blue);
+    border: 1px solid rgba(0,40,104,0.15);
+  }
+  .conf-day { border-top: 3px solid var(--tx-blue); }
+
+  .day-activities { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .activity { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .act-time {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--tx-red);
+    white-space: nowrap;
+    min-width: 3.5rem;
+    padding-top: 0.15rem;
+  }
+  .act-content { flex: 1; }
+  .act-name { font-size: 0.95rem; font-weight: 500; }
+  .act-name a { color: var(--gray-900); }
+  .act-name a:hover { color: var(--tx-red); }
+  .act-desc { font-size: 0.85rem; color: var(--gray-500); margin-top: 0.15rem; line-height: 1.4; }
+  .act-map { font-size: 0.78rem; color: var(--tx-blue); margin-top: 0.2rem; display: inline-block; }
+  .act-map:hover { text-decoration: underline; }
+</style>

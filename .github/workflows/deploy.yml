@@ -59,6 +59,20 @@ jobs:
           mkdir -p dist/usa-trip
           cp -r usa-trip/dist/. dist/usa-trip/
 
+      # Build texas-trip (base: /texas-trip → outputs flat to texas-trip/dist/)
+      - name: Install texas-trip dependencies
+        working-directory: texas-trip
+        run: npm install
+
+      - name: Build texas-trip
+        working-directory: texas-trip
+        run: npm run build
+
+      - name: Copy texas-trip output into dist/texas-trip/
+        run: |
+          mkdir -p dist/texas-trip
+          cp -r texas-trip/dist/. dist/texas-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,105 @@
+---
+import type { Hotel } from '../data/types';
+
+interface Props { hotel: Hotel; }
+const { hotel } = Astro.props;
+
+const tierLabels: Record<string, string> = {
+  budget: 'Budget',
+  mid: 'Mid-range',
+  upscale: 'Upscale',
+  luxury: 'Luxury',
+};
+const tierColors: Record<string, string> = {
+  budget: 'badge',
+  mid: 'badge badge-blue',
+  upscale: 'badge badge-red',
+  luxury: 'badge badge-red',
+};
+const stars = '★'.repeat(Math.floor(hotel.rating)) + (hotel.rating % 1 >= 0.5 ? '½' : '');
+const hasPii = !!hotel._pii;
+---
+
+<div class={`card hotel-card${hasPii ? ' has-pii' : ''}`} data-pii={hotel._pii || undefined}>
+  <div class="hotel-header">
+    <div>
+      <h3 class="hotel-name">
+        {hasPii
+          ? <span class="pii-name">{hotel.name}</span>
+          : hotel.website
+            ? <a href={hotel.website} target="_blank" rel="noopener">{hotel.name}</a>
+            : hotel.name
+        }
+      </h3>
+      <div class="hotel-meta">
+        <span class="stars">{stars}</span>
+        <span class="rating-num">{hotel.rating}</span>
+        <span class={tierColors[hotel.tier] ?? 'badge'}>{tierLabels[hotel.tier] ?? hotel.tier}</span>
+      </div>
+    </div>
+    <div class="hotel-price">
+      <span class="price-amount">${hotel.pricePerNight}</span>
+      <span class="price-unit">/night</span>
+    </div>
+  </div>
+
+  {hotel.address && (
+    <p class={`hotel-address${hasPii ? ' pii-address' : ''}`}>{hotel.address}</p>
+  )}
+
+  {hotel.description && <p class="hotel-desc">{hotel.description}</p>}
+
+  {hotel.tags && hotel.tags.length > 0 && (
+    <div class="hotel-tags">
+      {hotel.tags.map(tag => <span class="tag">{tag}</span>)}
+    </div>
+  )}
+
+  {hotel.tip && (
+    <p class={`hotel-tip${hasPii ? ' pii-tip' : ''}`}>
+      <span class="tip-icon">💡</span>
+      {hasPii ? 'Unlock to reveal booking details' : hotel.tip}
+    </p>
+  )}
+
+  <div class="hotel-footer">
+    {hasPii
+      ? <a class="btn btn-outline pii-link" style="display:none">View Booking →</a>
+      : hotel.website
+        ? <a href={hotel.website} target="_blank" rel="noopener" class="btn btn-outline">View Hotel →</a>
+        : null
+    }
+    {hotel.mapsLink && (
+      <a href={hotel.mapsLink} target="_blank" rel="noopener" class="btn btn-secondary">📍 Map</a>
+    )}
+  </div>
+</div>
+
+<style>
+  .hotel-card { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .hotel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+  .hotel-name { font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .hotel-name a { color: var(--gray-900); }
+  .hotel-name a:hover { color: var(--tx-red); }
+  .hotel-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .rating-num { font-size: 0.85rem; color: var(--gray-700); font-weight: 500; }
+  .hotel-price { text-align: right; white-space: nowrap; }
+  .price-amount { font-size: 1.25rem; font-weight: 700; color: var(--tx-red); font-family: var(--font-serif); }
+  .price-unit { font-size: 0.78rem; color: var(--gray-500); display: block; }
+  .hotel-address { font-size: 0.85rem; color: var(--gray-500); }
+  .hotel-desc { font-size: 0.9rem; color: var(--gray-700); line-height: 1.5; }
+  .hotel-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .hotel-tip {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    background: var(--gray-50);
+    border-left: 3px solid var(--tx-red);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+  .tip-icon { flex-shrink: 0; }
+  .hotel-footer { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.25rem; }
+</style>

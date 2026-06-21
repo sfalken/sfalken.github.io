@@ -3,6 +3,7 @@ dist/
 .astro/
 .idea/
 .DS_Store
+scripts/pii-sources/
 europe-trip/node_modules/
 europe-trip/dist/
 europe-trip/.astro/

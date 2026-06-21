@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="Sync — Texas Trip" description="Import and export expense data for Texas trip.">
+  <Nav />
+  <main>
+    <div class="sync-hero">
+      <div class="container">
+        <p class="section-label">Cross-Device</p>
+        <h1>Sync Data</h1>
+      </div>
+    </div>
+
+    <div class="container sync-container">
+      <div class="card sync-card">
+        <h2>Export</h2>
+        <p>Download your expenses and checklist progress as a JSON file you can import on another device.</p>
+        <button id="export-btn" class="btn btn-primary">⬇ Export Data</button>
+      </div>
+
+      <div class="card sync-card">
+        <h2>Import</h2>
+        <p>Import a previously exported JSON file to restore your data.</p>
+        <label for="import-file" class="btn btn-outline import-label">⬆ Choose File</label>
+        <input type="file" id="import-file" accept=".json" style="display:none" />
+        <p id="import-status" hidden class="import-status"></p>
+      </div>
+
+      <div class="card sync-card">
+        <h2>Clear All Data</h2>
+        <p>Permanently delete all expenses, checklist progress, and settings stored in this browser.</p>
+        <button id="clear-btn" class="btn btn-outline clear-btn">🗑 Clear All Data</button>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const KEYS = ['texas-expenses', 'texas-checklist', 'texas-budget-settings'];
+
+  document.getElementById('export-btn')?.addEventListener('click', () => {
+    const data: Record<string, unknown> = {};
+    KEYS.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) { try { data[k] = JSON.parse(v); } catch { data[k] = v; } }
+    });
+    data._exported = new Date().toISOString();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `texas-trip-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('import-file')?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        KEYS.forEach(k => {
+          if (data[k] !== undefined) {
+            localStorage.setItem(k, JSON.stringify(data[k]));
+          }
+        });
+        const status = document.getElementById('import-status')!;
+        status.textContent = '✓ Data imported successfully! Reload the budget and checklist pages to see your data.';
+        status.hidden = false;
+      } catch {
+        alert('Failed to import: invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('clear-btn')?.addEventListener('click', () => {
+    if (!confirm('This will permanently delete all your expenses and checklist progress in this browser. Are you sure?')) return;
+    KEYS.forEach(k => localStorage.removeItem(k));
+    alert('All data cleared.');
+  });
+</script>
+
+<style>
+  .sync-hero {
+    background: linear-gradient(135deg, var(--tx-blue) 0%, #1a3d8a 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .sync-hero .section-label { color: rgba(255,255,255,0.7); }
+  .sync-hero h1 { color: white; }
+
+  .sync-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .sync-card { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; }
+  .sync-card h2 { font-size: 1.1rem; color: var(--gray-900); }
+  .sync-card p  { font-size: 0.9rem; color: var(--gray-500); line-height: 1.5; }
+
+  .import-label { cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .import-status {
+    font-size: 0.85rem;
+    color: #059669;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .clear-btn { color: var(--tx-red); border-color: var(--tx-red); }
+  .clear-btn:hover { background: var(--tx-red); }
+</style>

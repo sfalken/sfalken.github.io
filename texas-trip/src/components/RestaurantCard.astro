@@ -1,0 +1,80 @@
+---
+import type { Restaurant } from '../data/types';
+
+interface Props { restaurant: Restaurant; }
+const { restaurant: r } = Astro.props;
+
+const stars = '★'.repeat(Math.floor(r.rating)) + (r.rating % 1 >= 0.5 ? '½' : '');
+const priceLabel = r.priceRange === '$' ? 'Budget' : r.priceRange === '$$' ? 'Moderate' : r.priceRange === '$$$' ? 'Upscale' : 'Fine Dining';
+---
+
+<div class="card restaurant-card">
+  <div class="rest-header">
+    <div>
+      <h3 class="rest-name">
+        {r.website
+          ? <a href={r.website} target="_blank" rel="noopener">{r.name}</a>
+          : r.name
+        }
+      </h3>
+      <div class="rest-meta">
+        <span class="stars">{stars}</span>
+        <span class="rating-num">{r.rating}</span>
+        <span class="badge">{r.cuisine}</span>
+        <span class="price-range" title={priceLabel}>{r.priceRange}</span>
+      </div>
+    </div>
+  </div>
+
+  {r.address && <p class="rest-address">📍 {r.address}</p>}
+
+  {r.mustTry && r.mustTry.length > 0 && (
+    <div class="must-try">
+      <span class="must-try-label">Must try:</span>
+      {r.mustTry.map((dish, i) => (
+        <span>{dish}{i < r.mustTry.length - 1 ? ', ' : ''}</span>
+      ))}
+    </div>
+  )}
+
+  {r.hours && <p class="rest-hours">🕐 {r.hours}</p>}
+  {r.tip  && <p class="rest-tip"><span>💡</span> {r.tip}</p>}
+
+  {(r.website || r.mapsLink) && (
+    <div class="rest-footer">
+      {r.website  && <a href={r.website} target="_blank" rel="noopener" class="btn btn-outline">Visit Site →</a>}
+      {r.mapsLink && <a href={r.mapsLink} target="_blank" rel="noopener" class="btn btn-secondary">📍 Map</a>}
+    </div>
+  )}
+</div>
+
+<style>
+  .restaurant-card { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.65rem; }
+  .rest-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .rest-name { font-size: 1.05rem; margin-bottom: 0.3rem; }
+  .rest-name a { color: var(--gray-900); }
+  .rest-name a:hover { color: var(--tx-red); }
+  .rest-meta { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+  .rating-num { font-size: 0.85rem; color: var(--gray-700); font-weight: 500; }
+  .price-range { font-weight: 700; color: var(--tx-blue); font-size: 0.9rem; }
+  .rest-address { font-size: 0.85rem; color: var(--gray-500); }
+  .must-try {
+    font-size: 0.88rem;
+    color: var(--gray-700);
+    line-height: 1.5;
+  }
+  .must-try-label { font-weight: 600; color: var(--tx-red); margin-right: 0.3rem; }
+  .rest-hours { font-size: 0.85rem; color: var(--gray-500); }
+  .rest-tip {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    background: var(--gray-50);
+    border-left: 3px solid var(--tx-blue);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+  .rest-footer { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.25rem; }
+</style>
