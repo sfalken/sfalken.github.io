@@ -21,9 +21,9 @@ export const checklistCategories: ChecklistCategory[] = [
     id: 'accommodation',
     label: 'Accommodation',
     items: [
-      { id: 'hotel-booked', label: 'Book hotel for Aug 6–9 (3 nights) near Vancouver Convention Centre' },
+      { id: 'hotel-booked', label: 'Book hotel for Aug 6–9 (3 nights) — Sheraton Wall Centre has the best transit to UBC via 99 B-Line' },
       { id: 'parking', label: 'Confirm hotel parking availability and daily rate' },
-      { id: 'ev-charging-hotel', label: 'Check if hotel has EV charging — Westin Bayshore and Fairmont Pacific Rim do' },
+      { id: 'ev-charging-hotel', label: 'Check if hotel has EV charging — Fairmont Pacific Rim and Westin Bayshore both have chargers' },
       { id: 'hotel-confirm', label: 'Save hotel confirmation email and address offline' },
     ],
   },
@@ -33,12 +33,12 @@ export const checklistCategories: ChecklistCategory[] = [
     items: [
       { id: 'fossy-register', label: 'Register for FOSSY at fossy.us' },
       { id: 'fossy-schedule', label: 'Review the FOSSY schedule and bookmark sessions' },
-      { id: 'fossy-venue', label: 'Confirm venue address (check fossy.us — venue TBC for 2026)' },
+      { id: 'fossy-venue', label: 'Download UBC campus map — FOSSY 2026 is at UBC Point Grey campus (check fossy.us for the specific building)' },
       { id: 'fossy-coc', label: 'Read the FOSSY Code of Conduct' },
       { id: 'fossy-laptop', label: 'Pack laptop and charger for workshops' },
       { id: 'fossy-cards', label: 'Pack business cards or set up digital contact card (e.g. Linktree)' },
       { id: 'fossy-stickers', label: 'Bring project stickers for the swag table' },
-      { id: 'icecream-scout', label: 'Scout ice cream selfie spots near the convention centre (Soft Peaks in Gastown is closest)' },
+      { id: 'icecream-scout', label: 'Scout ice cream selfie spots — Rain or Shine on W 4th Ave is 10 min from UBC by bus; Soft Peaks in Gastown is a great evening detour' },
     ],
   },
   {
