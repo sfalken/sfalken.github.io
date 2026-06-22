@@ -222,9 +222,13 @@ form.addEventListener('submit', async (e) => {
     const key = await deriveKey(pass);
     const testEls = document.querySelectorAll<HTMLElement>('[data-pii]');
     if (testEls.length === 0) {
-      if (!await verifyAuthToken(key)) {
-        errEl.textContent = 'Please unlock on a trip details page first.';
-        errEl.hidden = false; passEl.select(); return;
+      if (localStorage.getItem(AUTH_STORE_KEY)) {
+        if (!await verifyAuthToken(key)) {
+          errEl.textContent = 'Incorrect passphrase — try again.';
+          errEl.hidden = false; passEl.select(); return;
+        }
+      } else {
+        await storeAuthToken(key);
       }
       storeKey(key); await applyPii(key); dialog.close();
       if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }

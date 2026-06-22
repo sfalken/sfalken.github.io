@@ -121,10 +121,15 @@
     const testEl = [...document.querySelectorAll<HTMLElement>('[data-pii]')]
       .find(el => el.dataset.pii && el.dataset.pii.length > 10);
     if (testEl) {
+      // PII blobs on this page — verify by decryption (throws if wrong key)
       await decryptBlob(testEl.dataset.pii!, key);
       await storeAuthToken(key);
+    } else if (localStorage.getItem(AUTH_STORE_KEY)) {
+      // Auth token already set — verify the entered password matches it
+      if (!await verifyAuthToken(key)) throw new Error('wrong-password');
     } else {
-      if (!await verifyAuthToken(key)) throw new Error('no-token');
+      // No blobs, no token yet — first-time setup: accept this passphrase
+      await storeAuthToken(key);
     }
     await storeKey(key);
     currentKey = key;
@@ -198,11 +203,9 @@
         dialog?.close();
         if (errorEl) errorEl.hidden = true;
         if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
-      } catch (err: any) {
+      } catch {
         if (errorEl) {
-          errorEl.textContent = err?.message === 'no-token'
-            ? 'Please unlock on a trip details page first.'
-            : 'Incorrect passphrase — try again.';
+          errorEl.textContent = 'Incorrect passphrase — try again.';
           errorEl.hidden = false;
         }
       } finally {
