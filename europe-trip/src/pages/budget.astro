@@ -47,7 +47,7 @@ const seedJson = JSON.stringify(seedExpenses);
             <input type="number" id="rate-usd-eur" step="0.001" min="0.1" />
           </div>
           <div class="rate-input-group">
-            <label>USD → CZK</label>
+            <label>USD → CZK Kč</label>
             <input type="number" id="rate-usd-czk" step="0.1" min="1" />
           </div>
         </div>
@@ -101,7 +101,7 @@ const seedJson = JSON.stringify(seedExpenses);
                       {item.note && <span class={item._pii ? 'item-note pii-note' : 'item-note'}>{item.note}</span>}
                     </div>
                     <span class="item-est">
-                      <span class="raw-amount">{item.estimated.toLocaleString()} {item.currency}</span>
+                      <span class="raw-amount">{item.estimated.toLocaleString()} {item.currency === 'CZK' ? 'Kč' : item.currency}</span>
                       <span class="converted-amount"></span>
                     </span>
                     <span class="item-actual" data-cat={cat.id} data-item={item.id}>—</span>
@@ -144,7 +144,7 @@ const seedJson = JSON.stringify(seedExpenses);
         <select id="edit-currency">
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
-          <option value="CZK">CZK</option>
+          <option value="CZK">CZK Kč</option>
         </select>
       </div>
       <div class="form-group">
@@ -269,12 +269,19 @@ const seedJson = JSON.stringify(seedExpenses);
     // Expenses per category
     const expensesByCat = {};
     const expensesByCatCurrency = {};
+    const expensesByItem = {};
+    const expensesByItemCurrency = {};
     expenses.forEach(e => {
       const converted = convert(e.amount, e.currency, displayCurrency, rates);
       expensesByCat[e.category] = (expensesByCat[e.category] || 0) + converted;
       totalActual += converted;
       if (!expensesByCatCurrency[e.category]) expensesByCatCurrency[e.category] = {};
       expensesByCatCurrency[e.category][e.currency] = (expensesByCatCurrency[e.category][e.currency] || 0) + e.amount;
+      if (e.budgetItemId) {
+        expensesByItem[e.budgetItemId] = (expensesByItem[e.budgetItemId] || 0) + converted;
+        if (!expensesByItemCurrency[e.budgetItemId]) expensesByItemCurrency[e.budgetItemId] = {};
+        expensesByItemCurrency[e.budgetItemId][e.currency] = (expensesByItemCurrency[e.budgetItemId][e.currency] || 0) + e.amount;
+      }
     });
 
     // Update summary
@@ -285,18 +292,24 @@ const seedJson = JSON.stringify(seedExpenses);
     remEl.textContent = fmt(remaining, displayCurrency);
     remEl.style.color = remaining < 0 ? 'var(--eu-red)' : '#166534';
 
-    // Update actual per item
+    // Update actual per item — per-item where mapped, category total fallback otherwise
     budgetCategories.forEach(cat => {
-      let actualText;
-      if (columnMode === 'usd-usd') {
-        const actual = expensesByCat[cat.id] || 0;
-        actualText = actual > 0 ? fmt(actual, displayCurrency) : '—';
-      } else {
-        const byCur = expensesByCatCurrency[cat.id] || {};
-        const parts = Object.entries(byCur).map(([cur, amt]) => fmt(amt, cur));
-        actualText = parts.length > 0 ? parts.join(' + ') : '—';
-      }
-      document.querySelectorAll(`[data-cat="${cat.id}"]`).forEach(el => {
+      cat.items.forEach(item => {
+        const el = document.querySelector(`.item-actual[data-item="${item.id}"]`);
+        if (!el) return;
+        const hasItemData = expensesByItem[item.id] !== undefined;
+        let actualText;
+        if (hasItemData) {
+          if (columnMode === 'usd-usd') {
+            actualText = fmt(expensesByItem[item.id], displayCurrency);
+          } else {
+            const byCur = expensesByItemCurrency[item.id] || {};
+            const parts = Object.entries(byCur).map(([cur, amt]) => fmt(amt, cur));
+            actualText = parts.length > 0 ? parts.join(' + ') : '—';
+          }
+        } else {
+          actualText = '—';
+        }
         el.textContent = actualText;
       });
     });
@@ -364,7 +377,7 @@ const seedJson = JSON.stringify(seedExpenses);
             <span class="exp-cat">${budgetCategories.find(c => c.id === e.category)?.label || e.category}</span>
           </div>
           <div class="exp-right">
-            <span class="exp-amount">${fmt(e.amount, e.currency)} <small>${e.currency}</small></span>
+            <span class="exp-amount">${fmt(e.amount, e.currency)}${e.currency !== 'CZK' ? ` <small>${e.currency}</small>` : ''}</span>
             <span class="exp-date">${e.date}</span>
             <div class="exp-actions">
               <button class="exp-btn" onclick="editExpense('${e.id}')">✏️</button>

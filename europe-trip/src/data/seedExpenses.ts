@@ -10,6 +10,7 @@ export interface Expense {
   city: string;
   date: string;
   savedAt: string;
+  budgetItemId?: string;
   _pii?: string;
 }
 
@@ -23,6 +24,7 @@ export const seedExpenses: Expense[] = [
     city: 'Transit',
     date: '2026-06-10',
     savedAt: '2026-06-10T00:00:00.000Z',
+    budgetItemId: 'flight-outbound',
     _pii: seedBlobs['seed-klm-rt-flight'] || undefined,
   },
   {
@@ -34,6 +36,7 @@ export const seedExpenses: Expense[] = [
     city: 'Prague',
     date: '2026-06-17',
     savedAt: '2026-06-23T09:31:41.122Z',
+    budgetItemId: 'hotel-andels',
   },
   {
     id: '1782207152673',
@@ -64,6 +67,7 @@ export const seedExpenses: Expense[] = [
     city: 'Prague',
     date: '2026-06-22',
     savedAt: '2026-06-23T09:41:08.063Z',
+    budgetItemId: 'hotel-hilton-prague',
   },
   {
     id: '1782207709523',
@@ -94,5 +98,6 @@ export const seedExpenses: Expense[] = [
     city: 'Prague',
     date: '2026-06-20',
     savedAt: '2026-06-23T09:48:12.674Z',
+    budgetItemId: 'bus-prague-nuremberg',
   },
 ];
