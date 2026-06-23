@@ -15,6 +15,7 @@ const trips = [
       'FOSSY 2026 in Vancouver — driving up from Seattle for four days of open source talks, aburi sushi at Miku, and ice cream selfies at La Casa Gelato\'s legendary 218-flavor wall.',
     tags: ['🐧 FOSSY 2026'],
     status: 'upcoming',
+    hasTalk: true,
     url: '/canada-trip/',
     accentColor: '#C8102E',
   },
@@ -31,6 +32,7 @@ const trips = [
       'Two open-source conferences, two medieval cities. 12 nights in Prague for Flock to Fedora, then a bus ride to Nuremberg for openSUSECon.',
     tags: ['🐧 Flock to Fedora', '🦎 openSUSECon'],
     status: 'in-progress',
+    hasTalk: true,
     url: '/europe-trip/',
     accentColor: '#D7141A',
   },
@@ -47,6 +49,7 @@ const trips = [
       'Five days in Boston for DevConf.US at Boston University, plus the Freedom Trail, the North End, and a few ice cream selfies.',
     tags: ['💻 DevConf.US'],
     status: 'upcoming',
+    hasTalk: true,
     url: '/usa-trip/',
     accentColor: '#3C3B6E',
   },
@@ -138,9 +141,14 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
                   <article class={`trip-card card-${trip.status}`} style={`--accent: ${trip.accentColor}`}>
                     <div class="card-top">
                       <span class="card-flags">{trip.flags}</span>
-                      <span class={`inline-badge badge-${trip.status}`}>
-                        {statusMeta[trip.status].dot} {statusMeta[trip.status].label}
-                      </span>
+                      <div class="card-badges">
+                        <span class={`inline-badge badge-${trip.status}`}>
+                          {statusMeta[trip.status].dot} {statusMeta[trip.status].label}
+                        </span>
+                        {'hasTalk' in trip && trip.hasTalk && (
+                          <span class="inline-badge badge-talk">🎤 Talk Accepted</span>
+                        )}
+                      </div>
                     </div>
 
                     <p class="card-category">{trip.category}</p>
@@ -308,6 +316,7 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
   .badge-upcoming    { background: var(--s-upcoming-bg);  color: var(--s-upcoming);  border: 1px solid var(--s-upcoming-border); }
   .badge-completed   { background: var(--s-completed-bg); color: var(--s-completed); border: 1px solid var(--s-completed-border); }
   .badge-not-taken   { background: var(--s-shelved-bg);   color: var(--s-shelved);   border: 1px solid var(--s-shelved-border); }
+  .badge-talk        { background: #f3e8ff; color: #7c3aed; border: 1px solid #ddd6fe; }
 
   .section-title {
     font-size: 1.05rem;
@@ -343,9 +352,16 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
 
   .card-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 0.2rem;
+  }
+
+  .card-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
   }
 
   .card-flags { font-size: 2.2rem; line-height: 1; }
