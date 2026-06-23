@@ -14,6 +14,10 @@ export interface Expense {
   _pii?: string;
 }
 
+export const retiredExpenseIds: string[] = [
+  '1782207421607', // replaced by food-prague-jun22 + special-dinner-jun22 split
+];
+
 export const seedExpenses: Expense[] = [
   {
     id: 'seed-klm-rt-flight',
@@ -49,14 +53,26 @@ export const seedExpenses: Expense[] = [
     savedAt: '2026-06-23T09:32:32.673Z',
   },
   {
-    id: '1782207421607',
-    amount: 9874,
+    id: 'food-prague-jun22',
+    amount: 5864,
     currency: 'CZK',
     category: 'food',
-    description: 'Prague food - general',
+    description: 'Prague food',
     city: 'Prague',
     date: '2026-06-22',
     savedAt: '2026-06-23T09:37:01.607Z',
+    budgetItemId: 'food-prague',
+  },
+  {
+    id: 'special-dinner-jun22',
+    amount: 4010,
+    currency: 'CZK',
+    category: 'food',
+    description: 'Special dinner',
+    city: 'Prague',
+    date: '2026-06-22',
+    savedAt: '2026-06-23T09:37:01.607Z',
+    budgetItemId: 'special-dinners',
   },
   {
     id: '1782207668063',
@@ -88,6 +104,17 @@ export const seedExpenses: Expense[] = [
     city: 'Prague',
     date: '2026-06-15',
     savedAt: '2026-06-23T09:47:20.408Z',
+  },
+  {
+    id: 'connectivity-eu-sim',
+    amount: 40,
+    currency: 'USD',
+    category: 'connectivity',
+    description: 'EU SIM / roaming',
+    city: 'Prague',
+    date: '2026-06-11',
+    savedAt: '2026-06-23T00:00:00.000Z',
+    budgetItemId: 'sim-card',
   },
   {
     id: '1782208092674',

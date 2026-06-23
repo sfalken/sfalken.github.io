@@ -2,11 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import { budgetCategories } from '../data/budget';
-import { seedExpenses } from '../data/seedExpenses';
+import { seedExpenses, retiredExpenseIds } from '../data/seedExpenses';
 const base = import.meta.env.BASE_URL;
 
 const budgetJson = JSON.stringify(budgetCategories);
 const seedJson = JSON.stringify(seedExpenses);
+const retiredJson = JSON.stringify(retiredExpenseIds);
 ---
 
 <Layout title="Budget" description="Trip budget tracker — Prague and Nuremberg, CZK/EUR/USD">
@@ -167,7 +168,7 @@ const seedJson = JSON.stringify(seedExpenses);
 </Layout>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script define:vars={{ budgetJson, seedJson, base }}>
+<script define:vars={{ budgetJson, seedJson, retiredJson, base }}>
   const EXPENSE_KEY = 'europe-expenses';
   const RATE_KEY = 'europe-rates';
   const CURRENCY_KEY = 'europe-display-currency';
@@ -385,9 +386,14 @@ const seedJson = JSON.stringify(seedExpenses);
 
   function seedKnownExpenses() {
     const seeds = JSON.parse(seedJson);
-    const existing = getExpenses();
-    const existingMap = new Map(existing.map(e => [e.id, e]));
+    const retired = JSON.parse(retiredJson);
+    let existing = getExpenses();
     let changed = false;
+    // Remove retired IDs
+    const beforeLen = existing.length;
+    existing = existing.filter(e => !retired.includes(e.id));
+    if (existing.length !== beforeLen) changed = true;
+    const existingMap = new Map(existing.map(e => [e.id, e]));
     const result = [...existing];
     seeds.forEach(s => {
       if (!existingMap.has(s.id)) {
