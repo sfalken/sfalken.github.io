@@ -92,6 +92,7 @@ const seedJson = JSON.stringify(seedExpenses);
                 <span class="cat-ico">{cat.icon}</span>
                 <h3>{cat.label}</h3>
                 <span class="cat-est" id={`cat-est-${cat.id}`}></span>
+                <span class="cat-actual" id={`cat-actual-${cat.id}`}></span>
               </div>
               <div class="budget-items">
                 {cat.items.map(item => (
@@ -292,8 +293,22 @@ const seedJson = JSON.stringify(seedExpenses);
     remEl.textContent = fmt(remaining, displayCurrency);
     remEl.style.color = remaining < 0 ? 'var(--eu-red)' : '#166534';
 
-    // Update actual per item — per-item where mapped, category total fallback otherwise
+    // Update actual per item — per-item where mapped, — otherwise
+    // Update category header actual — always shows full category total
     budgetCategories.forEach(cat => {
+      // Category header actual
+      const catActualEl = document.getElementById(`cat-actual-${cat.id}`);
+      if (catActualEl) {
+        if (columnMode === 'usd-usd') {
+          const catActual = expensesByCat[cat.id] || 0;
+          catActualEl.textContent = catActual > 0 ? `actual: ${fmt(catActual, displayCurrency)}` : '';
+        } else {
+          const byCur = expensesByCatCurrency[cat.id] || {};
+          const parts = Object.entries(byCur).map(([cur, amt]) => fmt(amt, cur));
+          catActualEl.textContent = parts.length > 0 ? `actual: ${parts.join(' + ')}` : '';
+        }
+      }
+      // Per-item actuals
       cat.items.forEach(item => {
         const el = document.querySelector(`.item-actual[data-item="${item.id}"]`);
         if (!el) return;
@@ -422,10 +437,15 @@ const seedJson = JSON.stringify(seedExpenses);
       if (!existingMap.has(s.id)) {
         result.push(s);
         changed = true;
-      } else if (s._pii && !existingMap.get(s.id)._pii) {
-        // Patch in _pii blob after encrypt script runs
+      } else {
+        const stored = existingMap.get(s.id);
         const idx = result.findIndex(e => e.id === s.id);
-        if (idx !== -1) { result[idx] = { ...result[idx], _pii: s._pii }; changed = true; }
+        if (idx !== -1) {
+          let patch = {};
+          if (s._pii && !stored._pii) patch._pii = s._pii;
+          if (s.budgetItemId && !stored.budgetItemId) patch.budgetItemId = s.budgetItemId;
+          if (Object.keys(patch).length) { result[idx] = { ...result[idx], ...patch }; changed = true; }
+        }
       }
     });
     if (changed) saveExpenses(result);
@@ -549,6 +569,7 @@ const seedJson = JSON.stringify(seedExpenses);
   .cat-ico { font-size: 1.1rem; }
   .cat-heading h3 { font-size: 1rem; flex: 1; }
   .cat-est { font-size: 0.85rem; font-weight: 600; color: var(--eu-muted); }
+  .cat-actual { font-size: 0.8rem; font-weight: 600; color: var(--eu-blue); margin-left: 0.5rem; }
 
   .budget-items { display: flex; flex-direction: column; gap: 0.25rem; }
   .budget-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.88rem; }
