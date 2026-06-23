@@ -9,7 +9,7 @@ export const budgetCategories: BudgetCategory[] = [
     icon: '🚗',
     items: [
       { id: 'gas-rt', label: 'Gas — round trip SEA ↔ Vancouver (~490 km, 19 L/100km)', estimated: 155, currency: 'CAD', note: '~93 L total (WA + BC legs). BC pump price ~$1.70 CAD/L; WA is cheaper so fill up before the border on the way back.' },
-      { id: 'parking-vancouver', label: 'Parking in Vancouver (3 nights)', estimated: 105, currency: 'CAD', note: '~$35 CAD/night at hotel parkade or nearby lot. Fairmont valet is ~$50/night.' },
+      { id: 'parking-vancouver', label: 'Parking at UBC (3 nights)', estimated: 40, currency: 'CAD', note: '~$12–15 CAD/day at UBC commuter lots (e.g. North Parkade). Much cheaper than downtown parkades.' },
     ],
   },
   {

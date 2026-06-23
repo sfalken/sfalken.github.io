@@ -20,8 +20,8 @@ export const checklistCategories: ChecklistCategory[] = [
     id: 'accommodation',
     label: 'Accommodation',
     items: [
-      { id: 'hotel-booked', label: 'Book hotel for Aug 6–9 (3 nights) — Sheraton Wall Centre has the best transit to UBC via 99 B-Line' },
-      { id: 'parking', label: 'Confirm hotel parking availability and daily rate' },
+      { id: 'hotel-booked', label: 'Confirm on-campus accommodation details for Aug 6–9 (3 nights) — check-in time, building location, and key pickup' },
+      { id: 'parking', label: 'Confirm UBC campus parking — North Parkade or nearby lots, ~$12–15 CAD/day' },
       { id: 'hotel-confirm', label: 'Save hotel confirmation email and address offline' },
     ],
   },

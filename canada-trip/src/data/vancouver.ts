@@ -198,8 +198,8 @@ export const vancouver: CityData = {
           mapsLink: 'https://maps.google.com/?q=Peace+Arch+Border+Crossing+Blaine+WA',
         },
         {
-          name: 'Arrive Vancouver — hotel check-in & orient',
-          description: 'Follow BC-99 north into Vancouver (~1 hr from border). Drop luggage at your hotel. Most check-ins are 3pm but you can drop bags. From downtown, UBC is 35–45 min via rideshare, or 30 min via the 99 B-Line bus from Broadway.',
+          name: 'Arrive UBC campus — check in & orient',
+          description: 'Follow BC-99 north and continue to UBC campus (~1.5–2 hrs total from the border). Check into on-campus accommodation — you\'re already at the conference venue, so no commute needed. Grab a coffee and explore the campus before the opening session.',
           duration: '~30 min',
         },
         {
@@ -274,7 +274,7 @@ export const vancouver: CityData = {
       activities: [
         {
           name: 'Morning: Granville Island Public Market',
-          description: 'Catch a rideshare or bus to Granville Island before the conference starts. The Public Market opens at 9am — grab breakfast from one of the food vendors (salmon chowder, fresh BC baked goods) and browse artisan stalls. Quick rideshare to UBC from here (~15 min).',
+          description: 'Take a rideshare from UBC to Granville Island before the conference starts (~15 min). The Public Market opens at 9am — grab breakfast from one of the food vendors (salmon chowder, fresh BC baked goods) and browse artisan stalls. Quick rideshare back to campus.',
           cost: 20,
           currency: 'CAD',
           website: 'https://granvilleisland.com',
@@ -323,8 +323,8 @@ export const vancouver: CityData = {
         },
         {
           name: 'Check out & fill up',
-          description: 'Hotel check-out by noon. No need to fill up in Vancouver — BC gas prices are higher than WA. Make sure you have enough fuel to reach the border, then fill up in Blaine or Burlington on the US side where it\'s cheaper.',
-          mapsLink: 'https://maps.google.com/?q=gas+stations+Vancouver+BC',
+          description: 'Check out of on-campus accommodation by noon. No need to fill up in Vancouver — BC gas prices are higher than WA. From UBC take SW Marine Dr east to connect to BC-99 south, then fill up in Blaine or Burlington on the US side where it\'s cheaper.',
+          mapsLink: 'https://maps.google.com/?q=gas+stations+Blaine+WA',
         },
         {
           name: 'Drive Vancouver → Seattle',
