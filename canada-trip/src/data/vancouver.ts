@@ -33,7 +33,7 @@ export const vancouver: CityData = {
       tier: 'upscale',
       tags: ['Upscale', 'Coal Harbour', 'Outdoor pool', 'Stanley Park adjacent', '40 min to UBC'],
       description: 'Iconic Coal Harbour hotel with a beautiful outdoor pool and direct access to the seawall. Stanley Park is steps away. UBC is 35–45 min by rideshare or the 44 bus. The outdoor pool is heated — great for an early morning dip before heading to campus.',
-      tip: 'EV charging available in the parkade. Book seawall-facing rooms. Rideshare to UBC takes ~25 min in light morning traffic — split with other conference-goers to save.',
+      tip: 'Book seawall-facing rooms. Rideshare to UBC takes ~25 min in light morning traffic — split with other conference-goers to save.',
       address: '1601 Bayshore Dr, Vancouver, BC V6G 2V4',
       website: 'https://www.marriott.com/en-us/hotels/yvrwi-the-westin-bayshore-vancouver',
       mapsLink: 'https://maps.google.com/?q=Westin+Bayshore+1601+Bayshore+Dr+Vancouver+BC',
@@ -194,7 +194,7 @@ export const vancouver: CityData = {
         },
         {
           name: 'Border crossing — Peace Arch (BC-99)',
-          description: 'Cross at the Peace Arch / Douglas border crossing on BC-99. Have your passport ready. Declare any food items — CBSA checks fruit, vegetables, meat. Estimated 20–60 min depending on traffic. EV: you\'ll have plenty of charge from a full Seattle start.',
+          description: 'Cross at the Peace Arch / Douglas border crossing on BC-99. Have your passport ready. Declare any food items — CBSA checks fruit, vegetables, meat. Estimated 20–60 min depending on traffic.',
           mapsLink: 'https://maps.google.com/?q=Peace+Arch+Border+Crossing+Blaine+WA',
         },
         {
@@ -322,9 +322,9 @@ export const vancouver: CityData = {
           mapsLink: 'https://maps.google.com/?q=La+Casa+Gelato+1033+Venables+St+Vancouver+BC',
         },
         {
-          name: 'Check out & charge up',
-          description: 'Hotel check-out by noon. Top up the EV before departing — BC Hydro DC fast chargers and ChargePoint stations are available throughout Vancouver. The BCIT campus and Whole Foods on Cambie have reliable chargers.',
-          mapsLink: 'https://maps.google.com/?q=EV+charging+Vancouver+BC',
+          name: 'Check out & fill up',
+          description: 'Hotel check-out by noon. No need to fill up in Vancouver — BC gas prices are higher than WA. Make sure you have enough fuel to reach the border, then fill up in Blaine or Burlington on the US side where it\'s cheaper.',
+          mapsLink: 'https://maps.google.com/?q=gas+stations+Vancouver+BC',
         },
         {
           name: 'Drive Vancouver → Seattle',

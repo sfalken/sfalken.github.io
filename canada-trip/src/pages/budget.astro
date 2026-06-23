@@ -2,6 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import { budgetCategories, defaultExchangeRate } from '../data/budget';
+import { seedExpenses, retiredExpenseIds } from '../data/seedExpenses';
+
+const seedJson    = JSON.stringify(seedExpenses);
+const retiredJson = JSON.stringify(retiredExpenseIds);
 
 const catMeta = budgetCategories.map(cat => ({
   id:       cat.id,
@@ -118,11 +122,25 @@ const catMeta = budgetCategories.map(cat => ({
   </main>
 </Layout>
 
-<script define:vars={{ catMeta, defaultExchangeRate }}>
+<script define:vars={{ catMeta, defaultExchangeRate, seedJson, retiredJson }}>
   const EXP_KEY  = 'canada-expenses';
   const PREF_KEY = 'canada-budget-settings';
 
-  function loadExpenses() { try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); } catch { return []; } }
+  function loadExpenses()      { try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); } catch { return []; } }
+  function saveExpenses(arr)   { localStorage.setItem(EXP_KEY, JSON.stringify(arr)); }
+
+  function seedKnownExpenses() {
+    const seeds   = JSON.parse(seedJson);
+    const retired = JSON.parse(retiredJson);
+    let existing  = loadExpenses();
+    let changed   = false;
+    const beforeLen = existing.length;
+    existing = existing.filter(e => !retired.includes(e.id));
+    if (existing.length !== beforeLen) changed = true;
+    const existingIds = new Set(existing.map(e => e.id));
+    seeds.forEach(s => { if (!existingIds.has(s.id)) { existing.push(s); changed = true; } });
+    if (changed) saveExpenses(existing);
+  }
   function loadPrefs()    { try { return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); } catch { return {}; } }
   function savePrefs(p)   { localStorage.setItem(PREF_KEY, JSON.stringify(p)); }
 
@@ -279,6 +297,7 @@ const catMeta = budgetCategories.map(cat => ({
   s.onload = () => renderCharts(loadExpenses());
   document.head.appendChild(s);
 
+  seedKnownExpenses();
   renderExpenses();
   updateDisplay();
 </script>

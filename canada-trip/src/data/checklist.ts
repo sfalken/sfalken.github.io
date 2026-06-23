@@ -12,8 +12,7 @@ export const checklistCategories: ChecklistCategory[] = [
       { id: 'border-wait', label: 'Check border wait times before departing — use the CBSA Border Wait Time app or BorderXing' },
       { id: 'early-departure', label: 'Depart Seattle by 6–7am to minimize border wait and arrive before FOSSY starts' },
       { id: 'cbsa-declaration', label: 'Know CBSA rules: no fresh fruit/vegetables/meat from US. $800 USD personal exemption on return.' },
-      { id: 'ev-range', label: 'Charge EV to 100% before departing Seattle — no mandatory stop needed for 140-mile drive' },
-      { id: 'plugshare', label: 'Download PlugShare app — locate DC fast chargers in Vancouver for top-up charge' },
+      { id: 'fuel-level', label: 'Fill up with gas in Seattle before departing — WA pump prices are lower than BC' },
       { id: 'google-maps-bc', label: 'Download BC offline maps in Google Maps (cell roaming charges may apply)' },
     ],
   },
@@ -23,7 +22,6 @@ export const checklistCategories: ChecklistCategory[] = [
     items: [
       { id: 'hotel-booked', label: 'Book hotel for Aug 6–9 (3 nights) — Sheraton Wall Centre has the best transit to UBC via 99 B-Line' },
       { id: 'parking', label: 'Confirm hotel parking availability and daily rate' },
-      { id: 'ev-charging-hotel', label: 'Check if hotel has EV charging — Fairmont Pacific Rim and Westin Bayshore both have chargers' },
       { id: 'hotel-confirm', label: 'Save hotel confirmation email and address offline' },
     ],
   },
@@ -84,14 +82,13 @@ export const checklistCategories: ChecklistCategory[] = [
       { id: 'power-bank', label: 'Portable power bank for all-day conference use' },
       { id: 'reusable-bag', label: 'Reusable bag — BC has a plastic bag ban. Bring your own for Granville Island shopping.' },
       { id: 'laptop-bag', label: 'Laptop bag/backpack suitable for the conference' },
-      { id: 'ev-charger', label: 'EV charging adapter if your car uses non-standard connector (CCS2 / CHAdeMO adapter)' },
     ],
   },
   {
     id: 'before-departure',
     label: 'Before Departure (Day of Drive)',
     items: [
-      { id: 'ev-full', label: 'Charge EV to 100% the night before departing' },
+      { id: 'gas-tank-full', label: 'Fill the gas tank the night before or morning of departure — fuel up in WA before crossing' },
       { id: 'route-planned', label: 'Route planned: I-5 N → Peace Arch (BC-99) → BC-99 N to Vancouver' },
       { id: 'border-time', label: 'Set phone alarm for early departure — 6am or earlier is ideal' },
       { id: 'offline-maps', label: 'Offline maps downloaded — Vancouver + route' },
