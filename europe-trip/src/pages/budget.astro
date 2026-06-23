@@ -33,15 +33,7 @@ const seedJson = JSON.stringify(seedExpenses);
             <button class="toggle-btn" data-currency="CZK">CZK Kč</button>
           </div>
         </div>
-        <div class="currency-toggle">
-          <span class="ctrl-label">Column view:</span>
-          <div class="toggle-group">
-            <button class="col-mode-btn active" data-colmode="usd-usd">USD / USD</button>
-            <button class="col-mode-btn" data-colmode="local-local">Local / Local</button>
-            <button class="col-mode-btn" data-colmode="usd-entries">USD / Entries</button>
-          </div>
-        </div>
-        <div class="rate-inputs">
+<div class="rate-inputs">
           <div class="rate-input-group">
             <label>USD → EUR</label>
             <input type="number" id="rate-usd-eur" step="0.001" min="0.1" />
@@ -218,7 +210,6 @@ const seedJson = JSON.stringify(seedExpenses);
   }
 
   let displayCurrency = localStorage.getItem(CURRENCY_KEY) || 'USD';
-  let columnMode = localStorage.getItem('europe-column-mode') || 'usd-usd';
   let barChart = null;
   let donutChart = null;
 
@@ -241,9 +232,6 @@ const seedJson = JSON.stringify(seedExpenses);
     const catEstTotals = {};
     const catActualTotals = {};
 
-    const budgetCatsEl = document.getElementById('budget-categories');
-    if (budgetCatsEl) budgetCatsEl.dataset.colmode = columnMode;
-
     budgetCategories.forEach(cat => {
       let catEst = 0;
       cat.items.forEach(item => {
@@ -251,15 +239,10 @@ const seedJson = JSON.stringify(seedExpenses);
         catEst += conv;
         totalEst += conv;
         const el = document.querySelector(`[data-item-id="${item.id}"] .converted-amount`);
-        if (columnMode === 'local-local') {
-          if (el) el.textContent = '';
-        } else {
-          const usd = convert(item.estimated, item.currency, 'USD', rates);
-          if (el && item.currency !== 'USD') {
-            el.textContent = ` ≈ ${fmt(usd, 'USD')}`;
-          } else if (el) {
-            el.textContent = '';
-          }
+        if (el && item.currency !== displayCurrency) {
+          el.textContent = ` ≈ ${fmt(conv, displayCurrency)}`;
+        } else if (el) {
+          el.textContent = '';
         }
       });
       catEstTotals[cat.id] = catEst;
@@ -269,19 +252,13 @@ const seedJson = JSON.stringify(seedExpenses);
 
     // Expenses per category
     const expensesByCat = {};
-    const expensesByCatCurrency = {};
     const expensesByItem = {};
-    const expensesByItemCurrency = {};
     expenses.forEach(e => {
       const converted = convert(e.amount, e.currency, displayCurrency, rates);
       expensesByCat[e.category] = (expensesByCat[e.category] || 0) + converted;
       totalActual += converted;
-      if (!expensesByCatCurrency[e.category]) expensesByCatCurrency[e.category] = {};
-      expensesByCatCurrency[e.category][e.currency] = (expensesByCatCurrency[e.category][e.currency] || 0) + e.amount;
       if (e.budgetItemId) {
         expensesByItem[e.budgetItemId] = (expensesByItem[e.budgetItemId] || 0) + converted;
-        if (!expensesByItemCurrency[e.budgetItemId]) expensesByItemCurrency[e.budgetItemId] = {};
-        expensesByItemCurrency[e.budgetItemId][e.currency] = (expensesByItemCurrency[e.budgetItemId][e.currency] || 0) + e.amount;
       }
     });
 
@@ -293,39 +270,18 @@ const seedJson = JSON.stringify(seedExpenses);
     remEl.textContent = fmt(remaining, displayCurrency);
     remEl.style.color = remaining < 0 ? 'var(--eu-red)' : '#166534';
 
-    // Update actual per item — per-item where mapped, — otherwise
-    // Update category header actual — always shows full category total
+    // Update actuals — category header total + per-item where mapped
     budgetCategories.forEach(cat => {
-      // Category header actual
       const catActualEl = document.getElementById(`cat-actual-${cat.id}`);
       if (catActualEl) {
-        if (columnMode === 'usd-usd') {
-          const catActual = expensesByCat[cat.id] || 0;
-          catActualEl.textContent = catActual > 0 ? `actual: ${fmt(catActual, displayCurrency)}` : '';
-        } else {
-          const byCur = expensesByCatCurrency[cat.id] || {};
-          const parts = Object.entries(byCur).map(([cur, amt]) => fmt(amt, cur));
-          catActualEl.textContent = parts.length > 0 ? `actual: ${parts.join(' + ')}` : '';
-        }
+        const catActual = expensesByCat[cat.id] || 0;
+        catActualEl.textContent = catActual > 0 ? `actual: ${fmt(catActual, displayCurrency)}` : '';
       }
-      // Per-item actuals
       cat.items.forEach(item => {
         const el = document.querySelector(`.item-actual[data-item="${item.id}"]`);
         if (!el) return;
-        const hasItemData = expensesByItem[item.id] !== undefined;
-        let actualText;
-        if (hasItemData) {
-          if (columnMode === 'usd-usd') {
-            actualText = fmt(expensesByItem[item.id], displayCurrency);
-          } else {
-            const byCur = expensesByItemCurrency[item.id] || {};
-            const parts = Object.entries(byCur).map(([cur, amt]) => fmt(amt, cur));
-            actualText = parts.length > 0 ? parts.join(' + ') : '—';
-          }
-        } else {
-          actualText = '—';
-        }
-        el.textContent = actualText;
+        const itemActual = expensesByItem[item.id];
+        el.textContent = itemActual !== undefined ? fmt(itemActual, displayCurrency) : '—';
       });
     });
 
@@ -461,17 +417,7 @@ const seedJson = JSON.stringify(seedExpenses);
       });
     });
 
-    document.querySelectorAll('.col-mode-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.colmode === columnMode);
-      btn.addEventListener('click', () => {
-        columnMode = btn.dataset.colmode;
-        localStorage.setItem('europe-column-mode', columnMode);
-        document.querySelectorAll('.col-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.colmode === columnMode));
-        renderAll();
-      });
-    });
-
-    document.getElementById('rate-usd-eur').addEventListener('change', function() {
+document.getElementById('rate-usd-eur').addEventListener('change', function() {
       const r = getRates();
       r['USD-EUR'] = parseFloat(this.value);
       saveRates(r);
@@ -580,9 +526,7 @@ const seedJson = JSON.stringify(seedExpenses);
   .item-est { text-align: right; white-space: nowrap; }
   .raw-amount { font-size: 0.82rem; color: var(--eu-muted); }
   .converted-amount { display: block; font-size: 0.82rem; font-weight: 600; color: var(--eu-dark); }
-  .item-actual { font-size: 0.82rem; font-weight: 600; color: var(--eu-blue); min-width: 60px; text-align: right; white-space: normal; }
-  #budget-categories[data-colmode="local-local"] .raw-amount { font-weight: 600; color: var(--eu-dark); font-size: 0.88rem; }
-  #budget-categories[data-colmode="local-local"] .converted-amount { display: none; }
+  .item-actual { font-size: 0.82rem; font-weight: 600; color: var(--eu-blue); min-width: 60px; text-align: right; }
 
   .section-header-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
   .expense-list { display: flex; flex-direction: column; gap: 0.5rem; }
