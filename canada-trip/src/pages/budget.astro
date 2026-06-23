@@ -80,6 +80,7 @@ const catMeta = budgetCategories.map(cat => ({
                 <div class="cat-header">
                   <span class="cat-icon">{cat.icon}</span>
                   <h3 class="cat-name">{cat.label}</h3>
+                  <span class="cat-actual" id={`cat-actual-${cat.id}`}></span>
                   <span class="cat-total" data-cat-total={cat.id}>—</span>
                 </div>
                 <div class="cat-items">
@@ -94,6 +95,7 @@ const catMeta = budgetCategories.map(cat => ({
                         <span class="item-est" data-item-id={item.id} data-orig={item.estimated} data-orig-currency={item.currency}>
                           {item.estimated.toLocaleString()}
                         </span>
+                        <span class="item-actual" data-item={item.id}>—</span>
                       </div>
                     </div>
                   ))}
@@ -137,8 +139,14 @@ const catMeta = budgetCategories.map(cat => ({
     const beforeLen = existing.length;
     existing = existing.filter(e => !retired.includes(e.id));
     if (existing.length !== beforeLen) changed = true;
-    const existingIds = new Set(existing.map(e => e.id));
-    seeds.forEach(s => { if (!existingIds.has(s.id)) { existing.push(s); changed = true; } });
+    const existingMap = new Map(existing.map(e => [e.id, e]));
+    seeds.forEach(s => {
+      if (!existingMap.has(s.id)) { existing.push(s); changed = true; }
+      else if (s.budgetItemId && !existingMap.get(s.id).budgetItemId) {
+        const idx = existing.findIndex(e => e.id === s.id);
+        if (idx !== -1) { existing[idx] = { ...existing[idx], budgetItemId: s.budgetItemId }; changed = true; }
+      }
+    });
     if (changed) saveExpenses(existing);
   }
   function loadPrefs()    { try { return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); } catch { return {}; } }
@@ -194,18 +202,43 @@ const catMeta = budgetCategories.map(cat => ({
     const expenses = loadExpenses();
     const estimated = catMeta.reduce((s, cat) =>
       s + cat.items.reduce((ss, item) => ss + convert(item.estimated, item.currency), 0), 0);
-    const actual = expenses.reduce((s, e) => s + convert(Number(e.amount), e.currency || 'CAD'), 0);
+
+    const expensesByCat  = {};
+    const expensesByItem = {};
+    let totalActual = 0;
+    expenses.forEach(e => {
+      const converted = convert(Number(e.amount), e.currency || 'CAD');
+      expensesByCat[e.category] = (expensesByCat[e.category] || 0) + converted;
+      totalActual += converted;
+      if (e.budgetItemId) {
+        expensesByItem[e.budgetItemId] = (expensesByItem[e.budgetItemId] || 0) + converted;
+      }
+    });
 
     const estEl  = document.getElementById('est-total');
     const actEl  = document.getElementById('actual-total');
     const remEl  = document.getElementById('remaining');
     if (estEl) estEl.textContent = fmt(estimated);
-    if (actEl) actEl.textContent = fmt(actual);
+    if (actEl) actEl.textContent = fmt(totalActual);
     if (remEl) {
-      const diff = estimated - actual;
+      const diff = estimated - totalActual;
       remEl.textContent = fmt(Math.abs(diff));
       remEl.style.color = diff >= 0 ? '#059669' : 'var(--ca-red)';
     }
+
+    catMeta.forEach(cat => {
+      const catActualEl = document.getElementById(`cat-actual-${cat.id}`);
+      if (catActualEl) {
+        const catActual = expensesByCat[cat.id] || 0;
+        catActualEl.textContent = catActual > 0 ? `actual: ${fmt(catActual)}` : '';
+      }
+      cat.items.forEach(item => {
+        const el = document.querySelector(`.item-actual[data-item="${item.id}"]`);
+        if (!el) return;
+        const itemActual = expensesByItem[item.id];
+        el.textContent = itemActual !== undefined ? fmt(itemActual) : '—';
+      });
+    });
   }
 
   function renderExpenses() {
@@ -342,6 +375,7 @@ const catMeta = budgetCategories.map(cat => ({
   .cat-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.25rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
   .cat-icon { font-size: 1.25rem; }
   .cat-name { flex: 1; font-size: 0.95rem; font-family: var(--font-sans); font-weight: 600; }
+  .cat-actual { font-size: 0.8rem; font-weight: 600; color: var(--ca-red); margin-left: 0.5rem; }
   .cat-total { font-weight: 700; color: var(--ca-red); font-family: var(--font-serif); font-size: 1.05rem; }
 
   .cat-items { display: flex; flex-direction: column; }
@@ -352,6 +386,7 @@ const catMeta = budgetCategories.map(cat => ({
   .item-note { font-size: 0.78rem; color: var(--gray-500); }
   .item-right { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
   .item-est { font-size: 0.95rem; font-weight: 600; color: var(--ca-maple); }
+  .item-actual { font-size: 0.95rem; font-weight: 600; color: var(--ca-red); min-width: 4rem; text-align: right; }
 
   .exp-section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; gap: 1rem; }
   .no-expenses { background: white; border-radius: var(--radius-lg); border: 1px dashed var(--gray-300); padding: 2rem; text-align: center; color: var(--gray-500); font-size: 0.9rem; }

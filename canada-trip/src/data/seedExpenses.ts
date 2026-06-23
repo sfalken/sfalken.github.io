@@ -6,6 +6,7 @@ export interface Expense {
   description: string;
   date: string;
   savedAt: string;
+  budgetItemId?: string;
 }
 
 export const retiredExpenseIds: string[] = [];
@@ -19,5 +20,6 @@ export const seedExpenses: Expense[] = [
     description: 'Hotel confirmed (Aug 6–9, 3 nights)',
     date: '2026-08-09',
     savedAt: '2026-06-23T00:00:00.000Z',
+    budgetItemId: 'hotel-nights',
   },
 ];
