@@ -1,9 +1,11 @@
 ---
+import sentinelData from '../data/pii-sentinel.json';
+const sentinelBlob = sentinelData.sentinel || '';
 ---
 
 <button id="pii-fab" title="Unlock private details" aria-label="Unlock private details">🔒</button>
 
-<dialog id="pii-dialog">
+<dialog id="pii-dialog" data-sentinel={sentinelBlob}>
   <form id="pii-form" method="dialog">
     <h2>Unlock Private Details</h2>
     <p>Enter the passphrase to reveal booking details, hotel names, and confirmation numbers.</p>
@@ -124,27 +126,8 @@
 <script>
 const SALT_STR = 'sfalken-trips-pii-v1';
 const PBKDF2_ITER = 250_000;
-const SS_KEY         = 'trips-pii-key';
-const AUTH_SENTINEL  = 'trips-pii-auth-v1';
-const AUTH_STORE_KEY = 'trips-pii-auth';
-
-async function storeAuthToken(key: CryptoKey) {
-  const raw     = await crypto.subtle.exportKey('raw', key);
-  const hmacKey = await crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig     = await crypto.subtle.sign('HMAC', hmacKey, new TextEncoder().encode(AUTH_SENTINEL));
-  localStorage.setItem(AUTH_STORE_KEY, btoa(String.fromCharCode(...new Uint8Array(sig))));
-}
-
-async function verifyAuthToken(key: CryptoKey): Promise<boolean> {
-  const stored = localStorage.getItem(AUTH_STORE_KEY);
-  if (!stored) return false;
-  try {
-    const raw     = await crypto.subtle.exportKey('raw', key);
-    const hmacKey = await crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const sig     = await crypto.subtle.sign('HMAC', hmacKey, new TextEncoder().encode(AUTH_SENTINEL));
-    return btoa(String.fromCharCode(...new Uint8Array(sig))) === stored;
-  } catch { return false; }
-}
+const SS_KEY = 'trips-pii-key';
+const SENTINEL_PLAINTEXT = 'sfalken-trips-pii-sentinel-v1';
 
 async function deriveKey(password: string): Promise<CryptoKey> {
   const enc = new TextEncoder();
@@ -179,6 +162,15 @@ async function loadKey(): Promise<CryptoKey | null> {
     const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
     return await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
   } catch { return null; }
+}
+
+async function verifySentinel(key: CryptoKey): Promise<boolean> {
+  const blob = document.getElementById('pii-dialog')?.dataset.sentinel;
+  if (!blob) return false;
+  try {
+    const data = await decryptBlob(blob, key) as { sentinel?: string };
+    return data.sentinel === SENTINEL_PLAINTEXT;
+  } catch { return false; }
 }
 
 async function applyPii(key: CryptoKey) {
@@ -248,23 +240,11 @@ form.addEventListener('submit', async (e) => {
   if (!pass) return;
   try {
     const key = await deriveKey(pass);
-    const testEls = document.querySelectorAll<HTMLElement>('[data-pii]');
-    if (testEls.length === 0) {
-      if (localStorage.getItem(AUTH_STORE_KEY)) {
-        if (!await verifyAuthToken(key)) {
-          errEl.textContent = 'Incorrect passphrase — try again.';
-          errEl.hidden = false; passEl.select(); return;
-        }
-      } else {
-        await storeAuthToken(key);
-      }
-      storeKey(key); await applyPii(key); dialog.close();
-      if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
+    if (!await verifySentinel(key)) {
+      errEl.textContent = 'Incorrect passphrase — try again.';
+      errEl.hidden = false; passEl.select();
       return;
     }
-    const first = testEls[0].dataset.pii!;
-    await decryptBlob(first, key);
-    await storeAuthToken(key);
     storeKey(key); await applyPii(key); dialog.close();
     if (pendingCallback) { const cb = pendingCallback; pendingCallback = null; cb(); }
   } catch {

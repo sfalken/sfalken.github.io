@@ -101,4 +101,18 @@ for (const file of sourceFiles) {
   console.log(`✓ ${city}: ${Object.keys(blobMap).length} entries → ${trip}/src/data/${outFile}`);
 }
 
-console.log(`\n${total} entries encrypted. Commit the updated *-pii-blobs.json files.`);
+// Sentinel: a fixed known plaintext, encrypted with this passphrase, written to
+// every PII-enabled trip. PiiUnlock.astro decrypts this on every submit to
+// verify a passphrase is correct — even on pages with no real PII of their own
+// (e.g. the checklist page) — instead of blindly trusting the first password
+// ever typed when nothing local was available to test it against.
+const SENTINEL_PLAINTEXT = 'sfalken-trips-pii-sentinel-v1';
+const SENTINEL_TRIPS = [...new Set(Object.values(CITY_TRIP))];
+const sentinelBlob = encryptPii({ sentinel: SENTINEL_PLAINTEXT }, key);
+for (const trip of SENTINEL_TRIPS) {
+  const outPath = resolve(root, trip, 'src', 'data', 'pii-sentinel.json');
+  writeFileSync(outPath, JSON.stringify({ sentinel: sentinelBlob }, null, 2) + '\n');
+}
+console.log(`✓ sentinel written to ${SENTINEL_TRIPS.length} trips: ${SENTINEL_TRIPS.join(', ')}`);
+
+console.log(`\n${total} entries encrypted. Commit the updated *-pii-blobs.json and *-sentinel.json files.`);

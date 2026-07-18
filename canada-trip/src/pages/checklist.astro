@@ -81,27 +81,19 @@ const totalItems = checklistCategories.reduce((sum, c) => sum + c.items.length, 
     if (state[box.dataset.item!]) { box.checked = true; box.closest('.checklist-item')?.classList.add('done'); }
     box.addEventListener('change', () => {
       const newChecked = box.checked;
-      box.checked = !newChecked;
-      const requireAuth = (window as any).piiRequireAuth || ((cb: () => void) => cb());
-      requireAuth(() => {
-        state[box.dataset.item!] = newChecked;
-        save(state);
-        box.checked = newChecked;
-        box.closest('.checklist-item')?.classList.toggle('done', newChecked);
-        updateProgress();
-      });
+      state[box.dataset.item!] = newChecked;
+      save(state);
+      box.closest('.checklist-item')?.classList.toggle('done', newChecked);
+      updateProgress();
     });
   });
   updateProgress();
 
   document.getElementById('clear-all')?.addEventListener('click', () => {
-    const requireAuth = (window as any).piiRequireAuth || ((cb: () => void) => cb());
-    requireAuth(() => {
-      if (!confirm('Clear all checklist progress?')) return;
-      state = {}; save(state);
-      document.querySelectorAll<HTMLInputElement>('input[type=checkbox][data-item]').forEach(b => { b.checked = false; b.closest('.checklist-item')?.classList.remove('done'); });
-      updateProgress();
-    });
+    if (!confirm('Clear all checklist progress?')) return;
+    state = {}; save(state);
+    document.querySelectorAll<HTMLInputElement>('input[type=checkbox][data-item]').forEach(b => { b.checked = false; b.closest('.checklist-item')?.classList.remove('done'); });
+    updateProgress();
   });
 </script>
 

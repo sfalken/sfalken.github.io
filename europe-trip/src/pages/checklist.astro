@@ -106,30 +106,22 @@ const base = import.meta.env.BASE_URL;
 
       input.addEventListener('change', () => {
         const newChecked = input.checked;
-        input.checked = !newChecked;
-        const requireAuth = window.piiRequireAuth || (cb => cb());
-        requireAuth(() => {
-          const newState = getState();
-          newState[id] = newChecked;
-          saveState(newState);
-          input.checked = newChecked;
-          input.closest('.checklist-item')?.classList.toggle('done', newChecked);
-          updateProgress(newState);
-        });
+        const newState = getState();
+        newState[id] = newChecked;
+        saveState(newState);
+        input.closest('.checklist-item')?.classList.toggle('done', newChecked);
+        updateProgress(newState);
       });
     });
 
     document.getElementById('clear-all')?.addEventListener('click', () => {
-      const requireAuth = window.piiRequireAuth || (cb => cb());
-      requireAuth(() => {
-        if (!confirm('Reset all checklist items?')) return;
-        localStorage.removeItem(STORAGE_KEY);
-        document.querySelectorAll('.check-input').forEach(input => {
-          input.checked = false;
-          input.closest('.checklist-item')?.classList.remove('done');
-        });
-        updateProgress({});
+      if (!confirm('Reset all checklist items?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      document.querySelectorAll('.check-input').forEach(input => {
+        input.checked = false;
+        input.closest('.checklist-item')?.classList.remove('done');
       });
+      updateProgress({});
     });
 
     updateProgress(state);

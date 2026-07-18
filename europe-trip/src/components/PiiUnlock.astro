@@ -2,11 +2,13 @@
 // Client-side AES-256-GCM decryption for PII blobs.
 // Key derivation: PBKDF2-SHA256 · 250k iterations · fixed salt.
 // Session key persisted in sessionStorage so re-entry isn't needed per tab.
+import sentinelData from '../data/pii-sentinel.json';
+const sentinelBlob = sentinelData.sentinel || '';
 ---
 
 <button id="pii-fab" class="pii-fab" title="Unlock private details" aria-label="Unlock private details">🔒</button>
 
-<dialog id="pii-dialog" class="pii-dialog">
+<dialog id="pii-dialog" class="pii-dialog" data-sentinel={sentinelBlob}>
   <div class="pii-form">
     <h3 class="pii-heading">Unlock private details</h3>
     <p class="pii-hint">Enter the passphrase to reveal confirmed booking names, addresses, and links.</p>
@@ -95,42 +97,20 @@
   let currentKey: CryptoKey | null = null;
   let pendingCallback: (() => void) | null = null;
 
-  const AUTH_SENTINEL  = 'trips-pii-auth-v1';
-  const AUTH_STORE_KEY = 'trips-pii-auth';
+  const SENTINEL_PLAINTEXT = 'sfalken-trips-pii-sentinel-v1';
 
-  async function storeAuthToken(key: CryptoKey) {
-    const raw     = await crypto.subtle.exportKey('raw', key);
-    const hmacKey = await crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const sig     = await crypto.subtle.sign('HMAC', hmacKey, new TextEncoder().encode(AUTH_SENTINEL));
-    localStorage.setItem(AUTH_STORE_KEY, btoa(String.fromCharCode(...new Uint8Array(sig))));
-  }
-
-  async function verifyAuthToken(key: CryptoKey): Promise<boolean> {
-    const stored = localStorage.getItem(AUTH_STORE_KEY);
-    if (!stored) return false;
+  async function verifySentinel(key: CryptoKey): Promise<boolean> {
+    const blob = document.getElementById('pii-dialog')?.dataset.sentinel;
+    if (!blob) return false;
     try {
-      const raw     = await crypto.subtle.exportKey('raw', key);
-      const hmacKey = await crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-      const sig     = await crypto.subtle.sign('HMAC', hmacKey, new TextEncoder().encode(AUTH_SENTINEL));
-      return btoa(String.fromCharCode(...new Uint8Array(sig))) === stored;
+      const data = await decryptBlob(blob, key) as { sentinel?: string };
+      return data.sentinel === SENTINEL_PLAINTEXT;
     } catch { return false; }
   }
 
   async function unlock(password: string) {
     const key = await deriveKey(password);
-    const testEl = [...document.querySelectorAll<HTMLElement>('[data-pii]')]
-      .find(el => el.dataset.pii && el.dataset.pii.length > 10);
-    if (testEl) {
-      // PII blobs on this page — verify by decryption (throws if wrong key)
-      await decryptBlob(testEl.dataset.pii!, key);
-      await storeAuthToken(key);
-    } else if (localStorage.getItem(AUTH_STORE_KEY)) {
-      // Auth token already set — verify the entered password matches it
-      if (!await verifyAuthToken(key)) throw new Error('wrong-password');
-    } else {
-      // No blobs, no token yet — first-time setup: accept this passphrase
-      await storeAuthToken(key);
-    }
+    if (!await verifySentinel(key)) throw new Error('wrong-password');
     await storeKey(key);
     currentKey = key;
     await applyPii(key);
