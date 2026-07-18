@@ -37,8 +37,8 @@ export const budgetCategories: BudgetCategory[] = [
     label: 'Food & Dining',
     icon: '🍽️',
     items: [
-      { id: 'food-prague', label: 'Prague food budget (8 days × 600 CZK)', estimated: 4800, currency: 'CZK', note: 'Mix of casual and nice dinners' },
-      { id: 'food-nuremberg', label: 'Nuremberg food budget (11 days × 35 EUR)', estimated: 385, currency: 'EUR', note: 'Bratwurst + local restaurants' },
+      { id: 'food-prague', label: 'Prague food budget (11 days × 600 CZK)', estimated: 6600, currency: 'CZK', note: 'Mix of casual and nice dinners' },
+      { id: 'food-nuremberg', label: 'Nuremberg food budget (8 days × 35 EUR)', estimated: 280, currency: 'EUR', note: 'Bratwurst + local restaurants' },
       { id: 'special-dinners', label: 'Special dinners (Esszimmer, Na Kopci, Eska)', estimated: 150, currency: 'EUR', note: 'Budget for 3 splurge meals' },
     ],
   },
@@ -47,8 +47,8 @@ export const budgetCategories: BudgetCategory[] = [
     label: 'Local Transport',
     icon: '🚇',
     items: [
-      { id: 'transit-prague', label: 'Prague transit (8 days, Lítačka passes)', estimated: 800, currency: 'CZK', note: '24-hr or multi-day passes via app' },
-      { id: 'transit-nuremberg', label: 'Nuremberg VGN transit (11 days)', estimated: 55, currency: 'EUR', note: '7-day + 4-day passes or daily' },
+      { id: 'transit-prague', label: 'Prague transit (11 days, Lítačka passes)', estimated: 1100, currency: 'CZK', note: '24-hr or multi-day passes via app' },
+      { id: 'transit-nuremberg', label: 'Nuremberg VGN transit (8 days)', estimated: 40, currency: 'EUR', note: '7-day + 4-day passes or daily' },
     ],
   },
   {
