@@ -2,9 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import { budgetCategories } from '../data/budget';
+import { seedExpenses, retiredExpenseIds } from '../data/seedExpenses';
 
 const base = '/usa-trip';
 const categoriesJson = JSON.stringify(budgetCategories);
+const seedJson = JSON.stringify(seedExpenses);
+const retiredJson = JSON.stringify(retiredExpenseIds);
 
 const totalEstimated = budgetCategories.reduce(
   (sum, cat) => sum + cat.items.reduce((s, item) => s + item.estimated, 0),
@@ -115,7 +118,7 @@ const totalEstimated = budgetCategories.reduce(
 <!-- Chart.js -->
 <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 
-<script is:inline define:vars={{ categoriesJson, totalEstimated }}>
+<script is:inline define:vars={{ categoriesJson, seedJson, retiredJson, totalEstimated }}>
   const EXPENSE_KEY = 'usa-expenses';
   const categories = JSON.parse(categoriesJson);
 
@@ -123,17 +126,44 @@ const totalEstimated = budgetCategories.reduce(
     try { return JSON.parse(localStorage.getItem(EXPENSE_KEY) || '[]'); } catch { return []; }
   }
 
+  function saveExpenses(expenses) {
+    localStorage.setItem(EXPENSE_KEY, JSON.stringify(expenses));
+  }
+
+  function seedKnownExpenses() {
+    const seeds = JSON.parse(seedJson);
+    const retired = JSON.parse(retiredJson);
+    let existing = loadExpenses();
+    let changed = false;
+    const beforeLen = existing.length;
+    existing = existing.filter(e => !retired.includes(e.id));
+    if (existing.length !== beforeLen) changed = true;
+    const existingIds = new Set(existing.map(e => e.id));
+    seeds.forEach(s => {
+      if (!existingIds.has(s.id)) {
+        existing.push(s);
+        changed = true;
+      }
+    });
+    if (changed) saveExpenses(existing);
+  }
+
   function formatUSD(n) {
     return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  function init() {
+  function renderData() {
+    seedKnownExpenses();
     const expenses = loadExpenses();
 
     // Compute actual per category
     const actualByCat = {};
+    const actualByItem = {};
     expenses.forEach(exp => {
       actualByCat[exp.category] = (actualByCat[exp.category] || 0) + Number(exp.amount);
+      if (exp.budgetItemId) {
+        actualByItem[exp.budgetItemId] = (actualByItem[exp.budgetItemId] || 0) + Number(exp.amount);
+      }
     });
 
     const totalActual = expenses.reduce((s, e) => s + Number(e.amount), 0);
@@ -142,12 +172,59 @@ const totalEstimated = budgetCategories.reduce(
     document.getElementById('actual-total').textContent = formatUSD(totalActual);
     document.getElementById('remaining-total').textContent = formatUSD(totalEstimated - totalActual);
 
-    // Update item-level actual (by matching category id)
+    // Update item-level actual (by matching budget item id)
     categories.forEach(cat => {
       cat.items.forEach(item => {
         const el = document.getElementById('actual-' + item.id);
-        if (el) el.textContent = '$0';
+        if (el) el.textContent = formatUSD(actualByItem[item.id] || 0);
       });
+    });
+
+    // Expense log
+    const logEl = document.getElementById('expense-log');
+    if (expenses.length === 0) {
+      logEl.innerHTML = '<div class="empty-log">No expenses yet. <a href="/usa-trip/log/">Log your first expense →</a></div>';
+    } else {
+      const recent = [...expenses].reverse().slice(0, 10);
+      logEl.innerHTML = `<table class="exp-table">
+        <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead>
+        <tbody>
+          ${recent.map((e, ri) => {
+            const idx = expenses.length - 1 - ri;
+            return `<tr>
+              <td>${e.date || '—'}</td>
+              <td>${e.category || '—'}</td>
+              <td>${e.label || '—'}</td>
+              <td class="exp-amt">${formatUSD(e.amount)}</td>
+              <td><button class="exp-del-btn" data-index="${idx}">✕</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+
+      logEl.querySelectorAll('.exp-del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const requireAuth = window.piiRequireAuth || (cb => cb());
+          requireAuth(() => {
+            const all = loadExpenses();
+            all.splice(Number(btn.dataset.index), 1);
+            localStorage.setItem(EXPENSE_KEY, JSON.stringify(all));
+            renderData();
+            renderCharts();
+          });
+        });
+      });
+    }
+
+    return { actualByCat };
+  }
+
+  function renderCharts() {
+    if (!window.Chart) return;
+    const expenses = loadExpenses();
+    const actualByCat = {};
+    expenses.forEach(exp => {
+      actualByCat[exp.category] = (actualByCat[exp.category] || 0) + Number(exp.amount);
     });
 
     // Bar chart
@@ -156,7 +233,7 @@ const totalEstimated = budgetCategories.reduce(
     const actData = categories.map(c => actualByCat[c.id] || 0);
 
     const barCtx = document.getElementById('bar-chart');
-    if (barCtx && window.Chart) {
+    if (barCtx) {
       if (barCtx._chart) barCtx._chart.destroy();
       barCtx._chart = new Chart(barCtx, {
         type: 'bar',
@@ -192,54 +269,22 @@ const totalEstimated = budgetCategories.reduce(
         },
       });
     }
+  }
 
-    // Expense log
-    const logEl = document.getElementById('expense-log');
-    if (expenses.length === 0) {
-      logEl.innerHTML = '<div class="empty-log">No expenses yet. <a href="/usa-trip/log/">Log your first expense →</a></div>';
-    } else {
-      const recent = [...expenses].reverse().slice(0, 10);
-      logEl.innerHTML = `<table class="exp-table">
-        <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead>
-        <tbody>
-          ${recent.map((e, ri) => {
-            const idx = expenses.length - 1 - ri;
-            return `<tr>
-              <td>${e.date || '—'}</td>
-              <td>${e.category || '—'}</td>
-              <td>${e.label || '—'}</td>
-              <td class="exp-amt">${formatUSD(e.amount)}</td>
-              <td><button class="exp-del-btn" data-index="${idx}">✕</button></td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
-
-      logEl.querySelectorAll('.exp-del-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const requireAuth = window.piiRequireAuth || (cb => cb());
-          requireAuth(() => {
-            const all = loadExpenses();
-            all.splice(Number(btn.dataset.index), 1);
-            localStorage.setItem(EXPENSE_KEY, JSON.stringify(all));
-            init();
-          });
-        });
-      });
+  function init() {
+    renderData();
+    renderCharts();
+    if (!window.Chart) {
+      const waitForChart = setInterval(() => {
+        if (window.Chart) { clearInterval(waitForChart); renderCharts(); }
+      }, 100);
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      // Wait for Chart.js to load
-      const waitForChart = setInterval(() => {
-        if (window.Chart) { clearInterval(waitForChart); init(); }
-      }, 100);
-    });
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    const waitForChart = setInterval(() => {
-      if (window.Chart) { clearInterval(waitForChart); init(); }
-    }, 100);
+    init();
   }
 </script>
 
