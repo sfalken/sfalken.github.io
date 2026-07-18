@@ -70,6 +70,23 @@ const trips = [
     url: '/texas-trip/',
     accentColor: '#BF0A30',
   },
+  {
+    id: 'seagl-trip',
+    flags: '🐧🌲',
+    title: 'Seattle',
+    subtitle: 'Washington, USA',
+    category: 'Local Trip',
+    dates: 'October 23–24, 2026',
+    travelers: 'Solo',
+    nights: 0,
+    description:
+      'A local trip across town for SeaGL 2026 at the University of Washington — no flights, no hotel, just transit and a talk to give.',
+    tags: ['🐧 SeaGL'],
+    status: 'upcoming',
+    hasTalk: true,
+    url: '/seagl-trip/',
+    accentColor: '#4b2e83',
+  },
 ] as const;
 
 type TripStatus = 'in-progress' | 'upcoming' | 'completed' | 'not-taken';

@@ -41,9 +41,21 @@ const stars = '★'.repeat(Math.round(restaurant.rating)) + '☆'.repeat(5 - Mat
       <span>📍</span>
       <span>{restaurant.address}</span>
     </div>
+
+    {restaurant.resyUrl && (
+      <div class="resy-note">
+        <span>💳</span>
+        <span>Book on Resy — dining here may count toward the Amex Platinum $100 annual Resy credit when paid with an eligible card</span>
+      </div>
+    )}
   </div>
 
   <div class="rest-footer">
+    {restaurant.resyUrl && (
+      <a href={restaurant.resyUrl} target="_blank" rel="noopener" class="btn btn-resy">
+        📅 Book on Resy
+      </a>
+    )}
     <a href={restaurant.website} target="_blank" rel="noopener" class="btn btn-outline">
       Website →
     </a>
@@ -125,5 +137,22 @@ const stars = '★'.repeat(Math.round(restaurant.rating)) + '☆'.repeat(5 - Mat
     padding: 0.75rem 1.25rem 1.1rem;
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
+
+  .resy-note {
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--usa-blue);
+    background: var(--usa-blue-pale);
+    border-left: 3px solid var(--usa-blue);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .btn-resy { background: #ff4b4b; color: white; }
+  .btn-resy:hover { background: #e63e3e; color: white; text-decoration: none; }
 </style>

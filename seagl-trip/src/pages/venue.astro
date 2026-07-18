@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import DayCard from '../components/DayCard.astro';
+import RestaurantCard from '../components/RestaurantCard.astro';
+import MapSection from '../components/MapSection.astro';
+import { venueName, venueAddress, venueCoordinates, days, restaurants, iceCreamSpots, mapPoints } from '../data/venue';
+---
+
+<Layout
+  title="Venue — SeaGL Trip"
+  description="University of Washington HUB venue info, itinerary, and food picks for SeaGL 2026."
+>
+  <Nav />
+  <main>
+    <section class="venue-hero">
+      <div class="container">
+        <p class="section-label">SeaGL 2026 Venue</p>
+        <h1>University of Washington</h1>
+        <p class="venue-address">📍 {venueName} · {venueAddress}</p>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Speaker callout -->
+      <section class="section">
+        <div class="card speaker-card">
+          <span class="speaker-badge">🎤 Talk Accepted</span>
+          <p>
+            I have a talk accepted for SeaGL 2026. The exact day and time slot isn't published yet —
+            check the <a href="https://seagl.org/" target="_blank" rel="noopener">official schedule</a>
+            once it drops (usually a couple of weeks before the event) and update the itinerary below.
+          </p>
+        </div>
+      </section>
+
+      <!-- Map -->
+      <section class="section">
+        <MapSection
+          points={mapPoints}
+          center={venueCoordinates}
+          zoom={14}
+          title="Venue & Food Map"
+        />
+      </section>
+
+      <!-- Itinerary -->
+      <section class="section">
+        <p class="section-label">Itinerary</p>
+        <h2>Day by Day</h2>
+        <div class="grid-2" style="margin-top:1rem;">
+          {days.map((day, i) => <DayCard day={day} index={i} />)}
+        </div>
+      </section>
+
+      <!-- Ice Cream Selfie Spots -->
+      {iceCreamSpots && iceCreamSpots.length > 0 && (
+        <section class="section">
+          <p class="section-label">Conference Tradition</p>
+          <h2>🍦 Ice Cream Selfie Spots</h2>
+          <p style="color:var(--gray-500);margin:.5rem 0 1rem;">One scoop per conference day — a different spot each day for variety.</p>
+          <div class="grid-2">
+            {iceCreamSpots.map(spot => (
+              <div class="card icecream-card">
+                <div class="ic-header">
+                  <span class="ic-emoji">🍦</span>
+                  <div>
+                    <h3 class="ic-name">{spot.name}</h3>
+                    <p class="ic-address">{spot.address}</p>
+                  </div>
+                </div>
+                <p class="ic-note">{spot.photoNote}</p>
+                <div class="ic-flavors">
+                  <span class="flavor-label">Signature flavors:</span>
+                  {spot.signatureFlavors.map((f, i) => (
+                    <span>{f}{i < spot.signatureFlavors.length - 1 ? ' · ' : ''}</span>
+                  ))}
+                </div>
+                <a href={spot.mapsLink} target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:.75rem;align-self:flex-start;">📍 Map</a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Restaurants -->
+      <section class="section">
+        <p class="section-label">Where to Eat</p>
+        <h2>Food Near Campus</h2>
+        <div class="grid-2" style="margin-top:1rem;">
+          {restaurants.map(r => <RestaurantCard restaurant={r} />)}
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .venue-hero {
+    background: linear-gradient(135deg, var(--sg-purple) 0%, #2e1a52 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .venue-hero .section-label { color: rgba(255,255,255,0.7); }
+  .venue-hero h1 { color: white; margin-top: 0.25rem; }
+  .venue-address { color: rgba(255,255,255,0.85); margin-top: 0.5rem; font-size: 0.95rem; }
+
+  .speaker-card {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    border-left: 4px solid var(--sg-gold);
+  }
+  .speaker-badge {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--sg-gold-pale);
+    color: #8a6d0a;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+  }
+  .speaker-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.6; }
+
+  .icecream-card {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    border-top: 3px solid var(--sg-gold);
+  }
+  .ic-header { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .ic-emoji { font-size: 1.75rem; line-height: 1; flex-shrink: 0; }
+  .ic-name { font-size: 1.05rem; margin-bottom: 0.15rem; }
+  .ic-address { font-size: 0.82rem; color: var(--gray-500); }
+  .ic-note { font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; }
+  .ic-flavors { font-size: 0.82rem; color: var(--gray-500); }
+  .flavor-label { font-weight: 600; color: var(--gray-700); margin-right: 0.25rem; }
+</style>

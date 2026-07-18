@@ -90,6 +90,7 @@ export const austin: CityData = {
       address: '801 S Lamar Blvd, Austin, TX 78704',
       website: 'https://uchiaustin.com',
       coordinates: [30.2550, -97.7536],
+      resyUrl: 'https://resy.com/cities/austin-tx/venues/uchi',
     },
     {
       name: 'Odd Duck',
@@ -98,10 +99,11 @@ export const austin: CityData = {
       priceRange: '$$$',
       mustTry: ['Smoked duck tacos', 'Wood-fired oysters', 'Beef tartare', 'Seasonal vegetable dishes'],
       hours: 'Mon–Thu 5–10pm, Fri–Sat 5–11pm, Sun 5–9pm',
-      bookingAdvice: 'Reservations on OpenTable, or sit at the bar for walk-ins. Great for solo diners — the bar seats have great views into the kitchen.',
+      bookingAdvice: 'Reservations on Resy, or sit at the bar for walk-ins. Great for solo diners — the bar seats have great views into the kitchen.',
       address: '1201 S Lamar Blvd, Austin, TX 78704',
       website: 'https://oddduckaustin.com',
       coordinates: [30.2511, -97.7536],
+      resyUrl: 'https://resy.com/cities/austin-tx/venues/odd-duck',
     },
     {
       name: "La Barbecue",

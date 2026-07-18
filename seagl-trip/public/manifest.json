@@ -1,0 +1,14 @@
+{
+  "name": "SeaGL Trip — Seattle GNU/Linux Conference 2026",
+  "short_name": "SeaGL",
+  "description": "Local trip planner for SeaGL 2026 at the University of Washington, October 23–24, 2026",
+  "start_url": "/seagl-trip/",
+  "scope": "/seagl-trip/",
+  "display": "standalone",
+  "background_color": "#4b2e83",
+  "theme_color": "#4b2e83",
+  "icons": [
+    { "src": "/seagl-trip/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/seagl-trip/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
+  ]
+}

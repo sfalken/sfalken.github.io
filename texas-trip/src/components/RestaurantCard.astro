@@ -38,10 +38,18 @@ const priceLabel = r.priceRange === '$' ? 'Budget' : r.priceRange === '$$' ? 'Mo
   )}
 
   {r.hours && <p class="rest-hours">🕐 {r.hours}</p>}
+  {r.bookingAdvice && <p class="rest-hours">📋 {r.bookingAdvice}</p>}
   {r.tip  && <p class="rest-tip"><span>💡</span> {r.tip}</p>}
 
-  {(r.website || r.mapsLink) && (
+  {r.resyUrl && (
+    <p class="resy-note">
+      <span>💳</span> Book on Resy — dining here may count toward the Amex Platinum $100 annual Resy credit when paid with an eligible card
+    </p>
+  )}
+
+  {(r.website || r.mapsLink || r.resyUrl) && (
     <div class="rest-footer">
+      {r.resyUrl  && <a href={r.resyUrl} target="_blank" rel="noopener" class="btn btn-resy">📅 Book on Resy</a>}
       {r.website  && <a href={r.website} target="_blank" rel="noopener" class="btn btn-outline">Visit Site →</a>}
       {r.mapsLink && <a href={r.mapsLink} target="_blank" rel="noopener" class="btn btn-secondary">📍 Map</a>}
     </div>
@@ -77,4 +85,20 @@ const priceLabel = r.priceRange === '$' ? 'Budget' : r.priceRange === '$$' ? 'Mo
     align-items: flex-start;
   }
   .rest-footer { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.25rem; }
+
+  .resy-note {
+    font-size: 0.82rem;
+    color: var(--tx-blue);
+    background: var(--tx-blue-pale);
+    border-left: 3px solid var(--tx-blue);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
+    line-height: 1.4;
+  }
+
+  .btn-resy { background: #ff4b4b; color: white; }
+  .btn-resy:hover { background: #e63e3e; color: white; text-decoration: none; }
 </style>

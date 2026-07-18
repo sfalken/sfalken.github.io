@@ -1,0 +1,218 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { budgetCategories } from '../data/budget';
+
+const categories = budgetCategories.map(c => ({ id: c.id, label: c.label }));
+---
+
+<Layout title="Log Expense — SeaGL Trip" description="Quick expense entry for the SeaGL trip.">
+  <Nav />
+  <main>
+    <div class="log-hero">
+      <div class="container">
+        <p class="section-label">Quick Entry</p>
+        <h1>Log Expense</h1>
+      </div>
+    </div>
+
+    <div class="container log-container">
+      <form id="log-form" class="card log-form">
+        <div class="field">
+          <label for="exp-date">Date</label>
+          <input type="date" id="exp-date" name="date" required />
+        </div>
+        <div class="field">
+          <label for="exp-cat">Category</label>
+          <select id="exp-cat" name="category" required>
+            <option value="">— Select —</option>
+            {categories.map(c => <option value={c.id}>{c.label}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="exp-desc">Description</label>
+          <input type="text" id="exp-desc" name="description" placeholder="e.g. Lunch at Thai Tom" required />
+        </div>
+        <div class="field">
+          <label for="exp-amount">Amount (USD)</label>
+          <div class="amount-wrap">
+            <span class="currency-prefix">$</span>
+            <input type="number" id="exp-amount" name="amount" placeholder="0.00" min="0" step="0.01" required />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save Expense</button>
+          <a href="/seagl-trip/budget/" class="btn btn-outline">View Budget →</a>
+        </div>
+        <p id="log-success" class="log-success" hidden>✓ Expense saved!</p>
+      </form>
+
+      <div class="recent-wrap">
+        <h2>Recent Expenses</h2>
+        <div id="recent-list" class="recent-list"></div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const EXP_KEY = 'seagl-expenses';
+
+  interface Expense {
+    id: string;
+    date: string;
+    category: string;
+    description: string;
+    amount: number;
+    currency: string;
+  }
+
+  function loadExpenses(): Expense[] {
+    try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); } catch { return []; }
+  }
+  function saveExpenses(arr: Expense[]) {
+    localStorage.setItem(EXP_KEY, JSON.stringify(arr));
+  }
+
+  // Set today's date
+  const dateInput = document.getElementById('exp-date') as HTMLInputElement;
+  dateInput.value = new Date().toISOString().slice(0, 10);
+
+  function renderRecent() {
+    const list  = loadExpenses().slice().reverse().slice(0, 8);
+    const el    = document.getElementById('recent-list')!;
+    if (list.length === 0) {
+      el.innerHTML = '<p class="no-recent">No expenses yet.</p>';
+      return;
+    }
+    el.innerHTML = list.map(e => `
+      <div class="recent-row">
+        <div class="recent-info">
+          <span class="recent-date">${e.date}</span>
+          <span class="recent-desc">${e.description}</span>
+        </div>
+        <div class="recent-right">
+          <span class="recent-amount">$${Number(e.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+          <button class="del-btn" data-id="${e.id}" title="Delete">✕</button>
+        </div>
+      </div>
+    `).join('');
+
+    el.querySelectorAll<HTMLButtonElement>('.del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id!;
+        saveExpenses(loadExpenses().filter(e => e.id !== id));
+        renderRecent();
+      });
+    });
+  }
+
+  document.getElementById('log-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const expense: Expense = {
+      id:          crypto.randomUUID(),
+      date:        (form.elements.namedItem('date') as HTMLInputElement).value,
+      category:    (form.elements.namedItem('category') as HTMLSelectElement).value,
+      description: (form.elements.namedItem('description') as HTMLInputElement).value,
+      amount:      parseFloat((form.elements.namedItem('amount') as HTMLInputElement).value),
+      currency:    'USD',
+    };
+    const arr = loadExpenses();
+    arr.push(expense);
+    saveExpenses(arr);
+    form.reset();
+    dateInput.value = new Date().toISOString().slice(0, 10);
+    const success = document.getElementById('log-success')!;
+    success.hidden = false;
+    setTimeout(() => { success.hidden = true; }, 2500);
+    renderRecent();
+  });
+
+  renderRecent();
+</script>
+
+<style>
+  .log-hero {
+    background: linear-gradient(135deg, var(--sg-purple) 0%, #2e1a52 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .log-hero .section-label { color: rgba(255,255,255,0.7); }
+  .log-hero h1 { color: white; }
+
+  .log-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+    align-items: flex-start;
+  }
+
+  .log-form { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
+  .field { display: flex; flex-direction: column; gap: 0.35rem; }
+  label { font-size: 0.85rem; font-weight: 600; color: var(--gray-700); }
+  input, select {
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.15s;
+    background: white;
+  }
+  input:focus, select:focus { border-color: var(--sg-purple); }
+
+  .amount-wrap { position: relative; }
+  .currency-prefix {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+  .amount-wrap input { padding-left: 1.75rem; }
+
+  .form-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .log-success { color: #059669; font-size: 0.9rem; font-weight: 600; }
+
+  .recent-wrap h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
+  .recent-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .no-recent { color: var(--gray-500); font-size: 0.9rem; }
+
+  .recent-row {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 0.65rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow);
+  }
+  .recent-info { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
+  .recent-date { font-size: 0.75rem; color: var(--gray-500); }
+  .recent-desc { font-size: 0.9rem; color: var(--gray-700); }
+  .recent-right { display: flex; align-items: center; gap: 0.6rem; }
+  .recent-amount { font-weight: 600; color: var(--sg-purple); font-family: var(--font-serif); }
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: color 0.1s;
+  }
+  .del-btn:hover { color: var(--sg-purple); }
+
+  @media (max-width: 640px) {
+    .log-container { grid-template-columns: 1fr; }
+  }
+</style>

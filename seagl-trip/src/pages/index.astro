@@ -1,0 +1,222 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = '/seagl-trip';
+---
+
+<Layout title="SeaGL Trip — Seattle GNU/Linux Conference 2026">
+  <Nav />
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero-label">Local Trip · October 2026</p>
+        <h1>SeaGL 2026<br/><span class="hero-sub">University of Washington, Seattle</span></h1>
+        <p class="hero-desc">
+          Oct 23–24 · A local trip across town for the Seattle GNU/Linux Conference — no flights, no hotel, just transit and a talk to give.
+        </p>
+        <div class="hero-actions">
+          <a href={`${base}/venue/`} class="btn btn-primary">Explore the Venue →</a>
+          <a href={`${base}/checklist/`} class="btn btn-secondary">Planning Checklist</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Trip at a Glance -->
+      <section class="section">
+        <p class="section-label">Trip Overview</p>
+        <h2>At a Glance</h2>
+        <div class="glance-grid" style="margin-top:1rem;">
+          <div class="glance-card">
+            <div class="glance-icon">📅</div>
+            <div>
+              <div class="glance-label">Dates</div>
+              <div class="glance-value">Oct 23–24, 2026 (2 days)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🚈</div>
+            <div>
+              <div class="glance-label">Getting There</div>
+              <div class="glance-value">Public transit — no flights, no hotel</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🐧</div>
+            <div>
+              <div class="glance-label">Conference</div>
+              <div class="glance-value">SeaGL, both days</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🎤</div>
+            <div>
+              <div class="glance-label">Speaking</div>
+              <div class="glance-value">Talk accepted — day/time TBD</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🌧️</div>
+            <div>
+              <div class="glance-label">Weather</div>
+              <div class="glance-value">46–58°F (8–14°C) · rain likely</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">💵</div>
+            <div>
+              <div class="glance-label">Est. Budget</div>
+              <div class="glance-value">~$157 USD (solo)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🍦</div>
+            <div>
+              <div class="glance-label">Ice Cream Selfies</div>
+              <div class="glance-value">2 spots planned (Molly Moon's, Sweet Alchemy)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conference section -->
+      <section class="section">
+        <p class="section-label">SeaGL 2026</p>
+        <h2>The Conference</h2>
+        <div class="conf-card card" style="margin-top:1rem;">
+          <div class="conf-body">
+            <div class="conf-text">
+              <p>
+                <strong>SeaGL</strong> (Seattle GNU/Linux Conference) is a free, community-run conference covering
+                Linux, free and open source software, and digital rights. It's known for a welcoming,
+                grassroots atmosphere and a strong hallway track.
+              </p>
+              <p style="margin-top:.75rem;">
+                Admission is free, and registration is optional. Venue for 2026 is the
+                <strong>University of Washington HUB</strong> (moved from the usual venue due to a scheduling
+                conflict) — check <a href="https://seagl.org/" target="_blank" rel="noopener">seagl.org</a> for
+                the latest details.
+              </p>
+              <div class="conf-details">
+                <span>📅 October 23–24, 2026</span>
+                <span>📍 University of Washington, Seattle</span>
+                <span>🎤 Talk accepted</span>
+              </div>
+            </div>
+            <div class="conf-links">
+              <a href="https://seagl.org/" target="_blank" rel="noopener" class="btn btn-primary">SeaGL Website →</a>
+              <a href={`${base}/checklist/`} class="btn btn-outline">Pre-conference Checklist</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick nav -->
+      <section class="section">
+        <p class="section-label">Navigate</p>
+        <h2>Plan Your Trip</h2>
+        <div class="nav-cards" style="margin-top:1rem;">
+          <a href={`${base}/venue/`} class="nav-card card">
+            <div class="nc-icon">🎓</div>
+            <div class="nc-text">
+              <div class="nc-title">Venue</div>
+              <div class="nc-desc">HUB info, itinerary, map, food picks, ice cream spots</div>
+            </div>
+          </a>
+          <a href={`${base}/checklist/`} class="nav-card card">
+            <div class="nc-icon">✅</div>
+            <div class="nc-text">
+              <div class="nc-title">Checklist</div>
+              <div class="nc-desc">Speaker prep and pre-conference tasks with progress tracking</div>
+            </div>
+          </a>
+          <a href={`${base}/budget/`} class="nav-card card">
+            <div class="nc-icon">💰</div>
+            <div class="nc-text">
+              <div class="nc-title">Budget</div>
+              <div class="nc-desc">Estimated costs with expense tracking and charts</div>
+            </div>
+          </a>
+          <a href={`${base}/log/`} class="nav-card card">
+            <div class="nc-icon">📝</div>
+            <div class="nc-text">
+              <div class="nc-title">Expense Log</div>
+              <div class="nc-desc">Quick mobile-optimized expense entry</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--sg-purple) 0%, #2e1a52 100%);
+    color: white;
+    padding: 3.5rem 0 3rem;
+    text-align: center;
+  }
+  .hero-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 { color: white; line-height: 1.15; }
+  .hero-sub { color: var(--sg-gold); font-style: italic; }
+  .hero-desc { max-width: 560px; margin: 1rem auto; color: rgba(255,255,255,0.85); font-size: 1.05rem; }
+  .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  .glance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+  .glance-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: var(--shadow);
+  }
+  .glance-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .glance-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.1rem; }
+  .glance-value { font-size: 0.92rem; color: var(--gray-900); font-weight: 500; }
+
+  .conf-card { padding: 1.5rem; }
+  .conf-body { display: flex; gap: 2rem; align-items: flex-start; }
+  .conf-text { flex: 1; font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; }
+  .conf-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--sg-purple);
+    font-weight: 500;
+  }
+  .conf-links { display: flex; flex-direction: column; gap: 0.6rem; flex-shrink: 0; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .nav-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--gray-900);
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .nav-card:hover { box-shadow: var(--shadow-md); border-color: var(--sg-purple); text-decoration: none; }
+  .nc-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .nc-title { font-weight: 600; font-size: 1rem; color: var(--gray-900); margin-bottom: 0.2rem; }
+  .nc-desc { font-size: 0.85rem; color: var(--gray-500); }
+
+  @media (max-width: 640px) {
+    .conf-body { flex-direction: column; }
+    .conf-links { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>

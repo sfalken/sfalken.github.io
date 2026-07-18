@@ -87,6 +87,20 @@ jobs:
           mkdir -p dist/canada-trip
           cp -r canada-trip/dist/. dist/canada-trip/
 
+      # Build seagl-trip (base: /seagl-trip)
+      - name: Install seagl-trip dependencies
+        working-directory: seagl-trip
+        run: npm install
+
+      - name: Build seagl-trip
+        working-directory: seagl-trip
+        run: npm run build
+
+      - name: Copy seagl-trip output into dist/seagl-trip/
+        run: |
+          mkdir -p dist/seagl-trip
+          cp -r seagl-trip/dist/. dist/seagl-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

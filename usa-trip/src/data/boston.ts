@@ -92,10 +92,11 @@ export const boston: CityData = {
       priceRange: '$$',
       mustTry: ['Pork & Chive Dumplings', 'Scallion Pancakes', 'Dan Dan Noodles'],
       hours: 'Mon–Thu 11:30am–10pm, Fri–Sat 11:30am–11pm, Sun 10:30am–9pm',
-      bookingAdvice: 'Reservations available on OpenTable — book ahead for dinner.',
+      bookingAdvice: 'Reservations available on Resy — books up weeks out, so grab a slot early.',
       address: '1145 Washington St, Boston, MA 02118',
       website: 'https://www.myersandchang.com',
       coordinates: [42.3404, -71.0657],
+      resyUrl: 'https://resy.com/cities/boston-ma/venues/myers-and-chang',
     },
     {
       name: 'Flour Bakery + Cafe',

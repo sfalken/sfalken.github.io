@@ -28,6 +28,8 @@ export interface Restaurant {
   website?: string;
   mapsLink?: string;
   coordinates: [number, number];
+  /** Real Resy booking URL — only set when the restaurant is verified to have an actual Resy listing */
+  resyUrl?: string;
 }
 
 export interface Activity {

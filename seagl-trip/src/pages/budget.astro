@@ -1,0 +1,388 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { budgetCategories } from '../data/budget';
+import { seedExpenses, retiredExpenseIds } from '../data/seedExpenses';
+
+const seedJson = JSON.stringify(seedExpenses);
+const retiredJson = JSON.stringify(retiredExpenseIds);
+
+const totalEstimated = budgetCategories.reduce(
+  (sum, cat) => sum + cat.items.reduce((s, item) => s + item.estimated, 0),
+  0,
+);
+
+const catMeta = budgetCategories.map(cat => ({
+  id:       cat.id,
+  label:    cat.label,
+  estimated: cat.items.reduce((s, i) => s + i.estimated, 0),
+  items:    cat.items.map(i => i.id),
+}));
+---
+
+<Layout title="Budget — SeaGL Trip" description="Budget tracker for the SeaGL 2026 local trip.">
+  <Nav />
+  <main>
+    <div class="budget-hero">
+      <div class="container">
+        <p class="section-label">Financial Planning</p>
+        <h1>Budget</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="sum-label">Estimated Total</div>
+          <div class="sum-value">${totalEstimated.toLocaleString()}</div>
+          <div class="sum-sub">USD</div>
+        </div>
+        <div class="summary-card highlight">
+          <div class="sum-label">Actual Spent</div>
+          <div class="sum-value" id="actual-total">$0</div>
+          <div class="sum-sub">from logged expenses</div>
+        </div>
+        <div class="summary-card">
+          <div class="sum-label">Remaining</div>
+          <div class="sum-value" id="remaining">${totalEstimated.toLocaleString()}</div>
+          <div class="sum-sub">vs. estimate</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <h3>Estimated vs Actual</h3>
+          <canvas id="chart-bar" height="200"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>By Category</h3>
+          <canvas id="chart-doughnut" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Budget categories -->
+      <section class="section">
+        <p class="section-label">Breakdown</p>
+        <h2>All Categories</h2>
+        <div class="budget-categories" style="margin-top:1rem;">
+          {budgetCategories.map(cat => {
+            const catTotal = cat.items.reduce((s, i) => s + i.estimated, 0);
+            return (
+              <div class="card budget-cat" data-cat={cat.id}>
+                <div class="cat-header">
+                  <span class="cat-icon">{cat.icon}</span>
+                  <h3 class="cat-name">{cat.label}</h3>
+                  <span class="cat-actual" id={`cat-actual-${cat.id}`}></span>
+                  <span class="cat-total">${catTotal.toLocaleString()}</span>
+                </div>
+                <div class="cat-items">
+                  {cat.items.map(item => (
+                    <div class="budget-item">
+                      <div class="item-info">
+                        <span class="item-name">{item.label}</span>
+                        {item.note && <span class="item-note">{item.note}</span>}
+                      </div>
+                      <div class="item-amounts">
+                        <span class="item-est">${item.estimated.toLocaleString()}</span>
+                        <span class="item-actual" data-item={item.id}>—</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <!-- Logged expenses -->
+      <section class="section">
+        <div class="exp-section-header">
+          <div>
+            <p class="section-label">Expense Log</p>
+            <h2>Logged Expenses</h2>
+          </div>
+          <a href="/seagl-trip/log/" class="btn btn-primary">+ Add Expense</a>
+        </div>
+
+        <div id="no-expenses" class="no-expenses">
+          <p>No expenses logged yet. <a href="/seagl-trip/log/">Add your first expense →</a></p>
+        </div>
+
+        <div id="expense-list" class="expense-list" hidden></div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ totalEstimated, catMeta, seedJson, retiredJson }}>
+  const EXP_KEY = 'seagl-expenses';
+
+  function loadExpenses() {
+    try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); } catch { return []; }
+  }
+
+  function saveExpenses(expenses) {
+    localStorage.setItem(EXP_KEY, JSON.stringify(expenses));
+  }
+
+  function seedKnownExpenses() {
+    const seeds = JSON.parse(seedJson);
+    const retired = JSON.parse(retiredJson);
+    let existing = loadExpenses();
+    let changed = false;
+    const beforeLen = existing.length;
+    existing = existing.filter(e => !retired.includes(e.id));
+    if (existing.length !== beforeLen) changed = true;
+    const existingIds = new Set(existing.map(e => e.id));
+    seeds.forEach(s => {
+      if (!existingIds.has(s.id)) {
+        existing.push(s);
+        changed = true;
+      }
+    });
+    if (changed) saveExpenses(existing);
+  }
+
+  function renderExpenses() {
+    const expenses = loadExpenses();
+    const noEl   = document.getElementById('no-expenses');
+    const listEl = document.getElementById('expense-list');
+    if (!noEl || !listEl) return;
+
+    if (expenses.length === 0) {
+      noEl.hidden  = false;
+      listEl.hidden = true;
+    } else {
+      noEl.hidden  = true;
+      listEl.hidden = false;
+      listEl.innerHTML = expenses.map(e => `
+        <div class="exp-row" data-id="${e.id}">
+          <div class="exp-info">
+            <span class="exp-date">${e.date}</span>
+            <span class="exp-cat badge">${e.category}</span>
+            <span class="exp-desc">${e.description}</span>
+          </div>
+          <div class="exp-right">
+            <span class="exp-amount">$${Number(e.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            <button class="exp-delete" data-id="${e.id}" title="Delete">✕</button>
+          </div>
+        </div>
+      `).join('');
+
+      listEl.querySelectorAll('.exp-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!confirm('Delete this expense?')) return;
+          const id = btn.dataset.id;
+          saveExpenses(loadExpenses().filter(e => e.id !== id));
+          renderExpenses();
+          updateSummary();
+          renderCharts(loadExpenses());
+        });
+      });
+    }
+  }
+
+  function updateSummary() {
+    const expenses = loadExpenses();
+    const actual   = expenses.reduce((s, e) => s + Number(e.amount), 0);
+    const estimated = totalEstimated;
+
+    const actualEl = document.getElementById('actual-total');
+    if (actualEl) actualEl.textContent = `$${actual.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+    const diff  = estimated - actual;
+    const remEl = document.getElementById('remaining');
+    if (remEl) {
+      remEl.textContent  = `$${Math.abs(diff).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      remEl.style.color  = diff >= 0 ? 'var(--sg-purple)' : '#b91c1c';
+    }
+
+    // Per-category and per-item actuals
+    const actualByCat  = {};
+    const actualByItem = {};
+    expenses.forEach(e => {
+      actualByCat[e.category] = (actualByCat[e.category] || 0) + Number(e.amount);
+      if (e.budgetItemId) actualByItem[e.budgetItemId] = (actualByItem[e.budgetItemId] || 0) + Number(e.amount);
+    });
+
+    catMeta.forEach(cat => {
+      const catActualEl = document.getElementById(`cat-actual-${cat.id}`);
+      if (catActualEl) {
+        const catActual = actualByCat[cat.id] || 0;
+        catActualEl.textContent = catActual > 0 ? `actual: $${catActual.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '';
+      }
+      cat.items.forEach(itemId => {
+        const itemEl = document.querySelector(`.item-actual[data-item="${itemId}"]`);
+        if (itemEl) {
+          const itemActual = actualByItem[itemId];
+          itemEl.textContent = itemActual !== undefined ? `$${itemActual.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '—';
+        }
+      });
+    });
+  }
+
+  function renderCharts(expenses) {
+    if (typeof window.Chart === 'undefined') return;
+    const Chart = window.Chart;
+    const COLORS = ['#4b2e83','#e8b923','#059669','#f59e0b','#7c3aed','#0891b2','#db2777','#65a30d'];
+
+    const catLabels = catMeta.map(c => c.label);
+    const catEst    = catMeta.map(c => c.estimated);
+    const actualByCat = {};
+    expenses.forEach(e => { actualByCat[e.category] = (actualByCat[e.category] || 0) + Number(e.amount); });
+    const catActual = catMeta.map(c => actualByCat[c.id] || 0);
+
+    const barCtx = document.getElementById('chart-bar')?.getContext('2d');
+    if (barCtx) {
+      if (window.__barChart) window.__barChart.destroy();
+      window.__barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: catLabels,
+          datasets: [
+            { label: 'Estimated', data: catEst, backgroundColor: 'rgba(75,46,131,0.25)', borderColor: '#4b2e83', borderWidth: 1 },
+            { label: 'Actual',    data: catActual, backgroundColor: 'rgba(232,185,35,0.35)', borderColor: '#e8b923', borderWidth: 1 },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true, ticks: { callback: v => `$${v}` } } },
+        },
+      });
+    }
+
+    const doCtx = document.getElementById('chart-doughnut')?.getContext('2d');
+    if (doCtx) {
+      if (window.__donutChart) window.__donutChart.destroy();
+      window.__donutChart = new Chart(doCtx, {
+        type: 'doughnut',
+        data: {
+          labels: catLabels,
+          datasets: [{ data: catEst, backgroundColor: COLORS, borderWidth: 2, borderColor: 'white' }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'right' } },
+        },
+      });
+    }
+  }
+
+  const script = document.createElement('script');
+  script.src   = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+  script.onload = () => { renderCharts(loadExpenses()); };
+  document.head.appendChild(script);
+
+  seedKnownExpenses();
+  renderExpenses();
+  updateSummary();
+</script>
+
+<style>
+  .budget-hero {
+    background: linear-gradient(135deg, var(--sg-purple) 0%, #2e1a52 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .budget-hero .section-label { color: rgba(255,255,255,0.7); }
+  .budget-hero h1 { color: white; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .summary-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .summary-card.highlight { border-color: var(--sg-purple); }
+  .sum-label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 0.35rem; }
+  .sum-value { font-size: 1.75rem; font-family: var(--font-serif); font-weight: 700; color: var(--sg-purple); }
+  .sum-sub { font-size: 0.78rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+  .charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .chart-card { padding: 1.25rem; }
+  .chart-card h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+
+  .budget-categories { display: flex; flex-direction: column; gap: 1rem; }
+  .budget-cat { overflow: hidden; }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .cat-icon { font-size: 1.25rem; }
+  .cat-name { flex: 1; font-size: 0.95rem; font-family: var(--font-sans); font-weight: 600; }
+  .cat-actual { font-size: 0.8rem; font-weight: 600; color: var(--sg-purple); }
+  .cat-total { font-weight: 700; color: var(--sg-purple); font-family: var(--font-serif); font-size: 1.05rem; }
+
+  .cat-items { display: flex; flex-direction: column; }
+  .budget-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .budget-item:last-child { border-bottom: none; }
+  .item-info { flex: 1; display: flex; flex-direction: column; gap: 0.15rem; }
+  .item-name { font-size: 0.9rem; color: var(--gray-900); }
+  .item-note { font-size: 0.78rem; color: var(--gray-500); }
+  .item-amounts { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+  .item-est { font-size: 0.95rem; font-weight: 600; color: #8a6d0a; white-space: nowrap; }
+  .item-actual { font-size: 0.85rem; font-weight: 600; color: var(--sg-purple); white-space: nowrap; min-width: 70px; text-align: right; }
+
+  .exp-section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; gap: 1rem; }
+
+  .no-expenses {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--gray-300);
+    padding: 2rem;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+  }
+
+  .expense-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .exp-row {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .exp-info { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; flex: 1; }
+  .exp-date { font-size: 0.78rem; color: var(--gray-500); }
+  .exp-desc { font-size: 0.9rem; color: var(--gray-700); }
+  .exp-right { display: flex; align-items: center; gap: 0.75rem; }
+  .exp-amount { font-weight: 600; color: var(--sg-purple); font-family: var(--font-serif); }
+  .exp-delete {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: color 0.1s;
+  }
+  .exp-delete:hover { color: var(--sg-purple); }
+</style>

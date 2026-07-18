@@ -1,19 +1,3 @@
-export interface Hotel {
-  id: string;
-  name: string;
-  rating: number;
-  pricePerNight: number;
-  currency: string;
-  tier: 'budget' | 'mid' | 'luxury';
-  tags: string[];
-  description: string;
-  tip?: string;
-  address: string;
-  website?: string;
-  coordinates: [number, number];
-  _pii?: string;
-}
-
 export interface Restaurant {
   name: string;
   rating: number;
@@ -21,9 +5,11 @@ export interface Restaurant {
   priceRange: '$' | '$$' | '$$$' | '$$$$';
   mustTry: string[];
   hours: string;
-  bookingAdvice: string;
+  bookingAdvice?: string;
+  tip?: string;
   address: string;
-  website: string;
+  website?: string;
+  mapsLink?: string;
   coordinates: [number, number];
   /** Real Resy booking URL — only set when the restaurant is verified to have an actual Resy listing */
   resyUrl?: string;
@@ -32,11 +18,13 @@ export interface Restaurant {
 export interface Activity {
   name: string;
   description: string;
-  duration: string;
-  cost: number;
-  currency: string;
+  duration?: string;
+  time?: string;
+  cost?: number;
+  currency?: string;
   website?: string;
   mapsLink?: string;
+  url?: string;
 }
 
 export interface Day {
@@ -59,7 +47,7 @@ export interface IceCreamSpot {
 export interface MapPoint {
   name: string;
   coordinates: [number, number];
-  category: 'hotel' | 'restaurant' | 'attraction' | 'conference' | 'icecream';
+  category: 'restaurant' | 'attraction' | 'conference' | 'icecream';
   description?: string;
   website?: string;
 }
@@ -89,15 +77,4 @@ export interface BudgetCategory {
   label: string;
   icon: string;
   items: BudgetItem[];
-}
-
-export interface CityData {
-  name: string;
-  country: string;
-  coordinates: [number, number];
-  hotels: Hotel[];
-  restaurants: Restaurant[];
-  days: Day[];
-  mapPoints: MapPoint[];
-  iceCreamSpots?: IceCreamSpot[];
 }

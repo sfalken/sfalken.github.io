@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="About — SeaGL Trip" description="About this SeaGL 2026 trip planner.">
+  <Nav />
+  <main>
+    <div class="about-hero">
+      <div class="container">
+        <p class="section-label">About This Site</p>
+        <h1>SeaGL 2026</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="about-grid">
+        <section class="card about-card">
+          <h2>The Trip</h2>
+          <p>
+            A local trip to the <a href="https://seagl.org/" target="_blank" rel="noopener">Seattle GNU/Linux Conference</a> (SeaGL) —
+            no flights, no hotel, just a transit ride across town.
+          </p>
+          <ul class="about-list">
+            <li>🚈 Public transit to the University of Washington</li>
+            <li>📅 October 23–24, 2026 (2 days)</li>
+            <li>🐧 SeaGL 2026, both days</li>
+            <li>🎤 Talk accepted</li>
+            <li>🍦 Ice cream selfie tradition (2 spots planned)</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>The Site</h2>
+          <p>
+            This is a personal trip planner built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+            and hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+            It's part of a monorepo of trip planners at <a href="/">sfalken.github.io</a>.
+          </p>
+          <ul class="about-list">
+            <li>🗺️ Interactive venue and food map (Leaflet + OpenStreetMap)</li>
+            <li>✅ Planning checklist with browser persistence</li>
+            <li>💰 Budget tracker with expense logging</li>
+            <li>📱 Progressive Web App (installable, offline-capable)</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>SeaGL</h2>
+          <p>
+            The Seattle GNU/Linux Conference (SeaGL) is a free, community-run conference covering Linux,
+            free and open source software, and digital rights — with a strong focus on inclusivity and
+            grassroots community organizing.
+          </p>
+          <p style="margin-top:.75rem;">
+            SeaGL 2026 moved venues this year — organizers shifted both the dates and location to the
+            University of Washington HUB due to a scheduling conflict at the previous venue.
+          </p>
+          <a href="https://seagl.org/" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:1rem;align-self:flex-start;">
+            Visit seagl.org →
+          </a>
+        </section>
+
+        <section class="card about-card">
+          <h2>University of Washington</h2>
+          <p>
+            SeaGL 2026 is held at the Husky Union Building (HUB) on the UW campus in Seattle's U-District —
+            a lively neighborhood with cheap eats, coffee shops, and University Village just a short walk away.
+          </p>
+          <ul class="about-list">
+            <li>📍 4001 E Stevens Way NE, Seattle, WA 98195</li>
+            <li>🌧️ October weather: 46–58°F (8–14°C), rain likely</li>
+            <li>🕐 Timezone: Pacific Time (UTC-7 during PDT / UTC-8 during PST)</li>
+            <li>🚈 Reachable via Link light rail (U District Station) or bus</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, var(--sg-purple) 0%, var(--sg-gold) 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .about-hero .section-label { color: rgba(255,255,255,0.8); }
+  .about-hero h1 { color: white; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .about-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .about-card h2 { font-size: 1.15rem; color: var(--sg-purple); }
+  .about-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.6; }
+
+  .about-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    color: var(--gray-700);
+  }
+</style>

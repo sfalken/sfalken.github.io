@@ -1,0 +1,250 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const { title, description = 'Local trip planner for SeaGL 2026 at the University of Washington, October 23–24, 2026.', ogImage = '/seagl-trip/icon-512.svg' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/seagl-trip/manifest.json" />
+    <meta name="theme-color" content="#4b2e83" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="SeaGL" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/seagl-trip/favicon.svg" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style is:global>
+      :root {
+        --sg-purple:       #4b2e83;
+        --sg-gold:         #e8b923;
+        --sg-purple-light: #6b4ba3;
+        --sg-gold-light:   #f0cc5c;
+        --sg-purple-pale:  #f1edf9;
+        --sg-gold-pale:    #fdf6e1;
+        --gray-50:  #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --gray-700: #374151;
+        --gray-900: #111827;
+        --font-serif: 'Cormorant Garamond', Georgia, serif;
+        --font-sans:  'Jost', system-ui, sans-serif;
+        --radius:    8px;
+        --radius-lg: 12px;
+        --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+        --shadow-lg: 0 10px 15px rgba(0,0,0,0.07), 0 4px 6px rgba(0,0,0,0.05);
+      }
+
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { scroll-behavior: smooth; font-size: 16px; }
+
+      body {
+        font-family: var(--font-sans);
+        color: var(--gray-900);
+        background-color: var(--gray-50);
+        background-image: radial-gradient(circle at 1px 1px, rgba(75,46,131,0.05) 1px, transparent 0);
+        background-size: 24px 24px;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      main { flex: 1; padding-bottom: 3rem; }
+
+      h1, h2, h3, h4 { font-family: var(--font-serif); line-height: 1.2; font-weight: 600; }
+      h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); }
+      h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+      h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); }
+
+      a { color: var(--sg-purple); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      .container { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem; }
+
+      .section { padding: 2.5rem 0; }
+
+      .section-label {
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sg-purple);
+        margin-bottom: 0.4rem;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.2rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: var(--gray-100);
+        color: var(--gray-700);
+      }
+      .badge-purple { background: var(--sg-purple-pale); color: var(--sg-purple); }
+      .badge-gold   { background: var(--sg-gold-pale);   color: #8a6d0a; }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.55rem 1.25rem;
+        border-radius: var(--radius);
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.15s;
+        text-decoration: none;
+      }
+      .btn-primary  { background: var(--sg-purple); color: white; }
+      .btn-primary:hover { background: var(--sg-purple-light); color: white; text-decoration: none; }
+      .btn-secondary { background: #8a6d0a; color: white; }
+      .btn-secondary:hover { background: #a8850d; color: white; text-decoration: none; }
+      .btn-outline {
+        background: transparent;
+        color: var(--sg-purple);
+        border: 1.5px solid var(--sg-purple);
+      }
+      .btn-outline:hover { background: var(--sg-purple); color: white; text-decoration: none; }
+
+      .card {
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+      }
+
+      .stars { color: var(--sg-gold); font-size: 0.85rem; letter-spacing: 0.05em; }
+
+      .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+      .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+
+      .tag {
+        display: inline-block;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        font-weight: 500;
+        background: var(--gray-100);
+        color: var(--gray-700);
+      }
+
+      footer {
+        background: var(--sg-purple);
+        color: rgba(255,255,255,0.75);
+        text-align: center;
+        padding: 1.25rem;
+        font-size: 0.85rem;
+        margin-top: auto;
+      }
+      footer a { color: rgba(255,255,255,0.9); }
+
+      #update-banner {
+        display: none;
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--sg-purple);
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        z-index: 9999;
+        gap: 1rem;
+        align-items: center;
+        font-size: 0.9rem;
+        max-width: 90vw;
+      }
+      #update-banner.show { display: flex; }
+      #update-banner button {
+        background: white;
+        color: var(--sg-purple);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.3rem 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 640px) {
+        .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        .section { padding: 1.75rem 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="update-banner">
+      <span>A new version is available!</span>
+      <button onclick="window.location.reload()">Refresh</button>
+      <button onclick="document.getElementById('update-banner').classList.remove('show')" style="background:transparent;color:white;font-weight:400;">✕</button>
+    </div>
+
+    <slot />
+
+    <footer>
+      <p>🐧🌲 SeaGL Trip · Solo · October 2026</p>
+      <p style="margin-top:0.25rem;">Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> · Hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></p>
+    </footer>
+
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/seagl-trip/sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+              const nw = reg.installing;
+              if (nw) {
+                nw.addEventListener('statechange', () => {
+                  if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                    document.getElementById('update-banner').classList.add('show');
+                  }
+                });
+              }
+            });
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

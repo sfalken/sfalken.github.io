@@ -1,8 +1,11 @@
 ---
 import type { Restaurant } from '../data/types';
+
 interface Props { restaurant: Restaurant; }
 const { restaurant: r } = Astro.props;
+
 const stars = '★'.repeat(Math.floor(r.rating)) + (r.rating % 1 >= 0.5 ? '½' : '');
+const priceLabel = r.priceRange === '$' ? 'Budget' : r.priceRange === '$$' ? 'Moderate' : r.priceRange === '$$$' ? 'Upscale' : 'Fine Dining';
 ---
 
 <div class="card restaurant-card">
@@ -18,7 +21,7 @@ const stars = '★'.repeat(Math.floor(r.rating)) + (r.rating % 1 >= 0.5 ? '½' :
         <span class="stars">{stars}</span>
         <span class="rating-num">{r.rating}</span>
         <span class="badge">{r.cuisine}</span>
-        <span class="price-range">{r.priceRange}</span>
+        <span class="price-range" title={priceLabel}>{r.priceRange}</span>
       </div>
     </div>
   </div>
@@ -28,14 +31,15 @@ const stars = '★'.repeat(Math.floor(r.rating)) + (r.rating % 1 >= 0.5 ? '½' :
   {r.mustTry && r.mustTry.length > 0 && (
     <div class="must-try">
       <span class="must-try-label">Must try:</span>
-      {r.mustTry.map((dish, i) => <span>{dish}{i < r.mustTry.length - 1 ? ', ' : ''}</span>)}
+      {r.mustTry.map((dish, i) => (
+        <span>{dish}{i < r.mustTry.length - 1 ? ', ' : ''}</span>
+      ))}
     </div>
   )}
 
   {r.hours && <p class="rest-hours">🕐 {r.hours}</p>}
-  {(r.tip || r.bookingAdvice) && (
-    <p class="rest-tip"><span>💡</span> {r.tip || r.bookingAdvice}</p>
-  )}
+  {r.bookingAdvice && <p class="rest-hours">📋 {r.bookingAdvice}</p>}
+  {r.tip  && <p class="rest-tip"><span>💡</span> {r.tip}</p>}
 
   {r.resyUrl && (
     <p class="resy-note">
@@ -57,29 +61,36 @@ const stars = '★'.repeat(Math.floor(r.rating)) + (r.rating % 1 >= 0.5 ? '½' :
   .rest-header { display: flex; justify-content: space-between; align-items: flex-start; }
   .rest-name { font-size: 1.05rem; margin-bottom: 0.3rem; }
   .rest-name a { color: var(--gray-900); }
-  .rest-name a:hover { color: var(--ca-red); }
+  .rest-name a:hover { color: var(--sg-purple); }
   .rest-meta { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
   .rating-num { font-size: 0.85rem; color: var(--gray-700); font-weight: 500; }
-  .price-range { font-weight: 700; color: var(--ca-maple); font-size: 0.9rem; }
+  .price-range { font-weight: 700; color: var(--sg-purple); font-size: 0.9rem; }
   .rest-address { font-size: 0.85rem; color: var(--gray-500); }
-  .must-try { font-size: 0.88rem; color: var(--gray-700); line-height: 1.5; }
-  .must-try-label { font-weight: 600; color: var(--ca-red); margin-right: 0.3rem; }
+  .must-try {
+    font-size: 0.88rem;
+    color: var(--gray-700);
+    line-height: 1.5;
+  }
+  .must-try-label { font-weight: 600; color: var(--sg-purple); margin-right: 0.3rem; }
   .rest-hours { font-size: 0.85rem; color: var(--gray-500); }
   .rest-tip {
-    font-size: 0.85rem; color: var(--gray-700);
+    font-size: 0.85rem;
+    color: var(--gray-700);
     background: var(--gray-50);
-    border-left: 3px solid var(--ca-maple);
+    border-left: 3px solid var(--sg-gold);
     padding: 0.5rem 0.75rem;
     border-radius: 0 var(--radius) var(--radius) 0;
-    display: flex; gap: 0.4rem; align-items: flex-start;
+    display: flex;
+    gap: 0.4rem;
+    align-items: flex-start;
   }
   .rest-footer { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.25rem; }
 
   .resy-note {
     font-size: 0.82rem;
     color: #8a6d0a;
-    background: #fff8e1;
-    border-left: 3px solid #d4a017;
+    background: var(--sg-gold-pale);
+    border-left: 3px solid var(--sg-gold);
     padding: 0.5rem 0.75rem;
     border-radius: 0 var(--radius) var(--radius) 0;
     display: flex;
