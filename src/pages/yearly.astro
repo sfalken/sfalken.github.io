@@ -1,0 +1,465 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+import { budgetCategories as europeCategories } from '../../europe-trip/src/data/budget';
+import { seedExpenses as europeExpenses } from '../../europe-trip/src/data/seedExpenses';
+import { budgetCategories as canadaCategories } from '../../canada-trip/src/data/budget';
+import { seedExpenses as canadaExpenses } from '../../canada-trip/src/data/seedExpenses';
+import { budgetCategories as usaCategories } from '../../usa-trip/src/data/budget';
+import { seedExpenses as usaExpenses } from '../../usa-trip/src/data/seedExpenses';
+import { budgetCategories as texasCategories } from '../../texas-trip/src/data/budget';
+import { seedExpenses as texasExpenses } from '../../texas-trip/src/data/seedExpenses';
+import { budgetCategories as seaglCategories } from '../../seagl-trip/src/data/budget';
+import { seedExpenses as seaglExpenses } from '../../seagl-trip/src/data/seedExpenses';
+
+// Fixed conversion rates to USD, matching the defaults already used on each
+// trip's own budget page (europe-trip/pages/budget.astro, canada-trip/data/budget.ts).
+const RATES: Record<string, number> = { USD: 1, EUR: 1 / 0.92, CZK: 1 / 22.5, CAD: 1 / 1.35 };
+function toUSD(amount: number, currency: string): number {
+  return amount * (RATES[currency] ?? 1);
+}
+
+// General categories every trip's specific budget categories roll up into.
+// "No details on items, just general items" — flights, hotels, transit, etc.
+const GENERAL_CATEGORIES = [
+  { id: 'travel',          label: 'Flights & Long-Distance Travel', icon: '✈️' },
+  { id: 'accommodation',   label: 'Accommodation',                  icon: '🏨' },
+  { id: 'local-transport', label: 'Local Transport',                icon: '🚇' },
+  { id: 'food',            label: 'Food & Dining',                  icon: '🍽️' },
+  { id: 'activities',      label: 'Activities & Sightseeing',       icon: '🎭' },
+  { id: 'events',          label: 'Conference & Events',            icon: '🎤' },
+  { id: 'icecream',        label: 'Ice Cream Selfies',              icon: '🍦' },
+  { id: 'shopping',        label: 'Shopping',                       icon: '🛍️' },
+  { id: 'connectivity',    label: 'Connectivity',                   icon: '📶' },
+  { id: 'misc',            label: 'Miscellaneous',                  icon: '🎒' },
+] as const;
+
+const TRIPS = [
+  {
+    id: 'europe-trip', label: 'Prague & Nuremberg', flags: '🇨🇿🇩🇪', status: 'completed', url: '/europe-trip/',
+    categories: europeCategories, expenses: europeExpenses,
+    map: { flights: 'travel', accommodation: 'accommodation', transport: 'travel', food: 'food', 'local-transport': 'local-transport', activities: 'activities', shopping: 'shopping', connectivity: 'connectivity', events: 'events', misc: 'misc' } as Record<string, string>,
+  },
+  {
+    id: 'canada-trip', label: 'Vancouver, BC', flags: '🇨🇦🐧', status: 'upcoming', url: '/canada-trip/',
+    categories: canadaCategories, expenses: canadaExpenses,
+    map: { driving: 'travel', accommodation: 'accommodation', food: 'food', 'local-transport': 'local-transport', activities: 'activities', events: 'events', icecream: 'icecream', shopping: 'shopping', misc: 'misc' } as Record<string, string>,
+  },
+  {
+    id: 'usa-trip', label: 'Boston', flags: '🇺🇸', status: 'upcoming', url: '/usa-trip/',
+    categories: usaCategories, expenses: usaExpenses,
+    map: { flights: 'travel', accommodation: 'accommodation', 'intercity-transport': 'travel', food: 'food', 'local-transport': 'local-transport', activities: 'activities', events: 'events', icecream: 'icecream', shopping: 'shopping', connectivity: 'connectivity', misc: 'misc' } as Record<string, string>,
+  },
+  {
+    id: 'texas-trip', label: 'Austin, Texas', flags: '🤠🐧', status: 'upcoming', url: '/texas-trip/',
+    categories: texasCategories, expenses: texasExpenses,
+    map: { flights: 'travel', accommodation: 'accommodation', food: 'food', 'local-transport': 'local-transport', activities: 'activities', events: 'events', icecream: 'icecream', shopping: 'shopping', misc: 'misc' } as Record<string, string>,
+  },
+  {
+    id: 'seagl-trip', label: 'Seattle (SeaGL)', flags: '🐧🌲', status: 'upcoming', url: '/seagl-trip/',
+    categories: seaglCategories, expenses: seaglExpenses,
+    map: { 'local-transport': 'local-transport', food: 'food', event: 'events', icecream: 'icecream', misc: 'misc' } as Record<string, string>,
+  },
+].filter(t => (t.status as string) !== 'not-taken');
+
+const catEstimated: Record<string, number> = {};
+const catActual: Record<string, number> = {};
+for (const c of GENERAL_CATEGORIES) { catEstimated[c.id] = 0; catActual[c.id] = 0; }
+
+const tripEstimated: Record<string, number> = {};
+const tripActual: Record<string, number> = {};
+
+for (const trip of TRIPS) {
+  let tEst = 0, tAct = 0;
+  for (const cat of trip.categories) {
+    const genId = trip.map[cat.id] || 'misc';
+    for (const item of cat.items) {
+      const usd = toUSD(item.estimated, item.currency);
+      catEstimated[genId] = (catEstimated[genId] || 0) + usd;
+      tEst += usd;
+    }
+  }
+  for (const exp of trip.expenses) {
+    const genId = trip.map[exp.category] || 'misc';
+    const usd = toUSD(exp.amount, exp.currency);
+    catActual[genId] = (catActual[genId] || 0) + usd;
+    tAct += usd;
+  }
+  tripEstimated[trip.id] = tEst;
+  tripActual[trip.id] = tAct;
+}
+
+const totalEstimated = Object.values(catEstimated).reduce((s, v) => s + v, 0);
+const totalActualSeed = Object.values(catActual).reduce((s, v) => s + v, 0);
+
+// Handed to the client so it can merge in any expenses logged via each trip's
+// own /log/ page (localStorage) on top of the confirmed seedExpenses baseline
+// above — all trip pages share one browser origin, so this is just a read.
+const tripMeta = TRIPS.map(t => ({
+  id: t.id,
+  expenseKey: `${t.id.replace('-trip', '')}-expenses`,
+  map: t.map,
+  seed: t.expenses,
+}));
+const categoryIds = GENERAL_CATEGORIES.map(c => c.id);
+const tripIds = TRIPS.map(t => t.id);
+
+const tripMetaJson = JSON.stringify(tripMeta);
+const categoryIdsJson = JSON.stringify(categoryIds);
+const tripIdsJson = JSON.stringify(tripIds);
+---
+
+<Layout title="Yearly Budget — sfalken's Travels" description="Combined budget and actual spend across every trip, converted to USD.">
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">✈️ sfalken's Travels</a>
+      <a href="/" class="back-link">← All Trips</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="hero-eyebrow">All Trips Combined</p>
+        <h1>Yearly Budget</h1>
+        <p class="hero-desc">Estimated and actual spend across every trip, rolled up into general categories and converted to USD.</p>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="summary-grid">
+        <div class="card summary-card">
+          <span class="s-label">Estimated Total</span>
+          <span class="s-value">${Math.round(totalEstimated).toLocaleString()}</span>
+          <span class="s-sub">across {TRIPS.length} trips</span>
+        </div>
+        <div class="card summary-card highlight">
+          <span class="s-label">Actual Spent</span>
+          <span class="s-value" id="actual-total">${Math.round(totalActualSeed).toLocaleString()}</span>
+          <span class="s-sub" id="actual-sub">from confirmed expenses</span>
+        </div>
+        <div class="card summary-card">
+          <span class="s-label">Remaining</span>
+          <span class="s-value" id="remaining-total">${Math.round(totalEstimated - totalActualSeed).toLocaleString()}</span>
+          <span class="s-sub">estimated − actual</span>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="card chart-card">
+          <h3>By Category</h3>
+          <canvas id="chart-category" height="220"></canvas>
+        </div>
+        <div class="card chart-card">
+          <h3>By Trip</h3>
+          <canvas id="chart-trip" height="220"></canvas>
+        </div>
+      </div>
+
+      <section class="section">
+        <p class="section-label">Breakdown</p>
+        <h2>By Category</h2>
+        <div class="card table-card">
+          <table class="rollup-table">
+            <thead>
+              <tr><th>Category</th><th>Estimated</th><th>Actual</th></tr>
+            </thead>
+            <tbody id="category-tbody">
+              {GENERAL_CATEGORIES.map(c => (
+                <tr data-cat={c.id}>
+                  <td>{c.icon} {c.label}</td>
+                  <td>${Math.round(catEstimated[c.id]).toLocaleString()}</td>
+                  <td
+                    class={`actual-cell ${catActual[c.id] === 0 || catActual[c.id] === catEstimated[c.id] ? '' : catActual[c.id] > catEstimated[c.id] ? 'over' : 'under'}`}
+                    data-cat-actual={c.id}
+                  >${Math.round(catActual[c.id]).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-label">Breakdown</p>
+        <h2>By Trip</h2>
+        <div class="card table-card">
+          <table class="rollup-table">
+            <thead>
+              <tr><th>Trip</th><th>Status</th><th>Estimated</th><th>Actual</th><th></th></tr>
+            </thead>
+            <tbody>
+              {TRIPS.map(t => (
+                <tr>
+                  <td>{t.flags} {t.label}</td>
+                  <td><span class={`status-badge status-${t.status}`}>{t.status}</span></td>
+                  <td>${Math.round(tripEstimated[t.id]).toLocaleString()}</td>
+                  <td
+                    class={`actual-cell ${tripActual[t.id] === 0 || tripActual[t.id] === tripEstimated[t.id] ? '' : tripActual[t.id] > tripEstimated[t.id] ? 'over' : 'under'}`}
+                    data-trip-actual={t.id}
+                  >${Math.round(tripActual[t.id]).toLocaleString()}</td>
+                  <td><a href={t.url}>Open →</a></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="fx-note">
+        Amounts converted at fixed rates: 1 USD = 0.92 EUR, 22.5 CZK, 1.35 CAD — matching the
+        defaults on each trip's own budget page. Actuals reflect confirmed expenses checked into
+        each trip, merged with anything logged via each trip's own expense log in this browser.
+        For itemized detail, open a trip above.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>✈️ sfalken's Travels · Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> · <a href="https://github.com/sfalken/my-trips" target="_blank" rel="noopener">GitHub Pages</a></p>
+    </div>
+  </footer>
+</Layout>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script define:vars={{ tripMetaJson, categoryIdsJson, tripIdsJson, totalEstimated, catEstimatedJson: JSON.stringify(catEstimated), tripEstimatedJson: JSON.stringify(tripEstimated) }}>
+  const RATES = { USD: 1, EUR: 1 / 0.92, CZK: 1 / 22.5, CAD: 1 / 1.35 };
+  function toUSD(amount, currency) { return amount * (RATES[currency] || 1); }
+
+  const tripMeta = JSON.parse(tripMetaJson);
+  const categoryIds = JSON.parse(categoryIdsJson);
+  const tripIds = JSON.parse(tripIdsJson);
+  const catEstimated = JSON.parse(catEstimatedJson);
+  const tripEstimated = JSON.parse(tripEstimatedJson);
+
+  function loadLocalExpenses(key) {
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+  }
+
+  // Merge each trip's checked-in seed expenses with anything logged in this
+  // browser (read-only — never written back from this page).
+  function mergedExpensesFor(trip) {
+    const local = loadLocalExpenses(trip.expenseKey);
+    const byId = new Map(local.map(e => [e.id, e]));
+    for (const seed of trip.seed) {
+      if (!byId.has(seed.id)) byId.set(seed.id, seed);
+    }
+    return [...byId.values()];
+  }
+
+  const catActual = {};
+  const tripActual = {};
+  categoryIds.forEach(id => { catActual[id] = 0; });
+  tripIds.forEach(id => { tripActual[id] = 0; });
+
+  for (const trip of tripMeta) {
+    const expenses = mergedExpensesFor(trip);
+    let tAct = 0;
+    for (const exp of expenses) {
+      const genId = trip.map[exp.category] || 'misc';
+      const usd = toUSD(exp.amount, exp.currency);
+      catActual[genId] = (catActual[genId] || 0) + usd;
+      tAct += usd;
+    }
+    tripActual[trip.id] = tAct;
+  }
+
+  const totalActual = Object.values(catActual).reduce((s, v) => s + v, 0);
+
+  // Update summary cards
+  const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+  document.getElementById('actual-total').textContent = fmt(totalActual);
+  document.getElementById('actual-sub').textContent = 'confirmed + logged in this browser';
+  const remEl = document.getElementById('remaining-total');
+  remEl.textContent = fmt(totalEstimated - totalActual);
+
+  function colorClass(actual, estimated) {
+    if (actual === 0 || actual === estimated) return '';
+    return actual > estimated ? 'over' : 'under';
+  }
+
+  // Update category table
+  categoryIds.forEach(id => {
+    const el = document.querySelector(`[data-cat-actual="${id}"]`);
+    if (el) {
+      el.textContent = fmt(catActual[id]);
+      el.classList.remove('over', 'under');
+      const cls = colorClass(catActual[id], catEstimated[id]);
+      if (cls) el.classList.add(cls);
+    }
+  });
+
+  // Update trip table
+  tripIds.forEach(id => {
+    const el = document.querySelector(`[data-trip-actual="${id}"]`);
+    if (el) {
+      el.textContent = fmt(tripActual[id]);
+      el.classList.remove('over', 'under');
+      const cls = colorClass(tripActual[id], tripEstimated[id]);
+      if (cls) el.classList.add(cls);
+    }
+  });
+
+  // Charts
+  function renderCharts() {
+    if (typeof window.Chart === 'undefined') return;
+    const Chart = window.Chart;
+    const COLORS = ['#4338ca', '#C8102E', '#D7141A', '#3C3B6E', '#BF0A30', '#4b2e83', '#059669', '#f59e0b', '#0891b2', '#6b7280'];
+
+    const catLabels = categoryIds.map(id => document.querySelector(`[data-cat="${id}"] td`)?.textContent || id);
+    const catEstData = categoryIds.map(id => Math.round(catEstimated[id] || 0));
+    const catActData = categoryIds.map(id => Math.round(catActual[id] || 0));
+
+    new Chart(document.getElementById('chart-category'), {
+      type: 'bar',
+      data: {
+        labels: catLabels,
+        datasets: [
+          { label: 'Estimated', data: catEstData, backgroundColor: 'rgba(67,56,202,0.35)', borderColor: '#4338ca', borderWidth: 1 },
+          { label: 'Actual', data: catActData, backgroundColor: 'rgba(200,16,46,0.35)', borderColor: '#C8102E', borderWidth: 1 },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } } },
+      },
+    });
+
+    const tripLabels = tripMeta.map(t => t.id.replace('-trip', ''));
+    const tripEstData = tripIds.map(id => Math.round(tripEstimated[id] || 0));
+    const tripActData = tripIds.map(id => Math.round(tripActual[id] || 0));
+
+    new Chart(document.getElementById('chart-trip'), {
+      type: 'bar',
+      data: {
+        labels: tripLabels,
+        datasets: [
+          { label: 'Estimated', data: tripEstData, backgroundColor: 'rgba(67,56,202,0.35)', borderColor: '#4338ca', borderWidth: 1 },
+          { label: 'Actual', data: tripActData, backgroundColor: 'rgba(200,16,46,0.35)', borderColor: '#C8102E', borderWidth: 1 },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } } },
+      },
+    });
+  }
+
+  if (typeof window.Chart !== 'undefined') {
+    renderCharts();
+  } else {
+    window.addEventListener('load', renderCharts);
+  }
+</script>
+
+<style>
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .back-link { color: rgba(255,255,255,0.75); font-size: 0.85rem; }
+  .back-link:hover { color: white; }
+
+  .hero {
+    background: linear-gradient(135deg, var(--hub-hero-from) 0%, var(--hub-hero-to) 100%);
+    color: white;
+    padding: 2.5rem 0 2.25rem;
+  }
+  .hero-eyebrow {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 0.4rem;
+  }
+  .hero h1 { color: white; margin-bottom: 0.5rem; }
+  .hero-desc { color: rgba(255,255,255,0.8); max-width: 560px; }
+
+  .card {
+    background: var(--hub-surface);
+    border: 1px solid var(--hub-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0 1.5rem;
+  }
+  .summary-card {
+    padding: 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .summary-card.highlight { border-color: var(--hub-accent); }
+  .s-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--hub-muted); }
+  .s-value { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 700; color: var(--hub-accent); }
+  .s-sub { font-size: 0.78rem; color: var(--hub-muted); }
+
+  .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .chart-card { padding: 1.25rem; }
+  .chart-card h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--hub-text); font-weight: 600; font-family: 'Jost', sans-serif; }
+
+  .section { padding: 2rem 0 0.5rem; }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--hub-accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .table-card { overflow-x: auto; margin-top: 1rem; }
+  .rollup-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .rollup-table th {
+    text-align: left;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--hub-muted);
+    border-bottom: 1px solid var(--hub-border);
+    background: var(--hub-bg);
+  }
+  .rollup-table td {
+    padding: 0.65rem 1.1rem;
+    border-bottom: 1px solid var(--hub-border);
+    color: var(--hub-text);
+  }
+  .rollup-table tr:last-child td { border-bottom: none; }
+  .actual-cell { font-weight: 600; color: var(--hub-accent); }
+  .actual-cell.over  { color: #dc2626 !important; }
+  .actual-cell.under { color: #16a34a !important; }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .status-upcoming { background: var(--s-upcoming-bg); color: var(--s-upcoming); border: 1px solid var(--s-upcoming-border); }
+  .status-completed { background: var(--s-completed-bg); color: var(--s-completed); border: 1px solid var(--s-completed-border); }
+  .status-in-progress { background: var(--s-progress-bg); color: var(--s-progress); border: 1px solid var(--s-progress-border); }
+
+  .fx-note {
+    font-size: 0.8rem;
+    color: var(--hub-muted);
+    line-height: 1.6;
+    margin: 1.5rem 0 3rem;
+    max-width: 700px;
+  }
+
+  @media (max-width: 640px) {
+    .summary-grid, .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>

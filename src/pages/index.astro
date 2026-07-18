@@ -113,6 +113,7 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand">✈️ sfalken's Travels</a>
+      <a href="/yearly/" class="yearly-link">📊 Yearly Budget</a>
     </div>
   </header>
 
@@ -210,6 +211,13 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
 </Layout>
 
 <style>
+  .yearly-link {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .yearly-link:hover { color: white; text-decoration: none; }
+
   /* ── Hero ── */
   .hero {
     position: relative;
