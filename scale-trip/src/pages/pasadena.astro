@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import CityPage from '../components/CityPage.astro';
+import { pasadena } from '../data/pasadena';
+---
+
+<Layout
+  title="Pasadena — SCaLE Trip"
+  description="Hotels, restaurants, itinerary, and map for Pasadena, CA — SCaLE 24x 2027."
+>
+  <Nav />
+  <main>
+    <CityPage city={pasadena} />
+  </main>
+</Layout>

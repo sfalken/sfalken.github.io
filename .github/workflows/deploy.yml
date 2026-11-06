@@ -101,6 +101,20 @@ jobs:
           mkdir -p dist/seagl-trip
           cp -r seagl-trip/dist/. dist/seagl-trip/
 
+      # Build scale-trip (base: /scale-trip)
+      - name: Install scale-trip dependencies
+        working-directory: scale-trip
+        run: npm install
+
+      - name: Build scale-trip
+        working-directory: scale-trip
+        run: npm run build
+
+      - name: Copy scale-trip output into dist/scale-trip/
+        run: |
+          mkdir -p dist/scale-trip
+          cp -r scale-trip/dist/. dist/scale-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

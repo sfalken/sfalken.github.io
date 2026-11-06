@@ -1,0 +1,14 @@
+{
+  "name": "SCaLE Trip — SCaLE 24x Pasadena 2027",
+  "short_name": "SCaLE Trip",
+  "description": "Solo trip planner for SCaLE 24x in Pasadena, April 2027",
+  "start_url": "/scale-trip/",
+  "scope": "/scale-trip/",
+  "display": "standalone",
+  "background_color": "#7A4A21",
+  "theme_color": "#2E6B3F",
+  "icons": [
+    { "src": "/scale-trip/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/scale-trip/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
+  ]
+}

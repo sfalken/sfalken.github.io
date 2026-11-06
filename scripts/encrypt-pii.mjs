@@ -33,6 +33,7 @@ const CITY_TRIP = {
   boston:               'usa-trip',
   austin:               'texas-trip',
   vancouver:            'canada-trip',
+  pasadena:             'scale-trip',
   'europe-budget':      'europe-trip',
   'europe-seed-expenses': 'europe-trip',
 };

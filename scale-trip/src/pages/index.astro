@@ -1,0 +1,216 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = '/scale-trip';
+---
+
+<Layout title="SCaLE Trip — SCaLE 24x 2027">
+  <Nav />
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero-label">Solo Trip · April 2027</p>
+        <h1>SCaLE 24x<br/><span class="hero-sub">Pasadena, California</span></h1>
+        <p class="hero-desc">
+          SCaLE 24x, Apr 1–4 · Four days of Linux and open source at the Pasadena Convention Center, plus ice cream selfies in Old Pasadena.
+        </p>
+        <div class="hero-actions">
+          <a href={`${base}/pasadena/`} class="btn btn-primary">Explore Pasadena →</a>
+          <a href={`${base}/checklist/`} class="btn btn-secondary">Planning Checklist</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Trip at a Glance -->
+      <section class="section">
+        <p class="section-label">Trip Overview</p>
+        <h2>At a Glance</h2>
+        <div class="glance-grid" style="margin-top:1rem;">
+          <div class="glance-card">
+            <div class="glance-icon">📅</div>
+            <div>
+              <div class="glance-label">Dates</div>
+              <div class="glance-value">Apr 1–4, 2027 (4 days)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">✈️</div>
+            <div>
+              <div class="glance-label">Flights</div>
+              <div class="glance-value">SEA → LAX/BUR → SEA (~2h45m each way)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🐧</div>
+            <div>
+              <div class="glance-label">Conference</div>
+              <div class="glance-value">SCaLE 24x, Apr 1–4</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🌡️</div>
+            <div>
+              <div class="glance-label">Weather</div>
+              <div class="glance-value">Mild · check forecast closer to the trip</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">💵</div>
+            <div>
+              <div class="glance-label">Est. Budget</div>
+              <div class="glance-value">~$2,093 USD (solo)</div>
+            </div>
+          </div>
+          <div class="glance-card">
+            <div class="glance-icon">🍦</div>
+            <div>
+              <div class="glance-label">Ice Cream Selfies</div>
+              <div class="glance-value">4 spots planned (Wanderlust, Salt &amp; Straw, Ice Cream Lab, Kinrose)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conference section -->
+      <section class="section">
+        <p class="section-label">SCaLE 24x</p>
+        <h2>The Conference</h2>
+        <div class="conf-card card" style="margin-top:1rem;">
+          <div class="conf-body">
+            <div class="conf-text">
+              <p>
+                <strong>SCaLE</strong> (the Southern California Linux Expo) is the largest community-run open source
+                and free software conference in North America. SCaLE 24x runs four days of sessions, workshops,
+                and community activities, with co-located events such as PostgreSQL@SCaLE, Cloud Native Days LA,
+                DevOpsDay LA, and more.
+              </p>
+              <p style="margin-top:.75rem;">
+                The venue is the <strong>Pasadena Convention Center</strong> (300 E Green St). The official hotel is
+                Hotel Dena, steps from the venue. Registration pricing for 24x is not yet published on
+                <a href="https://www.socallinuxexpo.org/scale/24x" target="_blank" rel="noopener">socallinuxexpo.org</a>;
+                the budget assumes a paid SCaLE Pass because no talk has been accepted.
+              </p>
+              <div class="conf-details">
+                <span>📅 April 1–4, 2027</span>
+                <span>📍 Pasadena, CA</span>
+                <span>🐧 Open source · Linux · Community</span>
+              </div>
+            </div>
+            <div class="conf-links">
+              <a href="https://www.socallinuxexpo.org/scale/24x" target="_blank" rel="noopener" class="btn btn-primary">SCaLE Website →</a>
+              <a href={`${base}/checklist/`} class="btn btn-outline">Pre-trip Checklist</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick nav -->
+      <section class="section">
+        <p class="section-label">Navigate</p>
+        <h2>Plan Your Trip</h2>
+        <div class="nav-cards" style="margin-top:1rem;">
+          <a href={`${base}/pasadena/`} class="nav-card card">
+            <div class="nc-icon">🌴</div>
+            <div class="nc-text">
+              <div class="nc-title">Pasadena</div>
+              <div class="nc-desc">Hotels, restaurants, itinerary, map, ice cream spots</div>
+            </div>
+          </a>
+          <a href={`${base}/checklist/`} class="nav-card card">
+            <div class="nc-icon">✅</div>
+            <div class="nc-text">
+              <div class="nc-title">Checklist</div>
+              <div class="nc-desc">Pre-trip planning tasks with progress tracking</div>
+            </div>
+          </a>
+          <a href={`${base}/budget/`} class="nav-card card">
+            <div class="nc-icon">💰</div>
+            <div class="nc-text">
+              <div class="nc-title">Budget</div>
+              <div class="nc-desc">Estimated costs with expense tracking and charts</div>
+            </div>
+          </a>
+          <a href={`${base}/log/`} class="nav-card card">
+            <div class="nc-icon">📝</div>
+            <div class="nc-text">
+              <div class="nc-title">Expense Log</div>
+              <div class="nc-desc">Quick mobile-optimized expense entry</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--ca-primary) 0%, var(--ca-accent) 100%);
+    color: white;
+    padding: 3.5rem 0 3rem;
+    text-align: center;
+  }
+  .hero-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 { color: white; line-height: 1.15; }
+  .hero-sub { color: rgba(255,255,255,0.85); font-style: italic; }
+  .hero-desc { max-width: 520px; margin: 1rem auto; color: rgba(255,255,255,0.85); font-size: 1.05rem; }
+  .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  .glance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+  .glance-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: var(--shadow);
+  }
+  .glance-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .glance-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.1rem; }
+  .glance-value { font-size: 0.92rem; color: var(--gray-900); font-weight: 500; }
+
+  .conf-card { padding: 1.5rem; }
+  .conf-body { display: flex; gap: 2rem; align-items: flex-start; }
+  .conf-text { flex: 1; font-size: 0.95rem; color: var(--gray-700); line-height: 1.6; }
+  .conf-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--ca-accent);
+    font-weight: 500;
+  }
+  .conf-links { display: flex; flex-direction: column; gap: 0.6rem; flex-shrink: 0; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .nav-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--gray-900);
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .nav-card:hover { box-shadow: var(--shadow-md); border-color: var(--ca-primary); text-decoration: none; }
+  .nc-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .nc-title { font-weight: 600; font-size: 1rem; color: var(--gray-900); margin-bottom: 0.2rem; }
+  .nc-desc { font-size: 0.85rem; color: var(--gray-500); }
+
+  @media (max-width: 640px) {
+    .conf-body { flex-direction: column; }
+    .conf-links { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>
