@@ -1,0 +1,114 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+
+<Layout title="About — LFNW Trip" description="About this LinuxFest Northwest trip planner.">
+  <Nav />
+  <main>
+    <div class="about-hero">
+      <div class="container">
+        <p class="section-label">About This Site</p>
+        <h1>LinuxFest Northwest 2027</h1>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="about-grid">
+        <section class="card about-card">
+          <h2>The Trip</h2>
+          <p>
+            A solo road trip to Bellingham, Washington for <a href="https://www.linuxfestnorthwest.org/" target="_blank" rel="noopener">LinuxFest Northwest</a>.
+          </p>
+          <ul class="about-list">
+            <li>🚗 Driving from Seattle (~90 miles each way via I-5)</li>
+            <li>📅 April 23–25, 2027 (3 days)</li>
+            <li>🐧 LinuxFest Northwest: Apr 23–25</li>
+            <li>🌲 Solo traveler</li>
+            <li>🍦 Ice cream selfie tradition (4 spots planned)</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>The Site</h2>
+          <p>
+            This is a personal trip planner built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+            and hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+            It's part of a monorepo of trip planners at <a href="/" >sfalken.github.io</a>.
+          </p>
+          <ul class="about-list">
+            <li>🗺️ Interactive maps (Leaflet + OpenStreetMap)</li>
+            <li>✅ Planning checklist with browser persistence</li>
+            <li>💰 Budget tracker with expense logging</li>
+            <li>📱 Progressive Web App (installable, offline-capable)</li>
+            <li>🔒 Optional PII encryption for booking details</li>
+          </ul>
+        </section>
+
+        <section class="card about-card">
+          <h2>LinuxFest Northwest</h2>
+          <p>
+            LFNW is a free-to-attend, community-run open source and Linux conference hosted at Bellingham Technical College
+            since 2000, co-produced with Jupiter Broadcasting.
+          </p>
+          <p style="margin-top:.75rem;">
+            The call for speakers is open from Oct 12, 2026 to Jan 15, 2027. Speakers are unpaid. The schedule and
+            attendee registration details had not been published when this site was built.
+          </p>
+          <a href="https://www.linuxfestnorthwest.org/" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:1rem;align-self:flex-start;">
+            Visit linuxfestnorthwest.org →
+          </a>
+        </section>
+
+        <section class="card about-card">
+          <h2>Bellingham, Washington</h2>
+          <p>
+            Bellingham sits on Bellingham Bay near the Canadian border, about 90 miles north of Seattle. It has a
+            walkable downtown, the historic Fairhaven district, and a strong craft beer and ice cream scene.
+          </p>
+          <ul class="about-list">
+            <li>🕐 Timezone: Pacific Time (same as Seattle)</li>
+            <li>🚗 Drive: I-5 north, roughly 2 hours each way</li>
+            <li>🌧️ April: cool and often showery — pack a rain jacket</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, var(--wa-primary) 0%, var(--wa-accent) 100%);
+    color: white;
+    padding: 2.5rem 0 2rem;
+  }
+  .about-hero .section-label { color: rgba(255,255,255,0.7); }
+  .about-hero h1 { color: white; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .about-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .about-card h2 { font-size: 1.15rem; color: var(--wa-primary); }
+  .about-card p { font-size: 0.92rem; color: var(--gray-700); line-height: 1.6; }
+
+  .about-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.88rem;
+    color: var(--gray-700);
+  }
+</style>

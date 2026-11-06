@@ -115,6 +115,20 @@ jobs:
           mkdir -p dist/scale-trip
           cp -r scale-trip/dist/. dist/scale-trip/
 
+      # Build lfnw-trip (base: /lfnw-trip)
+      - name: Install lfnw-trip dependencies
+        working-directory: lfnw-trip
+        run: npm install
+
+      - name: Build lfnw-trip
+        working-directory: lfnw-trip
+        run: npm run build
+
+      - name: Copy lfnw-trip output into dist/lfnw-trip/
+        run: |
+          mkdir -p dist/lfnw-trip
+          cp -r lfnw-trip/dist/. dist/lfnw-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
