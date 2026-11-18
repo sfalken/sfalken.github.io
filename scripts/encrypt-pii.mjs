@@ -35,6 +35,9 @@ const CITY_TRIP = {
   vancouver:            'canada-trip',
   pasadena:             'scale-trip',
   bellingham:           'lfnw-trip',
+  brussels:             'belgium-trip',
+  'belgium-budget':     'belgium-trip',
+  'belgium-seed-expenses': 'belgium-trip',
   'europe-budget':      'europe-trip',
   'europe-seed-expenses': 'europe-trip',
 };
@@ -43,6 +46,8 @@ const CITY_TRIP = {
 const CUSTOM_OUTPUT = {
   'europe-budget':        'budget-pii-blobs.json',
   'europe-seed-expenses': 'seed-expenses-pii-blobs.json',
+  'belgium-budget':       'budget-pii-blobs.json',
+  'belgium-seed-expenses': 'seed-expenses-pii-blobs.json',
 };
 
 function deriveKey(password) {

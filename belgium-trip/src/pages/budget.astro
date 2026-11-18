@@ -1,0 +1,581 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { budgetCategories } from '../data/budget';
+import { seedExpenses, retiredExpenseIds } from '../data/seedExpenses';
+const base = import.meta.env.BASE_URL;
+
+const budgetJson = JSON.stringify(budgetCategories);
+const seedJson = JSON.stringify(seedExpenses);
+const retiredJson = JSON.stringify(retiredExpenseIds);
+---
+
+<Layout title="Budget" description="Trip budget tracker — Brussels, EUR/USD">
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">Financial Planning</span>
+      <h1>Budget Tracker</h1>
+      <p>Estimated costs and logged expenses. Toggle between USD and EUR.</p>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <!-- Controls -->
+      <div class="budget-controls">
+        <div class="currency-toggle">
+          <span class="ctrl-label">Display currency:</span>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-currency="USD">USD $</button>
+            <button class="toggle-btn" data-currency="EUR">EUR €</button>
+          </div>
+        </div>
+<div class="rate-inputs">
+          <div class="rate-input-group">
+            <label>USD → EUR</label>
+            <input type="number" id="rate-usd-eur" step="0.001" min="0.1" />
+          </div>
+        </div>
+        <a href={`${base}log/`} class="btn btn-primary">+ Log Expense</a>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <span class="s-label">Estimated Total</span>
+          <span class="s-amount" id="total-estimated">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="s-label">Logged Actual</span>
+          <span class="s-amount" id="total-actual">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="s-label">Remaining Budget</span>
+          <span class="s-amount" id="total-remaining">—</span>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-card card">
+          <h3>Estimated vs Actual by Category</h3>
+          <canvas id="chart-bar"></canvas>
+        </div>
+        <div class="chart-card card">
+          <h3>Spending by Category</h3>
+          <canvas id="chart-doughnut"></canvas>
+        </div>
+        <div class="chart-card card">
+          <h3>Actual Spending by City</h3>
+          <canvas id="chart-city"></canvas>
+        </div>
+      </div>
+
+      <!-- Budget table -->
+      <section>
+        <h2>Budget Breakdown</h2>
+        <div id="budget-categories">
+          {budgetCategories.map(cat => (
+            <div class="cat-block" data-cat-id={cat.id}>
+              <div class="cat-heading">
+                <span class="cat-ico">{cat.icon}</span>
+                <h3>{cat.label}</h3>
+                <span class="cat-est" id={`cat-est-${cat.id}`}></span>
+                <span class="cat-actual" id={`cat-actual-${cat.id}`}></span>
+              </div>
+              <div class="budget-items">
+                {cat.items.map(item => (
+                  <div class="budget-item" data-item-id={item.id} data-raw-amount={item.estimated} data-raw-currency={item.currency} data-pii={item._pii || undefined}>
+                    <div class="item-label">
+                      <span class={item._pii ? 'item-name pii-label' : 'item-name'}>{item.label}</span>
+                      {item.note && <span class={item._pii ? 'item-note pii-note' : 'item-note'}>{item.note}</span>}
+                    </div>
+                    <span class="item-est">
+                      <span class="raw-amount">{item.estimated.toLocaleString()} {item.currency}</span>
+                      <span class="converted-amount"></span>
+                    </span>
+                    <span class="item-actual" data-cat={cat.id} data-item={item.id}>—</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Logged Expenses -->
+      <section style="margin-top:3rem;">
+        <div class="section-header-row">
+          <h2>Logged Expenses</h2>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a href={`${base}sync/`} class="btn btn-outline" style="font-size:0.82rem;">Import / Export</a>
+            <button id="clear-expenses" class="btn btn-outline" style="font-size:0.82rem;">Clear All</button>
+          </div>
+        </div>
+        <div id="expense-list" class="expense-list">
+          <p class="empty-msg">No expenses logged yet. <a href={`${base}log/`}>Add one →</a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Edit modal -->
+  <div id="edit-modal" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <h3>Edit Expense</h3>
+      <input type="hidden" id="edit-id" />
+      <div class="form-group">
+        <label>Amount</label>
+        <input type="number" id="edit-amount" step="0.01" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Currency</label>
+        <select id="edit-currency">
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="edit-category">
+          {budgetCategories.map(c => <option value={c.id}>{c.icon} {c.label}</option>)}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="edit-desc" />
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <select id="edit-city">
+          <option value="Brussels">Brussels</option>
+          <option value="Transit">Transit</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="save-edit" class="btn btn-primary">Save</button>
+        <button id="cancel-edit" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script define:vars={{ budgetJson, seedJson, retiredJson, base }}>
+  const EXPENSE_KEY = 'belgium-expenses';
+  const RATE_KEY = 'belgium-rates';
+  const CURRENCY_KEY = 'belgium-display-currency';
+
+  const budgetCategories = JSON.parse(budgetJson);
+
+  // Default rates (approximate — edit the rate above to match the day's rate)
+  const defaultRates = { 'USD-EUR': 0.92 };
+
+  function getRates() {
+    try { return JSON.parse(localStorage.getItem(RATE_KEY) || 'null') || defaultRates; }
+    catch { return defaultRates; }
+  }
+  function saveRates(r) { localStorage.setItem(RATE_KEY, JSON.stringify(r)); }
+
+  function getExpenses() {
+    try { return JSON.parse(localStorage.getItem(EXPENSE_KEY) || '[]'); }
+    catch { return []; }
+  }
+  function saveExpenses(e) { localStorage.setItem(EXPENSE_KEY, JSON.stringify(e)); }
+
+  function convert(amount, fromCurrency, toCurrency, rates) {
+    if (fromCurrency === toCurrency) return amount;
+    const eur = rates['USD-EUR'];
+    // Convert to USD first
+    let usd = fromCurrency === 'USD' ? amount
+      : amount / eur;
+    // Then to target
+    return toCurrency === 'USD' ? usd
+      : usd * eur;
+  }
+
+  function fmt(amount, currency) {
+    const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '';
+    return sym + amount.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+
+  let displayCurrency = localStorage.getItem(CURRENCY_KEY) || 'USD';
+  let barChart = null;
+  let donutChart = null;
+  let cityChart = null;
+
+  function renderAll() {
+    const rates = getRates();
+    const expenses = getExpenses();
+
+    // Update rate inputs
+    document.getElementById('rate-usd-eur').value = rates['USD-EUR'];
+
+    // Toggle buttons
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.currency === displayCurrency);
+    });
+
+    // Category totals
+    let totalEst = 0;
+    let totalActual = 0;
+    const catEstTotals = {};
+    const catActualTotals = {};
+
+    budgetCategories.forEach(cat => {
+      let catEst = 0;
+      cat.items.forEach(item => {
+        const conv = convert(item.estimated, item.currency, displayCurrency, rates);
+        catEst += conv;
+        totalEst += conv;
+        const el = document.querySelector(`[data-item-id="${item.id}"] .converted-amount`);
+        if (el && item.currency !== displayCurrency) {
+          el.textContent = ` ≈ ${fmt(conv, displayCurrency)}`;
+        } else if (el) {
+          el.textContent = '';
+        }
+      });
+      catEstTotals[cat.id] = catEst;
+      const catEl = document.getElementById(`cat-est-${cat.id}`);
+      if (catEl) catEl.textContent = fmt(catEst, displayCurrency);
+    });
+
+    // Expenses per category
+    const expensesByCat = {};
+    const expensesByItem = {};
+    expenses.forEach(e => {
+      const converted = convert(e.amount, e.currency, displayCurrency, rates);
+      expensesByCat[e.category] = (expensesByCat[e.category] || 0) + converted;
+      totalActual += converted;
+      if (e.budgetItemId) {
+        expensesByItem[e.budgetItemId] = (expensesByItem[e.budgetItemId] || 0) + converted;
+      }
+    });
+
+    // Update summary
+    document.getElementById('total-estimated').textContent = fmt(totalEst, displayCurrency);
+    document.getElementById('total-actual').textContent = fmt(totalActual, displayCurrency);
+    const remaining = totalEst - totalActual;
+    const remEl = document.getElementById('total-remaining');
+    remEl.textContent = fmt(remaining, displayCurrency);
+    remEl.style.color = remaining < 0 ? 'var(--be-red)' : '#166534';
+
+    // Update actuals — category header total + per-item where mapped
+    budgetCategories.forEach(cat => {
+      const catActualEl = document.getElementById(`cat-actual-${cat.id}`);
+      if (catActualEl) {
+        const catActual = expensesByCat[cat.id] || 0;
+        catActualEl.textContent = catActual > 0 ? `actual: ${fmt(catActual, displayCurrency)}` : '';
+      }
+      cat.items.forEach(item => {
+        const el = document.querySelector(`.item-actual[data-item="${item.id}"]`);
+        if (!el) return;
+        const itemActual = expensesByItem[item.id];
+        el.textContent = itemActual !== undefined ? fmt(itemActual, displayCurrency) : '—';
+      });
+    });
+
+    // Charts
+    const labels = budgetCategories.map(c => c.label);
+    const estData = budgetCategories.map(c => Math.round(catEstTotals[c.id] || 0));
+    const actData = budgetCategories.map(c => Math.round(expensesByCat[c.id] || 0));
+
+    if (barChart) barChart.destroy();
+    const barCtx = document.getElementById('chart-bar').getContext('2d');
+    barChart = new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Estimated', data: estData, backgroundColor: 'rgba(212,32,44,0.6)' },
+          { label: 'Actual', data: actData, backgroundColor: 'rgba(27,27,27,0.6)' },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } },
+      },
+    });
+
+    if (donutChart) donutChart.destroy();
+    const donutCtx = document.getElementById('chart-doughnut').getContext('2d');
+    const nonZeroEst = budgetCategories.filter(c => (catEstTotals[c.id] || 0) > 0);
+    donutChart = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: nonZeroEst.map(c => c.label),
+        datasets: [{
+          data: nonZeroEst.map(c => Math.round(catEstTotals[c.id])),
+          backgroundColor: ['#D4202C','#1B1B1B','#FDDA24','#73ba25','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#10b981','#6b7280'],
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+      },
+    });
+
+    // Actual spending by city
+    const byCity = {};
+    expenses.forEach(e => {
+      const k = e.city || 'Other';
+      byCity[k] = (byCity[k] || 0) + convert(e.amount, e.currency, displayCurrency, rates);
+    });
+    const cityLabels = Object.keys(byCity);
+    if (cityChart) cityChart.destroy();
+    const cityCtx = document.getElementById('chart-city').getContext('2d');
+    cityChart = new Chart(cityCtx, {
+      type: 'doughnut',
+      data: {
+        labels: cityLabels.length ? cityLabels : ['No expenses yet'],
+        datasets: [{
+          data: cityLabels.length ? cityLabels.map(k => Math.round(byCity[k])) : [1],
+          backgroundColor: cityLabels.length ? ['#D4202C','#1B1B1B','#FDDA24','#6b7280'] : ['#e5e7eb'],
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } },
+      },
+    });
+
+    // Render expense list
+    renderExpenses(expenses, rates);
+  }
+
+  function renderExpenses(expenses, rates) {
+    const container = document.getElementById('expense-list');
+    if (!expenses.length) {
+      container.innerHTML = `<p class="empty-msg">No expenses logged yet. <a href="${base}log/">Add one →</a></p>`;
+      return;
+    }
+    const sorted = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+    container.innerHTML = sorted.map(e => {
+      const piiAttr  = e._pii ? ` data-pii="${e._pii}"` : '';
+      const descClass = e._pii ? 'exp-desc pii-desc' : 'exp-desc';
+      return `
+        <div class="expense-row"${piiAttr}>
+          <div class="exp-main">
+            <span class="exp-city">${e.city || ''}</span>
+            <span class="${descClass}">${e.description || '—'}</span>
+            <span class="exp-cat">${budgetCategories.find(c => c.id === e.category)?.label || e.category}</span>
+          </div>
+          <div class="exp-right">
+            <span class="exp-amount">${fmt(e.amount, e.currency)}${` <small>${e.currency}</small>`}</span>
+            <span class="exp-date">${e.date}</span>
+            <div class="exp-actions">
+              <button class="exp-btn" onclick="editExpense('${e.id}')">✏️</button>
+              <button class="exp-btn" onclick="deleteExpense('${e.id}')">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.editExpense = function(id) {
+    const expenses = getExpenses();
+    const e = expenses.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('edit-id').value = e.id;
+    document.getElementById('edit-amount').value = e.amount;
+    document.getElementById('edit-currency').value = e.currency;
+    document.getElementById('edit-category').value = e.category;
+    document.getElementById('edit-desc').value = e.description || '';
+    document.getElementById('edit-city').value = e.city || 'Brussels';
+    document.getElementById('edit-modal').style.display = 'flex';
+  };
+
+  window.deleteExpense = function(id) {
+    const requireAuth = window.piiRequireAuth || (cb => cb());
+    requireAuth(() => {
+      if (!confirm('Delete this expense?')) return;
+      const expenses = getExpenses().filter(e => e.id !== id);
+      saveExpenses(expenses);
+      renderAll();
+    });
+  };
+
+  function seedKnownExpenses() {
+    const seeds = JSON.parse(seedJson);
+    const retired = JSON.parse(retiredJson);
+    let existing = getExpenses();
+    let changed = false;
+    // Remove retired IDs
+    const beforeLen = existing.length;
+    existing = existing.filter(e => !retired.includes(e.id));
+    if (existing.length !== beforeLen) changed = true;
+    const existingMap = new Map(existing.map(e => [e.id, e]));
+    const result = [...existing];
+    seeds.forEach(s => {
+      if (!existingMap.has(s.id)) {
+        result.push(s);
+        changed = true;
+      } else {
+        const stored = existingMap.get(s.id);
+        const idx = result.findIndex(e => e.id === s.id);
+        if (idx !== -1) {
+          let patch = {};
+          if (s._pii && !stored._pii) patch._pii = s._pii;
+          if (s.budgetItemId && !stored.budgetItemId) patch.budgetItemId = s.budgetItemId;
+          if (Object.keys(patch).length) { result[idx] = { ...result[idx], ...patch }; changed = true; }
+        }
+      }
+    });
+    if (changed) saveExpenses(result);
+  }
+
+  function init() {
+    seedKnownExpenses();
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        displayCurrency = btn.dataset.currency;
+        localStorage.setItem(CURRENCY_KEY, displayCurrency);
+        renderAll();
+      });
+    });
+
+document.getElementById('rate-usd-eur').addEventListener('change', function() {
+      const r = getRates();
+      r['USD-EUR'] = parseFloat(this.value);
+      saveRates(r);
+      renderAll();
+    });
+
+    document.getElementById('clear-expenses')?.addEventListener('click', () => {
+      if (!confirm('Delete all logged expenses?')) return;
+      saveExpenses([]);
+      renderAll();
+    });
+
+    document.getElementById('save-edit')?.addEventListener('click', () => {
+      const id = document.getElementById('edit-id').value;
+      const expenses = getExpenses();
+      const idx = expenses.findIndex(e => e.id === id);
+      if (idx === -1) return;
+      expenses[idx] = {
+        ...expenses[idx],
+        amount: parseFloat(document.getElementById('edit-amount').value),
+        currency: document.getElementById('edit-currency').value,
+        category: document.getElementById('edit-category').value,
+        description: document.getElementById('edit-desc').value,
+        city: document.getElementById('edit-city').value,
+      };
+      saveExpenses(expenses);
+      document.getElementById('edit-modal').style.display = 'none';
+      renderAll();
+    });
+
+    document.getElementById('cancel-edit')?.addEventListener('click', () => {
+      document.getElementById('edit-modal').style.display = 'none';
+    });
+
+    renderAll();
+  }
+
+  if (typeof Chart !== 'undefined') {
+    init();
+  } else {
+    window.addEventListener('load', init);
+  }
+</script>
+
+<style>
+  .budget-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .ctrl-label { font-size: 0.82rem; color: var(--be-muted); white-space: nowrap; }
+  .currency-toggle { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .toggle-group { display: flex; border: 1px solid var(--be-border); border-radius: 6px; overflow: hidden; }
+  .toggle-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--be-muted);
+    transition: all 0.15s;
+    font-family: 'Jost', sans-serif;
+  }
+  .toggle-btn:not(:last-child) { border-right: 1px solid var(--be-border); }
+  .toggle-btn.active { background: var(--be-red); color: white; }
+  .rate-inputs { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .rate-input-group { display: flex; flex-direction: column; gap: 0.2rem; }
+  .rate-input-group label { font-size: 0.72rem; color: var(--be-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .rate-input-group input { width: 100px; padding: 0.35rem 0.6rem; border: 1px solid var(--be-border); border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.88rem; }
+
+  .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .summary-card { background: var(--be-surface); border: 1px solid var(--be-border); border-radius: 12px; padding: 1.25rem; text-align: center; }
+  .s-label { font-size: 0.72rem; color: var(--be-muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 0.4rem; }
+  .s-amount { font-family: 'Cormorant Garamond', serif; font-size: 1.75rem; font-weight: 700; color: var(--be-dark); }
+
+  .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+  .chart-card { }
+  .chart-card h3 { font-size: 0.95rem; margin-bottom: 1rem; color: var(--be-muted); font-family: 'Jost', sans-serif; }
+
+  .cat-block { margin-bottom: 1.5rem; }
+  .cat-heading { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--be-border); padding-bottom: 0.4rem; }
+  .cat-ico { font-size: 1.1rem; }
+  .cat-heading h3 { font-size: 1rem; flex: 1; }
+  .cat-est { font-size: 0.85rem; font-weight: 600; color: var(--be-muted); }
+  .cat-actual { font-size: 0.8rem; font-weight: 600; color: var(--be-black); margin-left: 0.5rem; }
+
+  .budget-items { display: flex; flex-direction: column; gap: 0.25rem; }
+  .budget-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.88rem; }
+  .budget-item:hover { background: #f9fafb; }
+  .item-label { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+  .item-name { }
+  .item-note { font-size: 0.75rem; color: var(--be-muted); }
+  .item-est { text-align: right; white-space: nowrap; }
+  .raw-amount { font-size: 0.82rem; color: var(--be-muted); }
+  .converted-amount { display: block; font-size: 0.82rem; font-weight: 600; color: var(--be-dark); }
+  .item-actual { font-size: 0.82rem; font-weight: 600; color: var(--be-black); min-width: 60px; text-align: right; }
+
+  .section-header-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .expense-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .expense-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+  .exp-main { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; flex: 1; }
+  .exp-city { font-size: 0.72rem; font-weight: 600; background: #dbeafe; color: var(--be-black); padding: 0.1rem 0.5rem; border-radius: 20px; }
+  .exp-desc { font-size: 0.88rem; font-weight: 500; }
+  .exp-cat { font-size: 0.72rem; color: var(--be-muted); background: var(--be-border); padding: 0.1rem 0.5rem; border-radius: 20px; }
+  .exp-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .exp-amount { font-weight: 700; font-size: 0.95rem; }
+  .exp-amount small { font-weight: 400; font-size: 0.72rem; color: var(--be-muted); }
+  .exp-date { font-size: 0.75rem; color: var(--be-muted); }
+  .exp-actions { display: flex; gap: 0.25rem; }
+  .exp-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.2rem; border-radius: 4px; }
+  .exp-btn:hover { background: var(--be-border); }
+  .empty-msg { color: var(--be-muted); font-size: 0.9rem; padding: 1.5rem; text-align: center; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { background: white; border-radius: 16px; padding: 2rem; max-width: 400px; width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+  .modal h3 { font-size: 1.3rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--be-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .form-group input, .form-group select { padding: 0.5rem 0.75rem; border: 1px solid var(--be-border); border-radius: 6px; font-family: 'Jost', sans-serif; font-size: 0.9rem; }
+  .modal-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+</style>

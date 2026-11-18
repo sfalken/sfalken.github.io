@@ -1,0 +1,43 @@
+{
+  "name": "Belgium Trip — CentOS Connect 2027",
+  "short_name": "Belgium 2027",
+  "description": "Potential solo trip planner for CentOS Connect in Brussels, January 2027",
+  "start_url": "/belgium-trip/",
+  "scope": "/belgium-trip/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fafaf8",
+  "theme_color": "#D4202C",
+  "icons": [
+    {
+      "src": "/belgium-trip/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/belgium-trip/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log Expense",
+      "short_name": "Log",
+      "description": "Quickly log a new expense",
+      "url": "/belgium-trip/log/",
+      "icons": [{ "src": "/belgium-trip/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Checklist",
+      "short_name": "Checklist",
+      "description": "View planning checklist",
+      "url": "/belgium-trip/checklist/",
+      "icons": [{ "src": "/belgium-trip/icon-192.svg", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["travel", "productivity"],
+  "lang": "en"
+}

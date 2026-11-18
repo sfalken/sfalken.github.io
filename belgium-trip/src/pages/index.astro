@@ -1,0 +1,302 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+  title="Overview"
+  description="Potential trip to Brussels, Belgium for CentOS Connect 2027 (January 28–29) and possibly the superSTACK launch event on January 28."
+>
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">January 26 – 30, 2027 · Solo · Potential</span>
+      <h1>Brussels, Belgium</h1>
+      <p>A possible short trip to Brussels for CentOS Connect on January 28–29, with the superSTACK launch event on the 28th as a maybe. Nothing is booked yet — this is the planning sandbox.</p>
+      <div class="hero-events">
+        <div class="event-chip centos">🐧 CentOS Connect · Brussels · Jan 28–29</div>
+        <div class="event-chip superstack">🚀 superSTACK launch · Jan 28 · maybe</div>
+      </div>
+      <div class="hero-actions">
+        <a href={`${base}brussels/`} class="btn btn-primary">🇧🇪 Brussels Guide</a>
+        <a href={`${base}budget/`} class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">💰 Budget</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+
+      <section class="section">
+        <span class="eyebrow">Trip at a Glance</span>
+        <h2>4 Days · 3 Nights · 1 City</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><span class="stat-num">5</span><span class="stat-label">Days (incl. travel)</span></div>
+          <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Nights</span></div>
+          <div class="stat-card"><span class="stat-num">2</span><span class="stat-label">Conference Days</span></div>
+          <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Ice Cream Selfies 🍦</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <span class="eyebrow">Route</span>
+        <h2>The Journey</h2>
+        <div class="route">
+          <div class="route-step">
+            <div class="route-dot home"></div>
+            <div class="route-content"><strong>Seattle (SEA)</strong><span>Depart January 26</span></div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot plane"></div>
+            <div class="route-content"><strong>✈️ Overnight flight</strong><span>Typically one stop (AMS / CDG / LHR / FRA) → Brussels Airport (BRU)</span></div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot brussels"></div>
+            <div class="route-content">
+              <strong>🇧🇪 Brussels</strong>
+              <span>January 27–30 · 3 nights</span>
+              <span class="conf-badge centos-badge">🐧 CentOS Connect · Jan 28–29</span>
+              <span class="conf-badge superstack-badge">🚀 superSTACK launch · Jan 28 · TBD</span>
+            </div>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-step">
+            <div class="route-dot home"></div>
+            <div class="route-content"><strong>Home</strong><span>January 30 · Depart BRU</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <span class="eyebrow">Destination</span>
+        <h2>City Guide</h2>
+        <div class="city-cards">
+          <a href={`${base}brussels/`} class="city-card brussels-card">
+            <div class="city-flag">🇧🇪</div>
+            <h3>Brussels</h3>
+            <p>Belgium · January 27–30</p>
+            <p class="city-highlights">Grand-Place · Comic Strip Center · Frites & waffles · CentOS Connect · Gaston and Giotto ice cream</p>
+            <span class="city-link">Explore Brussels →</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <span class="eyebrow">Events</span>
+        <h2>The Main Events</h2>
+        <div class="conf-cards">
+          <div class="card conf-card centos-conf">
+            <div class="conf-logo">🐧</div>
+            <div>
+              <h3><a href="https://www.centos.org/events/connect" target="_blank" rel="noopener">CentOS Connect 2027</a></h3>
+              <p class="conf-where">📍 DoubleTree by Hilton Brussels City (Sycamore ballroom)</p>
+              <p class="conf-when">📅 January 28–29, 2027 · part of the FOSDEM Fringe</p>
+              <p class="conf-desc">Two days of CentOS community talks and conversation. The CentOS page lists an attendee room block at the venue hotel running through the FOSDEM weekend.</p>
+              <a href="https://www.centos.org/events/connect" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:0.75rem;font-size:0.82rem;">centos.org/events/connect →</a>
+            </div>
+          </div>
+          <div class="card conf-card superstack-conf">
+            <div class="conf-logo">🚀</div>
+            <div>
+              <h3>superSTACK Launch Event <span class="maybe">(maybe)</span></h3>
+              <p class="conf-where">📍 Brussels · venue TBD</p>
+              <p class="conf-when">📅 January 28, 2027 · time TBD</p>
+              <p class="conf-desc">A possible launch event on the first day of CentOS Connect. No public details were found when this page was written — confirm venue, time, and registration, and check for overlap with CentOS sessions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <span class="eyebrow">Planning Tips</span>
+        <h2>Essential Travel Tips</h2>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <span class="tip-icon">💶</span>
+            <h4>Currency</h4>
+            <p>Belgium uses the euro (EUR). Cards and contactless work almost everywhere; carry a little cash for frites stands and small cafés.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🚆</span>
+            <h4>Airport to Town</h4>
+            <p>Trains from Brussels Airport reach Brussels-Nord in ~20 minutes — a short walk from the DoubleTree. Buy on the <a href="https://www.belgiantrain.be" target="_blank" rel="noopener">Belgian Rail</a> app.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🎪</span>
+            <h4>FOSDEM Weekend</h4>
+            <p>CentOS Connect is a FOSDEM Fringe event, so hotel prices and trains get busy as the weekend approaches. Check <a href="https://fosdem.org" target="_blank" rel="noopener">fosdem.org</a> for exact dates before booking flights.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🌧️</span>
+            <h4>January Weather</h4>
+            <p>Cold and damp: roughly 0–6°C (32–43°F) with frequent rain. Pack a waterproof coat, layers, and shoes that handle wet cobblestones.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🛂</span>
+            <h4>Schengen & ETIAS</h4>
+            <p>Belgium is in the Schengen Area. US citizens are visa-free for short stays, but check whether ETIAS authorisation is required by January 2027.</p>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🍟</span>
+            <h4>Eat Like a Local</h4>
+            <p>Frites with sauce, moules-frites, carbonnade flamande, waffles, and a Belgian beer. Fin de Siècle takes no reservations — arrive early.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="quick-links">
+          <a href={`${base}checklist/`} class="quick-link">
+            <span class="ql-icon">✅</span>
+            <div><strong>Planning Checklist</strong><span>Track what's done before departure</span></div>
+          </a>
+          <a href={`${base}budget/`} class="quick-link">
+            <span class="ql-icon">💰</span>
+            <div><strong>Budget Tracker</strong><span>Estimates & expense logging in EUR/USD</span></div>
+          </a>
+          <a href={`${base}log/`} class="quick-link">
+            <span class="ql-icon">➕</span>
+            <div><strong>Quick Log</strong><span>Mobile-optimized expense entry</span></div>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .section { margin: 3rem 0; }
+  .section h2 { margin-top: 0.25rem; margin-bottom: 1.5rem; }
+
+  .hero-events { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  .event-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .event-chip.centos { background: rgba(147, 34, 121, 0.3); border: 1px solid rgba(200, 90, 175, 0.5); color: #fbcfe8; }
+  .event-chip.superstack { background: rgba(14, 116, 144, 0.3); border: 1px dashed rgba(103, 232, 249, 0.6); color: #cffafe; }
+  .hero-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .stat-card {
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 700; color: var(--be-red); line-height: 1; }
+  .stat-label { font-size: 0.78rem; color: var(--be-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .route { display: flex; flex-direction: column; gap: 0; max-width: 500px; margin-top: 1.5rem; }
+  .route-step { display: flex; align-items: flex-start; gap: 1rem; }
+  .route-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--be-border);
+  }
+  .route-dot.home { background: var(--be-muted); }
+  .route-dot.brussels { background: var(--be-red); }
+  .route-dot.train { background: var(--be-gold); }
+  .route-dot.plane { background: var(--be-black); }
+  .route-line {
+    width: 2px;
+    height: 40px;
+    background: var(--be-border);
+    margin-left: 7px;
+  }
+  .route-content { display: flex; flex-direction: column; gap: 0.1rem; padding-bottom: 0.5rem; }
+  .route-content strong { font-size: 1rem; }
+  .route-content span { font-size: 0.82rem; color: var(--be-muted); }
+  .conf-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    margin-top: 0.2rem;
+    width: fit-content;
+  }
+  .centos-badge { background: #f5e1f0; color: var(--centos-color); }
+  .superstack-badge { background: #cffafe; color: #0e7490; }
+
+  .city-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .city-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .city-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); transform: translateY(-2px); text-decoration: none; }
+  .brussels-card { border-top: 4px solid var(--be-red); }
+  .city-flag { font-size: 3rem; }
+  .city-card h3 { font-size: 1.6rem; color: var(--be-dark); }
+  .city-card p { font-size: 0.85rem; color: var(--be-muted); }
+  .city-highlights { color: var(--be-text) !important; font-size: 0.82rem !important; }
+  .city-link { color: var(--be-red); font-weight: 600; font-size: 0.9rem; margin-top: auto; }
+
+  .conf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+  .conf-card { display: flex; gap: 1.25rem; }
+  .centos-conf { border-left: 4px solid var(--centos-color); }
+  .superstack-conf { border-left: 4px dashed var(--superstack-color); }
+  .conf-logo { font-size: 2.5rem; flex-shrink: 0; }
+  .conf-card h3 { font-size: 1.2rem; }
+  .conf-card h3 a { color: var(--be-dark); }
+  .conf-card h3 a:hover { color: var(--be-red); }
+  .conf-where, .conf-when { font-size: 0.82rem; color: var(--be-muted); }
+  .conf-desc { font-size: 0.88rem; margin-top: 0.5rem; }
+
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+  .tip-card {
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tip-icon { font-size: 1.75rem; }
+  .tip-card h4 { font-family: 'Jost', sans-serif; font-size: 0.95rem; font-weight: 600; }
+  .tip-card p { font-size: 0.85rem; color: var(--be-muted); }
+
+  .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--be-surface);
+    border: 1px solid var(--be-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.15s;
+  }
+  .quick-link:hover { border-color: var(--be-red); box-shadow: 0 4px 12px rgba(212,32,44,0.1); text-decoration: none; }
+  .ql-icon { font-size: 1.75rem; flex-shrink: 0; }
+  .quick-link strong { display: block; font-size: 0.95rem; color: var(--be-dark); }
+  .quick-link span { font-size: 0.8rem; color: var(--be-muted); }
+  .maybe { font-size: 0.8rem; font-weight: 500; color: var(--be-muted); }
+</style>
+

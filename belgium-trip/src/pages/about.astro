@@ -1,0 +1,124 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="About" description="About this trip planner — potential Brussels trip for CentOS Connect 2027 and the superSTACK launch event">
+  <Nav slot="nav" />
+
+  <div class="page-hero">
+    <div class="container">
+      <span class="eyebrow">About This Trip</span>
+      <h1>CentOS Connect in Brussels</h1>
+      <p>A potential short trip to Belgium for a CentOS community conference, with an optional launch event on top.</p>
+    </div>
+  </div>
+
+  <main>
+    <div class="container about-container">
+
+      <div class="about-grid">
+
+        <div class="about-section">
+          <h2>The Trip</h2>
+          <p>This is a potential 5-day solo trip to Brussels, Belgium, anchored by <strong>CentOS Connect</strong> on January 28–29, 2027, with the <strong>superSTACK launch event</strong> on January 28 as a possible add-on. Nothing is booked yet.</p>
+          <p>The draft plan runs January 26–30, 2027: depart Seattle on the 26th, three nights in Brussels (arriving the 27th), and fly home on the 30th. FOSDEM follows that weekend, so the trip could be extended if you want to attend.</p>
+        </div>
+
+        <div class="about-section">
+          <h2>The Events</h2>
+          <div class="conf-about">
+            <div class="conf-item">
+              <span class="conf-emoji">🐧</span>
+              <div>
+                <h3><a href="https://www.centos.org/events/connect" target="_blank" rel="noopener">CentOS Connect 2027</a></h3>
+                <p>The CentOS community event, held as part of the FOSDEM Fringe at the DoubleTree by Hilton Brussels City on January 28–29, 2027.</p>
+              </div>
+            </div>
+            <div class="conf-item">
+              <span class="conf-emoji">🚀</span>
+              <div>
+                <h3>superSTACK launch event <span style="font-weight:400;font-size:0.85rem;">(maybe)</span></h3>
+                <p>A possible launch event in Brussels on January 28. Venue, time, and registration are not yet public, so the itinerary treats it as TBD.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-section">
+          <h2>🍦 The Ice Cream Selfie Tradition</h2>
+          <p>The tradition continues: one ice cream selfie per conference day. The Brussels guide lists three spots — Gaston Sainte-Catherine, Gelateria Giotto in Ixelles, and a bonus scoop at Gaston Sablon.</p>
+          <p>See the <a href={`${base}brussels/`}>Brussels</a> city page for the full Ice Cream Selfie Spots guide.</p>
+        </div>
+
+        <div class="about-section">
+          <h2>This Site</h2>
+          <p>Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> and deployed on GitHub Pages. Features include:</p>
+          <ul class="feature-list">
+            <li>Interactive map (Leaflet + OpenStreetMap)</li>
+            <li>Day-by-day itinerary</li>
+            <li>Hotel & restaurant recommendations</li>
+            <li>Planning checklist with localStorage persistence</li>
+            <li>Budget tracker with EUR/USD currency switching</li>
+            <li>Mobile-optimized expense logging</li>
+            <li>Import/export for cross-device sync</li>
+            <li>PWA — works offline</li>
+          </ul>
+        </div>
+
+        <div class="about-section">
+          <h2>City at a Glance</h2>
+          <div class="city-quick">
+            <div class="cq-card">
+              <h3>🇧🇪 Brussels</h3>
+              <dl>
+                <dt>Country</dt><dd>Belgium</dd>
+                <dt>Currency</dt><dd>EUR (Euro)</dd>
+                <dt>Language</dt><dd>French & Dutch (English widely spoken)</dd>
+                <dt>Airport</dt><dd>BRU (Brussels Airport)</dd>
+                <dt>Transit</dt><dd>STIB metro, tram, bus; SNCB trains</dd>
+                <dt>Event</dt><dd>🐧 CentOS Connect, January 28–29</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="back-links">
+        <a href={`${base}brussels/`} class="btn btn-primary">🇧🇪 Brussels Guide</a>
+        <a href={`${base}checklist/`} class="btn btn-outline">✅ Checklist</a>
+        <a href={`${base}budget/`} class="btn btn-outline">💰 Budget</a>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .about-container { max-width: 900px; padding: 3rem 1.5rem; }
+  .about-grid { display: flex; flex-direction: column; gap: 2.5rem; }
+  .about-section h2 { margin-bottom: 0.75rem; }
+  .about-section p { font-size: 0.95rem; color: var(--be-text); margin-bottom: 0.5rem; }
+
+  .conf-about { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+  .conf-item { display: flex; gap: 1rem; align-items: flex-start; }
+  .conf-emoji { font-size: 2rem; flex-shrink: 0; }
+  .conf-item h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+  .conf-item h3 a { color: var(--be-dark); }
+  .conf-item h3 a:hover { color: var(--be-red); }
+  .conf-item p { font-size: 0.88rem; color: var(--be-muted); }
+
+  .feature-list { padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
+  .feature-list li { font-size: 0.9rem; }
+
+  .city-quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 0.5rem; }
+  .cq-card { background: var(--be-surface); border: 1px solid var(--be-border); border-radius: 12px; padding: 1.25rem; }
+  .cq-card h3 { font-size: 1.05rem; margin-bottom: 0.75rem; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; font-size: 0.82rem; }
+  dt { color: var(--be-muted); font-weight: 600; }
+  dd { color: var(--be-text); }
+
+  .back-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 3rem; }
+</style>

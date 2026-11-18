@@ -121,13 +121,31 @@ const trips = [
     url: '/seagl-trip/',
     accentColor: '#4b2e83',
   },
+  {
+    id: 'belgium-trip',
+    flags: '🇧🇪🐧',
+    title: 'Brussels, Belgium',
+    subtitle: 'Belgium',
+    category: 'Conference Trip',
+    dates: 'January 26–30, 2027',
+    travelers: 'Solo',
+    nights: 3,
+    description:
+      'A potential trip to CentOS Connect in Brussels on January 28–29, with the superSTACK launch event on the 28th as a maybe. Nothing booked yet — frites, comics, and ice cream selfies are on the shortlist.',
+    tags: ['🐧 CentOS Connect', '🚀 superSTACK (maybe)'],
+    status: 'potential',
+    hasTalk: false,
+    url: '/belgium-trip/',
+    accentColor: '#D4202C',
+  },
 ] as const;
 
-type TripStatus = 'in-progress' | 'upcoming' | 'completed' | 'not-taken';
+type TripStatus = 'in-progress' | 'upcoming' | 'potential' | 'completed' | 'not-taken';
 
 const statusMeta: Record<TripStatus, { label: string; dot: string }> = {
   'in-progress': { label: 'In Progress', dot: '●' },
   'upcoming':    { label: 'Upcoming',    dot: '○' },
+  'potential':   { label: 'Potential',   dot: '◌' },
   'completed':   { label: 'Completed',   dot: '✓' },
   'not-taken':   { label: 'Not Taken',   dot: '✕' },
 };
@@ -135,6 +153,7 @@ const statusMeta: Record<TripStatus, { label: string; dot: string }> = {
 const sections: { status: TripStatus; heading: string; subheading: string }[] = [
   { status: 'in-progress', heading: 'Currently Traveling',    subheading: 'In Progress' },
   { status: 'upcoming',    heading: 'On the Horizon',         subheading: 'Upcoming' },
+  { status: 'potential',   heading: 'Under Consideration',    subheading: 'Potential' },
   { status: 'completed',   heading: 'Trips Taken',            subheading: 'Completed' },
   { status: 'not-taken',   heading: 'Plans That Didn\'t Happen', subheading: 'Not Taken' },
 ];
@@ -374,6 +393,7 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
 
   .badge-in-progress { background: var(--s-progress-bg); color: var(--s-progress); border: 1px solid var(--s-progress-border); }
   .badge-upcoming    { background: var(--s-upcoming-bg);  color: var(--s-upcoming);  border: 1px solid var(--s-upcoming-border); }
+  .badge-potential   { background: var(--s-potential-bg); color: var(--s-potential); border: 1px dashed var(--s-potential-border); }
   .badge-completed   { background: var(--s-completed-bg); color: var(--s-completed); border: 1px solid var(--s-completed-border); }
   .badge-not-taken   { background: var(--s-shelved-bg);   color: var(--s-shelved);   border: 1px solid var(--s-shelved-border); }
   .badge-talk        { background: #f3e8ff; color: #7c3aed; border: 1px solid #ddd6fe; }
@@ -514,6 +534,9 @@ const inProgressTrips = trips.filter(t => t.status === 'in-progress');
 
   .btn-upcoming { background: var(--s-upcoming); color: white; }
   .btn-upcoming:hover { background: #1d4ed8; text-decoration: none; color: white; }
+
+  .btn-potential { background: var(--s-potential); color: white; }
+  .btn-potential:hover { background: #5b21b6; text-decoration: none; color: white; }
 
   .btn-completed { background: var(--s-completed); color: white; }
   .btn-completed:hover { background: #4b5563; text-decoration: none; color: white; }

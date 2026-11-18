@@ -129,6 +129,20 @@ jobs:
           mkdir -p dist/lfnw-trip
           cp -r lfnw-trip/dist/. dist/lfnw-trip/
 
+      # Build belgium-trip (base: /belgium-trip)
+      - name: Install belgium-trip dependencies
+        working-directory: belgium-trip
+        run: npm install
+
+      - name: Build belgium-trip
+        working-directory: belgium-trip
+        run: npm run build
+
+      - name: Copy belgium-trip output into dist/belgium-trip/
+        run: |
+          mkdir -p dist/belgium-trip
+          cp -r belgium-trip/dist/. dist/belgium-trip/
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
