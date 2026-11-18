@@ -4,9 +4,9 @@ dist/
 .idea/
 .DS_Store
 scripts/pii-sources/
-europe-trip/node_modules/
-europe-trip/dist/
-europe-trip/.astro/
-usa-trip/node_modules/
-usa-trip/dist/
-usa-trip/.astro/
+flock-opensusecon-2026/node_modules/
+flock-opensusecon-2026/dist/
+flock-opensusecon-2026/.astro/
+devconf-us-2026/node_modules/
+devconf-us-2026/dist/
+devconf-us-2026/.astro/

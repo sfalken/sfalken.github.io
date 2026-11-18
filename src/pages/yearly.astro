@@ -1,19 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-import { budgetCategories as europeCategories } from '../../europe-trip/src/data/budget';
-import { seedExpenses as europeExpenses } from '../../europe-trip/src/data/seedExpenses';
-import { budgetCategories as canadaCategories } from '../../canada-trip/src/data/budget';
-import { seedExpenses as canadaExpenses } from '../../canada-trip/src/data/seedExpenses';
-import { budgetCategories as usaCategories } from '../../usa-trip/src/data/budget';
-import { seedExpenses as usaExpenses } from '../../usa-trip/src/data/seedExpenses';
-import { budgetCategories as texasCategories } from '../../texas-trip/src/data/budget';
-import { seedExpenses as texasExpenses } from '../../texas-trip/src/data/seedExpenses';
-import { budgetCategories as seaglCategories } from '../../seagl-trip/src/data/budget';
-import { seedExpenses as seaglExpenses } from '../../seagl-trip/src/data/seedExpenses';
+import { budgetCategories as europeCategories } from '../../flock-opensusecon-2026/src/data/budget';
+import { seedExpenses as europeExpenses } from '../../flock-opensusecon-2026/src/data/seedExpenses';
+import { budgetCategories as canadaCategories } from '../../fossy-2026/src/data/budget';
+import { seedExpenses as canadaExpenses } from '../../fossy-2026/src/data/seedExpenses';
+import { budgetCategories as usaCategories } from '../../devconf-us-2026/src/data/budget';
+import { seedExpenses as usaExpenses } from '../../devconf-us-2026/src/data/seedExpenses';
+import { budgetCategories as texasCategories } from '../../txlf-2026/src/data/budget';
+import { seedExpenses as texasExpenses } from '../../txlf-2026/src/data/seedExpenses';
+import { budgetCategories as seaglCategories } from '../../seagl-2026/src/data/budget';
+import { seedExpenses as seaglExpenses } from '../../seagl-2026/src/data/seedExpenses';
 
 // Fixed conversion rates to USD, matching the defaults already used on each
-// trip's own budget page (europe-trip/pages/budget.astro, canada-trip/data/budget.ts).
+// trip's own budget page (flock-opensusecon-2026/pages/budget.astro, fossy-2026/data/budget.ts).
 const RATES: Record<string, number> = { USD: 1, EUR: 1 / 0.92, CZK: 1 / 22.5, CAD: 1 / 1.35 };
 function toUSD(amount: number, currency: string): number {
   return amount * (RATES[currency] ?? 1);

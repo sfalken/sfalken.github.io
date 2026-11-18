@@ -28,18 +28,18 @@ const ITERATIONS = 250_000;
 
 // Which source file lives in which trip sub-project
 const CITY_TRIP = {
-  prague:               'europe-trip',
-  nuremberg:            'europe-trip',
-  boston:               'usa-trip',
-  austin:               'texas-trip',
-  vancouver:            'canada-trip',
-  pasadena:             'scale-trip',
-  bellingham:           'lfnw-trip',
-  brussels:             'belgium-trip',
-  'belgium-budget':     'belgium-trip',
-  'belgium-seed-expenses': 'belgium-trip',
-  'europe-budget':      'europe-trip',
-  'europe-seed-expenses': 'europe-trip',
+  prague:               'flock-opensusecon-2026',
+  nuremberg:            'flock-opensusecon-2026',
+  boston:               'devconf-us-2026',
+  austin:               'txlf-2026',
+  vancouver:            'fossy-2026',
+  pasadena:             'scale-2027',
+  bellingham:           'lfnw-2027',
+  brussels:             'centos-connect-2027',
+  'belgium-budget':     'centos-connect-2027',
+  'belgium-seed-expenses': 'centos-connect-2027',
+  'europe-budget':      'flock-opensusecon-2026',
+  'europe-seed-expenses': 'flock-opensusecon-2026',
 };
 
 // Override output filename (default: {source}-pii-blobs.json)

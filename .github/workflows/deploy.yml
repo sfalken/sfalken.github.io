@@ -33,115 +33,115 @@ jobs:
 
       # Build europe-trip (base: /europe-trip → outputs flat to europe-trip/dist/)
       - name: Install europe-trip dependencies
-        working-directory: europe-trip
+        working-directory: flock-opensusecon-2026
         run: npm install
 
       - name: Build europe-trip
-        working-directory: europe-trip
+        working-directory: flock-opensusecon-2026
         run: npm run build
 
       - name: Copy europe-trip output into dist/europe-trip/
         run: |
           mkdir -p dist/europe-trip
-          cp -r europe-trip/dist/. dist/europe-trip/
+          cp -r flock-opensusecon-2026/dist/. dist/europe-trip/
 
       # Build usa-trip (base: /usa-trip → outputs flat to usa-trip/dist/)
       - name: Install usa-trip dependencies
-        working-directory: usa-trip
+        working-directory: devconf-us-2026
         run: npm install
 
       - name: Build usa-trip
-        working-directory: usa-trip
+        working-directory: devconf-us-2026
         run: npm run build
 
       - name: Copy usa-trip output into dist/usa-trip/
         run: |
           mkdir -p dist/usa-trip
-          cp -r usa-trip/dist/. dist/usa-trip/
+          cp -r devconf-us-2026/dist/. dist/usa-trip/
 
       # Build texas-trip (base: /texas-trip → outputs flat to texas-trip/dist/)
       - name: Install texas-trip dependencies
-        working-directory: texas-trip
+        working-directory: txlf-2026
         run: npm install
 
       - name: Build texas-trip
-        working-directory: texas-trip
+        working-directory: txlf-2026
         run: npm run build
 
       - name: Copy texas-trip output into dist/texas-trip/
         run: |
           mkdir -p dist/texas-trip
-          cp -r texas-trip/dist/. dist/texas-trip/
+          cp -r txlf-2026/dist/. dist/texas-trip/
 
       # Build canada-trip (base: /canada-trip)
       - name: Install canada-trip dependencies
-        working-directory: canada-trip
+        working-directory: fossy-2026
         run: npm install
 
       - name: Build canada-trip
-        working-directory: canada-trip
+        working-directory: fossy-2026
         run: npm run build
 
       - name: Copy canada-trip output into dist/canada-trip/
         run: |
           mkdir -p dist/canada-trip
-          cp -r canada-trip/dist/. dist/canada-trip/
+          cp -r fossy-2026/dist/. dist/canada-trip/
 
       # Build seagl-trip (base: /seagl-trip)
       - name: Install seagl-trip dependencies
-        working-directory: seagl-trip
+        working-directory: seagl-2026
         run: npm install
 
       - name: Build seagl-trip
-        working-directory: seagl-trip
+        working-directory: seagl-2026
         run: npm run build
 
       - name: Copy seagl-trip output into dist/seagl-trip/
         run: |
           mkdir -p dist/seagl-trip
-          cp -r seagl-trip/dist/. dist/seagl-trip/
+          cp -r seagl-2026/dist/. dist/seagl-trip/
 
       # Build scale-trip (base: /scale-trip)
       - name: Install scale-trip dependencies
-        working-directory: scale-trip
+        working-directory: scale-2027
         run: npm install
 
       - name: Build scale-trip
-        working-directory: scale-trip
+        working-directory: scale-2027
         run: npm run build
 
       - name: Copy scale-trip output into dist/scale-trip/
         run: |
           mkdir -p dist/scale-trip
-          cp -r scale-trip/dist/. dist/scale-trip/
+          cp -r scale-2027/dist/. dist/scale-trip/
 
       # Build lfnw-trip (base: /lfnw-trip)
       - name: Install lfnw-trip dependencies
-        working-directory: lfnw-trip
+        working-directory: lfnw-2027
         run: npm install
 
       - name: Build lfnw-trip
-        working-directory: lfnw-trip
+        working-directory: lfnw-2027
         run: npm run build
 
       - name: Copy lfnw-trip output into dist/lfnw-trip/
         run: |
           mkdir -p dist/lfnw-trip
-          cp -r lfnw-trip/dist/. dist/lfnw-trip/
+          cp -r lfnw-2027/dist/. dist/lfnw-trip/
 
       # Build belgium-trip (base: /belgium-trip)
       - name: Install belgium-trip dependencies
-        working-directory: belgium-trip
+        working-directory: centos-connect-2027
         run: npm install
 
       - name: Build belgium-trip
-        working-directory: belgium-trip
+        working-directory: centos-connect-2027
         run: npm run build
 
       - name: Copy belgium-trip output into dist/belgium-trip/
         run: |
           mkdir -p dist/belgium-trip
-          cp -r belgium-trip/dist/. dist/belgium-trip/
+          cp -r centos-connect-2027/dist/. dist/belgium-trip/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
