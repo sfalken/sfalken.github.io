@@ -9,15 +9,26 @@ export interface Expense {
   budgetItemId?: string;
 }
 
-export const retiredExpenseIds: string[] = [];
+// flight-rt-confirmed was $512.31 (fare + upgrade combined); split into two entries.
+export const retiredExpenseIds: string[] = ['flight-rt-confirmed'];
 
 export const seedExpenses: Expense[] = [
   {
-    id: 'flight-rt-confirmed',
-    amount: 512.31,
+    id: 'flight-rt-fare',
+    amount: 391.31,
     currency: 'USD',
     category: 'flights',
     description: 'Round-trip flight (confirmed)',
+    date: '2026-07-07',
+    savedAt: '2026-07-07T00:00:00.000Z',
+    budgetItemId: 'flight-rt',
+  },
+  {
+    id: 'flight-return-upgrade',
+    amount: 121,
+    currency: 'USD',
+    category: 'flights',
+    description: 'Premium economy upgrade (flight home)',
     date: '2026-07-07',
     savedAt: '2026-07-07T00:00:00.000Z',
     budgetItemId: 'flight-rt',
